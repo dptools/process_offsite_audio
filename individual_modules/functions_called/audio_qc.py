@@ -116,7 +116,7 @@ def offsite_qc(study, OLID):
 		join_csv=pd.concat([old_df, new_csv])
 		join_csv.reset_index(drop=True, inplace=True)
 		# drop any duplicates in case audio got decrypted a second time - shouldn't happen via pipeline
-		join_csv.drop_duplicates(subset=["OLID", "filename"],inplace=True)
+		join_csv.drop_duplicates(subset=["patient", "filename"],inplace=True)
 		join_csv.to_csv(output_path,index=False)
 	else:
 		new_csv.to_csv(output_path,index=False)

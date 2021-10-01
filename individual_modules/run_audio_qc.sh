@@ -38,7 +38,7 @@ for p in *; do
 		mkdir ../sliding_window_audio_qc
 	fi
 	for file in *.wav; do
-		name=$(echo "$file" | awk -F '.' '{print $1}')
+		name=$(echo "$file" | awk -F '.wav' '{print $1}')
 		# outputs still go in PROTECTED for now as at this stage they still contain dates/times
 		python "$func_root"/sliding_audio_qc.py "$file" ../sliding_window_audio_qc/"$name".csv
 	done

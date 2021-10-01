@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 
+# prevent librosa from logging a warning every time it is imported
+import warnings
+warnings.filterwarnings("ignore", category=FutureWarning)
+
 import os
 import pandas as pd
 import numpy as np

@@ -64,7 +64,7 @@ for p in *; do
 	# instead of printing file not found error message when there are no m4a's, print custom message indicating there was no new audio for this patient this round
 	if [ ! -z "$(ls -A *.m4a 2>/dev/null)" ]; then
 		for file in *.m4a; do
-			name=$(echo "$file" | awk -F '.' '{print $1}')
+			name=$(echo "$file" | awk -F '.m4a' '{print $1}')
 			ffmpeg -i "$file" "$name".wav &> /dev/null
 		done
 		rm *.m4a
