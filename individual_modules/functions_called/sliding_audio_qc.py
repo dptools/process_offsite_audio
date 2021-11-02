@@ -14,7 +14,7 @@ import sys
 
 def sliding_audio_qc(filename,savepath,window_size=2,window_increment=2):
 	# specify column headers that will be used for every CSV
-	headers=["minutes","overall_db","mean_flatness"]
+	headers=["minutes_start","minutes_end","overall_db","mean_flatness"]
 
 	# read in audio
 	try:
@@ -48,15 +48,17 @@ def sliding_audio_qc(filename,savepath,window_size=2,window_increment=2):
 
 	# compute features
 	chan1_rms_rolling = [np.sqrt(np.nanmean(np.square(chan1[i:i+window_size_bins]))) for i in range(0,len(chan1),window_increment_bins)]
-	chan1_flatness_rolling = [np.nanmean(librosa.feature.spectral_flatness(y=chan1[i:i+window_size_bins])) for i in range(0,len(chan1),window_increment_bins)]
-	minutes = range(0,len(chan1_rms_rolling)*window_increment,window_increment)
+	chan1_flatness_rolling = [round(np.nanmean(librosa.feature.spectral_flatness(y=chan1[i:i+window_size_bins])),5) for i in range(0,len(chan1),window_increment_bins)]
+	minutes_bins = range(len(chan1_rms_rolling))
+	minutes = [round(x*window_increment,3) for x in minutes_bins]
+	end_minutes = [round(x + window_size,3) for x in minutes]
 
 	# convert RMS to decibels
 	ref_rms=float(2*(10**(-5)))
-	c1_db = [20 * np.log10(x/ref_rms) for x in chan1_rms_rolling] 
+	c1_db = [round(20 * np.log10(x/ref_rms),2) for x in chan1_rms_rolling] 
 
 	# construct and save CSV
-	values = [minutes,c1_db,chan1_flatness_rolling]
+	values = [minutes,end_minutes,c1_db,chan1_flatness_rolling]
 	new_csv = pd.DataFrame()
 	for i in range(len(headers)):
 		h = headers[i]
@@ -66,4 +68,7 @@ def sliding_audio_qc(filename,savepath,window_size=2,window_increment=2):
 
 if __name__ == '__main__':
     # Map command line arguments to function arguments.
-    sliding_audio_qc(sys.argv[1], sys.argv[2])
+    try: # if extra arguments provided allow window settings to also be set via command line
+    	sliding_audio_qc(sys.argv[1], sys.argv[2], window_size=float(sys.argv[3]), window_increment=float(sys.argv[4]))
+    except:
+    	sliding_audio_qc(sys.argv[1], sys.argv[2])
