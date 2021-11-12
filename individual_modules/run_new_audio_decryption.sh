@@ -1,20 +1,24 @@
 #!/bin/bash
 
-# settings that can be kept in file - will be moved to config before final release
-data_root=/data/sbdp/PHOENIX
-study=BLS
-
-# study password, needs to be manually entered for security
+# decrypts any new interview audios since last run, to set up for rest of pipeline
 # assumes using cryptease module for encryption
-echo "Study passphrase?"
-read -s password
+
+# will call this module with arguments in main pipeline, root then study then password
+data_root="$1"
+study="$2"
+password="$3"
 	
 echo "Beginning decryption script for study ${study}"
 
-# get path current script is being run from, in order to get path of repo for calling functions used
-full_path=$(realpath $0)
-module_root=$(dirname $full_path)
-func_root="$module_root"/functions_called
+# allow module to be called stand alone as well as from main pipeline
+if [[ -z "${repo_root}" ]]; then
+	# get path current script is being run from, in order to get path of repo for calling functions used
+	full_path=$(realpath $0)
+	module_root=$(dirname $full_path)
+	func_root="$module_root"/functions_called
+else
+	func_root="$repo_root"/individual_modules/functions_called
+fi
 
 # move to study folder to loop over patients
 cd "$data_root"/PROTECTED/"$study"
