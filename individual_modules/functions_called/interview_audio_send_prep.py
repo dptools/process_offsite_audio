@@ -7,25 +7,25 @@ import shutil
 import pandas as pd
 import numpy as np
 
-def move_audio_to_send(data_root, study, ptID, length_cutoff, db_cutoff):
+def move_audio_to_send(interview_type, data_root, study, ptID, length_cutoff, db_cutoff):
 	# navigate to folder of interest, load initial CSVs
 	try:
-		os.chdir(os.path.join(data_root, "GENERAL", study, ptID, "offsite_interview/processed"))
-		dpdash_name_format = study + "-" + ptID + "-offsiteMonoAudioQC-day1to*.csv"
+		os.chdir(os.path.join(data_root, "GENERAL", study, "processed", ptID, "interviews", interview_type))
+		dpdash_name_format = study + "-" + ptID + "-interviewMonoAudioQC-" + interview_type + "-day*.csv"
 		dpdash_name = glob.glob(dpdash_name_format)[0] # DPDash script deletes any older days in this subfolder, so should only get 1 match each time
 		dpdash_qc = pd.read_csv(dpdash_name)
-		os.chdir(os.path.join(data_root, "PROTECTED", study, ptID, "offsite_interview/processed"))
-		os.chdir("decrypted_audio") # now actually go into folder with audios to be checked
+		os.chdir(os.path.join(data_root, "PROTECTED", study, "processed", ptID, "interviews", interview_type))
+		os.chdir("temp_audio") # now actually go into folder with audios to be checked
 	except:
 		# shouldn't encounter this issue ever if calling via main pipeline
-		print("No new phone audio (with QC output) for input patient " + ptID + ", continuing")
+		print("No new interview audio (with QC output) for input patient " + ptID + " " + interview_type + ", continuing")
 		return
 
-	# loop through the audios available in decrypted_audio
+	# loop through the audios available in temp_audio
 	# if acceptable will match name to desired transcript name, and move to to_send folder
 	# if unacceptable will rename to prepend an error code, keep in decrypted_files
-	cur_decrypted = os.listdir(".")
-	for filen in cur_decrypted:
+	cur_audio = os.listdir(".")
+	for filen in cur_audio:
 		if filen=="smile.log":
 			os.remove(filen) # make sure OpenSMILE log files don't count towards the error rate!
 			continue
@@ -55,10 +55,10 @@ def move_audio_to_send(data_root, study, ptID, length_cutoff, db_cutoff):
 
 		# if reach this point file is okay, should be moved to to_send
 		# will be renamed so that the matching txt files later pulled from transcribme can be kept as is
-		new_name = filen.split("_audio_")[0] + "_audioTranscript_" + filen.split("_audio_")[1]
+		new_name = filen.split("_interviewMonoAudio_")[0] + "_interviewAudioTranscript_" + filen.split("_interviewMonoAudio_")[1]
 		move_path = "../audio_to_send/" + new_name
 		shutil.move(filen, move_path)
 
 if __name__ == '__main__':
     # Map command line arguments to function arguments.
-    move_audio_to_send(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
+    move_audio_to_send(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6])

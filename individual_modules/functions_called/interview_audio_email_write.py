@@ -6,41 +6,41 @@ import glob
 import pandas as pd
 import numpy as np
 
-def get_email_summary_stats(data_root, study, lab_email_path, transcribeme_email_path):
+def get_email_summary_stats(data_root, study, lab_email_path, transcribeme_email_path, interview_type):
 	# get paths of interest for all patients in this study
 	os.chdir(os.path.join(data_root, "PROTECTED", study))
 	# first get paths to main folders for all patients that have them
-	path_of_interest1 = "*/offsite_interview/processed/decrypted_audio"
-	path_of_interest2 = "*/offsite_interview/processed/audio_to_send"
-	path_of_interest3 = "*/offsite_interview/processed/pending_audio"
-	decrypted_folders_list = glob.glob(path_of_interest1)
+	path_of_interest1 = "processed/*/interviews/" + interview_type + "/temp_audio"
+	path_of_interest2 = "processed/*/interviews/" + interview_type + "/audio_to_send"
+	path_of_interest3 = "processed/*/interviews/" + interview_type + "/pending_audio"
+	temp_folders_list = glob.glob(path_of_interest1)
 	send_folders_list = glob.glob(path_of_interest2)
 	pending_folders_list = glob.glob(path_of_interest3)
 	# then expand the lists to contain the contents of those folders (filtered when appropriate, see below)
-	decrypted_paths_list = []
+	temp_paths_list = []
 	send_paths_list = []
 	pending_paths_list_all = []
-	for folder in decrypted_folders_list:
-		decrypted_paths_list.extend(os.listdir(folder))
+	for folder in temp_folders_list:
+		temp_paths_list.extend(os.listdir(folder))
 	for folder in send_folders_list:
 		send_paths_list.extend(os.listdir(folder))
 	for folder in pending_folders_list:
 		pending_paths_list_all.extend(os.listdir(folder))
 	# get only the newly uploaded pending files, in case still waiting on prior transcript orders as well
-	pending_paths_list = [x for x in pending_paths_list_all if x[0:4]=="new+"] 
+	pending_paths_list = [x for x in pending_paths_list_all if x.split("/")[-1][0:4]=="new+"] 
 	# don't need to worry about a similar thing for the other two folders though - 
-	# pipeline is the only script involved in this repo that creates decrypted_audio subfolder, and it always deletes it at the end
+	# pipeline is the only script involved in this repo that created temp_audio subfolder, and it always deletes it at the end
 	# similarly, main pipeline will exit if there are any prior files in to_send when auto transcription is on (and email is only expected to be sent in that case)
 
 	# determine numbers in each category from the above lists
 	num_pushed = len(pending_paths_list)
 	num_failed = len(send_paths_list)
-	num_rejected = len(decrypted_paths_list)
+	num_rejected = len(temp_paths_list)
 	num_selected = num_pushed + num_failed
 	num_audios = num_selected + num_rejected
-	num_secondary = len([x for x in decrypted_paths_list if x[0] == "0"]) # see error code guide
-	num_short = len([x for x in decrypted_paths_list if x[0] == "1"])
-	num_quiet = len([x for x in decrypted_paths_list if x[0] == "2"])
+	num_secondary = len([x for x in temp_paths_list if x[0] == "0"]) # see error code guide
+	num_short = len([x for x in temp_paths_list if x[0] == "1"])
+	num_quiet = len([x for x in temp_paths_list if x[0] == "2"])
 
 	# loop through all NEW pending (i.e. successfully pushed this run) audio paths, load DPDash audio QC CSV for each patient to count up the total length in minutes
 	num_minutes = 0.0
@@ -48,8 +48,8 @@ def get_email_summary_stats(data_root, study, lab_email_path, transcribeme_email
 		# find dpdash path from file path
 		filen = filep.split("/")[-1]
 		ptID = filen.split("_")[1]
-		os.chdir(os.path.join(data_root, "GENERAL", study, ptID, "offsite_interview/processed"))
-		dpdash_name_format = study + "-" + ptID + "-offsiteMonoAudioQC-day1to*.csv"
+		os.chdir(os.path.join(data_root, "GENERAL", study, "processed", ptID, "interviews", interview_type))
+		dpdash_name_format = study + "-" + ptID + "-interviewMonoAudioQC-" + interview_type + "-day*.csv"
 		dpdash_name = glob.glob(dpdash_name_format)[0] # DPDash script deletes any older days in this subfolder, so should only get 1 match each time
 		dpdash_qc = pd.read_csv(dpdash_name) 
 		# technically reloading this CSV for each file instead of for each patient, but should be a fast operation because CSV is small
@@ -72,8 +72,8 @@ def get_email_summary_stats(data_root, study, lab_email_path, transcribeme_email
 		# find dpdash path from file path
 		filen = filep.split("/")[-1]
 		ptID = filen.split("_")[1]
-		os.chdir(os.path.join(data_root, "GENERAL", study, ptID, "offsite_interview/processed"))
-		dpdash_name_format = study + "-" + ptID + "-offsiteMonoAudioQC-day1to*.csv"
+		os.chdir(os.path.join(data_root, "GENERAL", study, "processed", ptID, "interviews", interview_type))
+		dpdash_name_format = study + "-" + ptID + "-interviewMonoAudioQC-" + interview_type + "-day*.csv"
 		dpdash_name = glob.glob(dpdash_name_format)[0] # DPDash script deletes any older days in this subfolder, so should only get 1 match each time
 		dpdash_qc = pd.read_csv(dpdash_name) 
 		# technically reloading this CSV for each file instead of for each patient, but should be a fast operation because CSV is small
@@ -92,12 +92,12 @@ def get_email_summary_stats(data_root, study, lab_email_path, transcribeme_email
 
 	# and get total length of bad files
 	num_minutes_bad = 0.0
-	for filep in decrypted_paths_list:
+	for filep in temp_paths_list:
 		## find dpdash path from file path
 		filen = filep.split("/")[-1]
 		ptID = filen.split("_")[1]
-		os.chdir(os.path.join(data_root, "GENERAL", study, ptID, "offsite_interview/processed"))
-		dpdash_name_format = study + "-" + ptID + "-offsiteMonoAudioQC-day1to*.csv"
+		os.chdir(os.path.join(data_root, "GENERAL", study, "processed", ptID, "interviews", interview_type))
+		dpdash_name_format = study + "-" + ptID + "-interviewMonoAudioQC-" + interview_type + "-day*.csv"
 		dpdash_name = glob.glob(dpdash_name_format)[0] # DPDash script deletes any older days in this subfolder, so should only get 1 match each time
 		dpdash_qc = pd.read_csv(dpdash_name) 
 		# technically reloading this CSV for each file instead of for each patient, but should be a fast operation because CSV is small
@@ -134,8 +134,11 @@ def get_email_summary_stats(data_root, study, lab_email_path, transcribeme_email
 
 	# actually add to the email bodies now, first the lab email
 	with open(lab_email_path, 'a') as f: # a for append mode, so doesn't erase any info already included
+		f.write("Stats for interview type " + interview_type + ":")
+		f.write("\n")
+
 		# prep main sentence text
-		lab_email_intro = str(num_audios) + " total offsite interviews were newly processed for " + study + ". Of those, " + str(num_selected) + " were identified to be suitable for transcription, and " + str(num_pushed) + " successfully uploaded to TranscribeMe."
+		lab_email_intro = str(num_audios) + " total interviews were newly processed for " + study + ". Of those, " + str(num_selected) + " were identified to be suitable for transcription, and " + str(num_pushed) + " successfully uploaded to TranscribeMe."
 		lab_email_cost = "The uploaded audios totalled ~" + str(num_minutes) + " minutes, for an estimated transcription cost of $" + str(est_cost) + "."
 		if num_minutes_unsent > 0:
 			lab_email_unsent_cost = "Audio files that were found to be transcribable but were NOT successfully uploaded to TranscribeMe totalled ~" + str(num_minutes_unsent) + " minutes, for a potential future transcription cost of ~$" + str(est_cost_unsent) + "."
@@ -160,6 +163,9 @@ def get_email_summary_stats(data_root, study, lab_email_path, transcribeme_email
 			f.write(lab_email_warning)
 			f.write("\n")
 
+		# add one extra new line at end to space out the different types
+		f.write("\n")
+
 	# finally, add to the TranscribeMe email similarly
 	# however, if nothing successfully sent to TrancribeMe, don't want to send any email to them, so delete the file instead in that case
 	if num_pushed == 0:
@@ -167,10 +173,11 @@ def get_email_summary_stats(data_root, study, lab_email_path, transcribeme_email
 	else:
 		with open(transcribeme_email_path, 'a') as f: # a for append mode, so doesn't erase any info already included
 			# for this email, only one main line that includes the stats calculated in this script
-			transcribeme_summary = "We have uploaded some new audio for transcription - there should be " + str(num_pushed) + " new audio files totalling ~" + str(num_minutes) + " minutes."
+			transcribeme_summary = "We have uploaded some new " + interview_type + " audio for transcription - there should be " + str(num_pushed) + " new audio files totalling ~" + str(num_minutes) + " minutes."
 			f.write(transcribeme_summary) 
 			f.write("\n")
 
 if __name__ == '__main__':
 	# Map command line arguments to function arguments.
-	get_email_summary_stats(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])
+	get_email_summary_stats(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], "open")
+	get_email_summary_stats(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], "psychs")

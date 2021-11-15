@@ -18,7 +18,7 @@ import glob
 # does QC on all files in current decrypted folder, as per larger pipeline these will be only new files
 # adds outputs to existing QC spreadsheet for given patient if there is one
 # expects files to already be renamed to match our conventions, as is done by default when this is called by main pipeline
-def offsite_mono_qc(data_root, study, ptID):
+def interview_mono_qc(interview_type, data_root, study, ptID):
 	# specify column headers that will be used for every CSV
 	# make it DPDash formatted, but will leave reftime columns blank. others will look up
 	headers=["reftime","day","timeofday","weekday","study","patient","interview_number","length(minutes)","overall_db","amplitude_stdev","mean_flatness"]
@@ -36,16 +36,18 @@ def offsite_mono_qc(data_root, study, ptID):
 	mean_flats=[]
 
 	try:
-		os.chdir(os.path.join(data_root,"PROTECTED", study, ptID, "offsite_interview/processed/decrypted_audio"))
+		os.chdir(os.path.join(data_root,"PROTECTED", study, "processed", ptID, "interviews", interview_type, "temp_audio"))
 	except:
-		print("Problem with input arguments, or haven't decrypted any audio files yet for this patient") # should never reach this error if calling via bash module
+		# should generally not reach this error if calling from main pipeline bash script
+		print("Haven't converted any new audio files yet for input patient " + ptID + " " + interview_type + ", or problem with input arguments") 
 		return
 
 	cur_files = os.listdir(".")
-	cur_files.sort() # go in order, although can also always sort CSV later.
 	if len(cur_files) == 0:
-		print("No new files for this patient, skipping") # should never reach this error if calling via bash module
+		# should generally not reach this error if calling from main pipeline bash script
+		print("Haven't converted any new audio files yet for input patient " + ptID + " " + interview_type)
 		return
+
 	for filename in cur_files:
 		if not filename.endswith(".wav"): # skip any non-audio files (and folders)
 			continue
@@ -88,10 +90,13 @@ def offsite_mono_qc(data_root, study, ptID):
 		
 		# finally add the lookup of other stats based on the renamed file
 		# format should be [study]_[ptID]_offsiteInterview_audio_day[4digit#]_session[3digit#].wav
-		study_day = int(filename.split("_")[4].split("y")[1])
-		int_num = int(filename.split("_")[5].split(".")[0].split("n")[1])
-		folder_paths = os.listdir(os.path.join(data_root,"PROTECTED", study, ptID, "offsite_interview/raw"))
+		study_day = int(filename.split("day")[1].split("_")[0])
+		int_num = int(filename.split("session")[1].split(".")[0])
+		folder_paths = os.listdir(os.path.join(data_root, "PROTECTED", study, "raw", ptID, "interviews", interview_type))
 		folder_names = [x.split("/")[-1] for x in folder_paths]
+		if interview_type == "psychs":
+			# make the onsites named the same as offsites for sorting purposess
+			folder_names = [x[0:4] + "-" + x[4:6] + "-" + x[6:8] + " " + x[8:10] + "." + x[10:12] + "." + x[12:14] if x.endswith(".wav") else x for x in folder_names]
 		folder_names.sort() # the way zoom puts date/time in text in the folder name means it will always sort in chronological order
 		cur_name = folder_names[int_num-1] # index using interview number, but adjust for 0-indexing
 		date_str = cur_name.split(" ")[0] # will use the date for getting weekday
@@ -122,10 +127,10 @@ def offsite_mono_qc(data_root, study, ptID):
 		new_csv[h] = vals
 
 	# now prepare to save new CSV for this patient (or update existing CSV if there is one)
-	os.chdir(os.path.join(data_root,"GENERAL", study, ptID, "offsite_interview/processed"))
+	os.chdir(os.path.join(data_root, "GENERAL", study, "processed", ptID, "interviews", interview_type))
 
 	# now save CSV
-	output_path_format = study+"-"+ptID+"-offsiteMonoAudioQC-day*.csv"
+	output_path_format = study+"-"+ptID+"-interviewMonoAudioQC-" + interview_type + "-day*.csv"
 	output_paths = glob.glob(output_path_format)
 	# single existing DPDash file is expected - do concatenation and then delete old version (since naming convention will not overwrite)
 	if len(output_paths) == 1:
@@ -135,17 +140,17 @@ def offsite_mono_qc(data_root, study, ptID):
 		# drop any duplicates in case audio got decrypted a second time - shouldn't happen via pipeline
 		join_csv.drop_duplicates(subset=["patient", "day", "timeofday"],inplace=True)
 		join_csv.sort_values(by=["day","timeofday"],inplace=True) # make sure concatenated CSV is still sorted primarily by day number and secondarily by time
-		output_path_cur = study + "-" + ptID + "-offsiteMonoAudioQC-day" + str(join_csv["day"].tolist()[0]) + "to" + str(join_csv["day"].tolist()[-1]) + '.csv'
+		output_path_cur = study + "-" + ptID + "-interviewMonoAudioQC-" + interview_type + "-day" + str(join_csv["day"].tolist()[0]) + "to" + str(join_csv["day"].tolist()[-1]) + '.csv'
 		join_csv.to_csv(output_path_cur,index=False)
 		return # function is now done if we are in the single existing dp dash case
 	# print warning if more than 1 for this patient
 	if len(output_paths) > 1:
 		print("Warning - multiple DPDash CSVs exist for patient " + ptID + ". Saving current CSV separately for now")
 	# with 0 or more than 1, just save this as is
-	output_path_cur = study + "-" + ptID + "-offsiteMonoAudioQC-day" + str(study_days[0]) + "to" + str(study_days[-1]) + '.csv'
+	output_path_cur = study + "-" + ptID + "-interviewMonoAudioQC-" + interview_type + "-day" + str(study_days[0]) + "to" + str(study_days[-1]) + '.csv'
 	new_csv.to_csv(output_path_cur,index=False)
 	return
 
 if __name__ == '__main__':
     # Map command line arguments to function arguments.
-    offsite_mono_qc(sys.argv[1], sys.argv[2], sys.argv[3])
+    interview_mono_qc(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])

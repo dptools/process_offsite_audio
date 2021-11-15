@@ -17,9 +17,30 @@ repo_root=$(dirname $full_path)
 # export the path to the repo for scripts called by this script to also use
 export repo_root
 
+# confirm study folder exists where it should, and has the expected GENERAL/PROTECTED and raw and processed folder paths
 cd "$data_root"/PROTECTED
 if [[ ! -d $study ]]; then
 	echo "Invalid data root path or study ID"
+	exit
+fi
+if [[ ! -d ../GENERAL/$study ]]; then
+	echo "Invalid data root path or study ID"
+	exit
+fi
+if [[ ! -d $study/raw ]]; then
+	echo "Study folder improperly set up"
+	exit
+fi
+if [[ ! -d $study/processed ]]; then
+	echo "Study folder improperly set up"
+	exit
+fi
+if [[ ! -d ../GENERAL/$study/raw ]]; then
+	echo "Study folder improperly set up"
+	exit
+fi
+if [[ ! -d ../GENERAL/$study/processed ]]; then
+	echo "Study folder improperly set up"
 	exit
 fi
 cd "$study" # switch to study folder for first loop over patient list
@@ -54,21 +75,36 @@ echo ""
 # setup processed folder (if necessary for new studies/patients)
 for p in *; do
 	# check that it is truly a patient ID that has some offsite interview data
-	if [[ ! -d ${data_root}/PROTECTED/${study}/${p}/offsite_interview ]]; then
+	if [[ ! -d ${data_root}/PROTECTED/${study}/raw/${p}/interviews ]]; then
 		continue
 	fi
-	if [[ ! -d ${data_root}/PROTECTED/${study}/${p}/offsite_interview/processed ]]; then
-		mkdir "$data_root"/PROTECTED/"$study"/"$p"/offsite_interview/processed # create subfolder if havent yet
-	fi
 
+	# now need to make sure processed folders are setup for this patient in both PROTECTED and GENERAL
+	# need patient folder under processed, and then also need interviews folder under patient (and psychs/open under interviews)
 	# TODO - confirm desired folder permissions situation here
-	# for a new patient there probably won't be a GENERAL offsite folder, since that should never go in raw - so need to make
-	if [[ ! -d ${data_root}/GENERAL/${study}/${p}/offsite_interview ]]; then
-		mkdir "$data_root"/GENERAL/"$study"/"$p"/offsite_interview
+	if [[ ! -d ${data_root}/PROTECTED/${study}/processed/${p} ]]; then
+		mkdir "$data_root"/PROTECTED/"$study"/processed/"$p"
 	fi
-	# then of course same for processed subfolder in GENERAL
-	if [[ ! -d ${data_root}/GENERAL/${study}/${p}/offsite_interview/processed ]]; then
-		mkdir "$data_root"/GENERAL/"$study"/"$p"/offsite_interview/processed
+	if [[ ! -d ${data_root}/GENERAL/${study}/processed/${p} ]]; then
+		mkdir "$data_root"/GENERAL/"$study"/processed/"$p"
+	fi
+	if [[ ! -d ${data_root}/PROTECTED/${study}/processed/${p}/interviews ]]; then
+		mkdir "$data_root"/PROTECTED/"$study"/processed/"$p"/interviews
+	fi
+	if [[ ! -d ${data_root}/GENERAL/${study}/processed/${p}/interviews ]]; then
+		mkdir "$data_root"/GENERAL/"$study"/processed/"$p"/interviews
+	fi
+	if [[ ! -d ${data_root}/PROTECTED/${study}/processed/${p}/interviews/open ]]; then
+		mkdir "$data_root"/PROTECTED/"$study"/processed/"$p"/interviews/open
+	fi
+	if [[ ! -d ${data_root}/GENERAL/${study}/processed/${p}/interviews/open ]]; then
+		mkdir "$data_root"/GENERAL/"$study"/processed/"$p"/interviews/open
+	fi
+	if [[ ! -d ${data_root}/PROTECTED/${study}/processed/${p}/interviews/psychs ]]; then
+		mkdir "$data_root"/PROTECTED/"$study"/processed/"$p"/interviews/psychs
+	fi
+	if [[ ! -d ${data_root}/GENERAL/${study}/processed/${p}/interviews/psychs ]]; then
+		mkdir "$data_root"/GENERAL/"$study"/processed/"$p"/interviews/psychs
 	fi
 
 	# if auto send is on:
@@ -79,28 +115,55 @@ for p in *; do
 	# so solution for now is just to exit the script if there are preexisting to_send files for this study
 	# then let user know the outstanding files should be dealt with outside of the main pipeline
 	if [ $auto_send_on = "Y" ] || [ $auto_send_on = "y" ]; then
-		if [[ -d "$data_root"/PROTECTED/"$study"/"$p"/offsite_interview/processed/audio_to_send ]]; then 
+		if [[ -d "$data_root"/PROTECTED/"$study"/processed/"$p"/interviews/open/audio_to_send ]]; then 
 			# know to_send exists for this patient now, so need it to be empty to continue the script
-			cd "$data_root"/PROTECTED/"$study"/"$p"/offsite_interview/processed
+			cd "$data_root"/PROTECTED/"$study"/processed/"$p"/interviews/open
 			if [ ! -z "$(ls -A audio_to_send)" ]; then
 				echo "Automatic transcription was selected, but there are preexisting audio files in audio_to_send folder(s) under this study"
 				echo "As those would get sent potentially unintentionally by auto transcription, please handle the backlog outside of the main pipeline"
 				echo "The files that need to be addressed can be listed with the following command:"
-				echo "ls ${data_root}/PROTECTED/${study}/*/offsite_interview/processed/audio_to_send"
+				echo "ls ${data_root}/PROTECTED/${study}/processed/*/interviews/open/audio_to_send"
+				echo ""
+				echo "Exiting, please requeue once the above has been addressed"
+				exit # will exit if there is a problem with even one patient in this study
+			fi
+		fi
+		# need to do everyting for psychs separately from open
+		if [[ -d "$data_root"/PROTECTED/"$study"/processed/"$p"/interviews/psychs/audio_to_send ]]; then 
+			# know to_send exists for this patient now, so need it to be empty to continue the script
+			cd "$data_root"/PROTECTED/"$study"/processed/"$p"/interviews/psychs
+			if [ ! -z "$(ls -A audio_to_send)" ]; then
+				echo "Automatic transcription was selected, but there are preexisting audio files in audio_to_send folder(s) under this study"
+				echo "As those would get sent potentially unintentionally by auto transcription, please handle the backlog outside of the main pipeline"
+				echo "The files that need to be addressed can be listed with the following command:"
+				echo "ls ${data_root}/PROTECTED/${study}/processed/*/interviews/psychs/audio_to_send"
 				echo ""
 				echo "Exiting, please requeue once the above has been addressed"
 				exit # will exit if there is a problem with even one patient in this study
 			fi
 		fi
 
-		# do a similar check for a decrypted_audio folder. if one already exists additional audio would be accidentally sent to TranscribeMe
-		if [[ -d "$data_root"/PROTECTED/"$study"/"$p"/offsite_interview/processed/decrypted_audio ]]; then 
-			cd "$data_root"/PROTECTED/"$study"/"$p"/offsite_interview/processed
-			if [ ! -z "$(ls -A decrypted_audio)" ]; then
+		# do a similar check for a temp_audio folder. if one already exists additional audio would be accidentally sent to TranscribeMe
+		if [[ -d "$data_root"/PROTECTED/"$study"/processed/"$p"/interviews/open/temp_audio ]]; then 
+			cd "$data_root"/PROTECTED/"$study"/processed/"$p"/interviews/open
+			if [ ! -z "$(ls -A temp_audio)" ]; then
 				echo "Automatic transcription was selected, but there are preexisting audio files in decrypted_audio folder(s) under this study"
 				echo "As those could get sent potentially unintentionally by auto transcription, please handle the backlog outside of the main pipeline"
 				echo "The files that need to be addressed can be listed with the following command:"
-				echo "ls ${data_root}/PROTECTED/${study}/*/offsite_interview/processed/decrypted_audio"
+				echo "ls ${data_root}/PROTECTED/${study}/processed/*/interviews/open/temp_audio"
+				echo ""
+				echo "Exiting, please requeue once the above has been addressed"
+				exit # will exit if there is a problem with even one patient in this study
+			fi
+		fi
+		# again repeat for psychs
+		if [[ -d "$data_root"/PROTECTED/"$study"/processed/"$p"/interviews/psychs/temp_audio ]]; then 
+			cd "$data_root"/PROTECTED/"$study"/processed/"$p"/interviews/psychs
+			if [ ! -z "$(ls -A temp_audio)" ]; then
+				echo "Automatic transcription was selected, but there are preexisting audio files in decrypted_audio folder(s) under this study"
+				echo "As those could get sent potentially unintentionally by auto transcription, please handle the backlog outside of the main pipeline"
+				echo "The files that need to be addressed can be listed with the following command:"
+				echo "ls ${data_root}/PROTECTED/${study}/processed/*/interviews/psychs/temp_audio"
 				echo ""
 				echo "Exiting, please requeue once the above has been addressed"
 				exit # will exit if there is a problem with even one patient in this study
@@ -114,7 +177,7 @@ now=$(date +"%T")
 echo "Current time: ${now}"
 echo ""
 
-bash "$repo_root"/individual_modules/run_new_audio_decryption.sh "$data_root" "$study"
+bash "$repo_root"/individual_modules/run_new_audio_conversion.sh "$data_root" "$study"
 echo ""
 
 # add current time for runtime tracking purposes
@@ -189,19 +252,5 @@ if [ $auto_send_on = "Y" ] || [ $auto_send_on = "y" ]; then
 	echo "Current time: ${now}"
 	echo ""
 fi
-
-# delete the unused decrypted audios when done. 
-# audio files sent will be deleted from pending_audio as their corresponding transcripts are pulled
-# so if auto send is off, will need to deal with deleting decrypted audio (left in to_send) manually once done with them
-# if there were any errors with upload so that audio is left in to_send, that will also need to be inspected/handled manually
-echo "Clearing unnecessary decrypted audio files"
-cd "$data_root"/PROTECTED/"$study"
-rm -rf */offsite_interview/processed/decrypted_audio
-echo ""
-
-# add current time for runtime tracking purposes
-now=$(date +"%T")
-echo "Current time: ${now}"
-echo ""
 
 echo "Script completed!"

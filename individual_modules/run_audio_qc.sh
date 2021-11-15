@@ -18,23 +18,25 @@ fi
 
 # move to study folder to loop over patients - python function defined per patient
 cd "$data_root"/PROTECTED/"$study"
+# will do one loop for open and another for psychs
+echo "Processing new open interviews"
 for p in *; do
-	# first check that it is truly an OLID, that has a decrypted audio folder for the offsites
-	if [[ ! -d $p/offsite_interview/processed/decrypted_audio ]]; then
+	# first check that it is truly a patient ID, that has a decrypted audio folder for the offsites
+	if [[ ! -d processed/$p/interviews/open/temp_audio ]]; then
 		continue
 	fi
-	cd "$p"/offsite_interview/processed
+	cd processed/"$p"/interviews/open
 
-	# then check that there are some decrypted files available for audio QC to run on this round
-	if [ -z "$(ls -A decrypted_audio)" ]; then
+	# then check that there are some new files available for audio QC to run on this round
+	if [ -z "$(ls -A temp_audio)" ]; then
 		cd "$data_root"/PROTECTED/"$study" # back out of folder before skipping over patient
 		continue
 	fi
-	cd decrypted_audio
+	cd temp_audio
 
 	echo "On patient ${p}"
 
-	# run sliding window QC script for this patient's decrypted files first
+	# run sliding window QC script for this patient's new files first
 	# setting up output folder first, then loop through files (this function runs per individual file)
 	if [[ ! -d ../sliding_window_audio_qc ]]; then
 		mkdir ../sliding_window_audio_qc
@@ -46,20 +48,62 @@ for p in *; do
 	done
 
 	# now need to rename the files for the summary QC and TranscribeMe pipeline
-	python "$func_root"/offsite_audio_rename.py "$data_root" "$study" "$p"
+	python "$func_root"/interview_audio_rename.py "open" "$data_root" "$study" "$p"
 
 	if [ $? = 1 ]; then # if rename script exited with an error for this patient, won't be able to run summary/dpdash QC
-		echo "Renaming script failed for patient, clearing their decrypted files and moving on"
-		# clear the decrypted files so there is no accidental TranscribeMe upload, etc.
-		cd ..
-		rm -rf decrypted_audio
+		echo "Renaming script failed for patient's open interviews, leaving files in temporary audio folder and moving on. Should be manually addressed"
 		# back out of folder before continuing to next patient
 		cd "$data_root"/PROTECTED/"$study"
 		continue
 	fi
 	
 	# finally run main audio QC script on this patient
-	python "$func_root"/offsite_audio_qc.py "$data_root" "$study" "$p"
+	python "$func_root"/interview_audio_qc.py "open" "$data_root" "$study" "$p"
+
+	# back out of folder before continuing to next patient
+	cd "$data_root"/PROTECTED/"$study"
+done
+
+echo "Processing new psychs interviews"
+for p in *; do
+	# first check that it is truly a patient ID, that has a decrypted audio folder for the offsites
+	if [[ ! -d processed/$p/interviews/psychs/temp_audio ]]; then
+		continue
+	fi
+	cd processed/"$p"/interviews/psychs
+
+	# then check that there are some new files available for audio QC to run on this round
+	if [ -z "$(ls -A temp_audio)" ]; then
+		cd "$data_root"/PROTECTED/"$study" # back out of folder before skipping over patient
+		continue
+	fi
+	cd temp_audio
+
+	echo "On patient ${p}"
+
+	# run sliding window QC script for this patient's new files first
+	# setting up output folder first, then loop through files (this function runs per individual file)
+	if [[ ! -d ../sliding_window_audio_qc ]]; then
+		mkdir ../sliding_window_audio_qc
+	fi
+	for file in *.wav; do
+		name=$(echo "$file" | awk -F '.wav' '{print $1}')
+		# outputs still go in PROTECTED for now as at this stage they still contain dates/times
+		python "$func_root"/sliding_audio_qc_func.py "$file" ../sliding_window_audio_qc/"$name".csv
+	done
+
+	# now need to rename the files for the summary QC and TranscribeMe pipeline
+	python "$func_root"/interview_audio_rename.py "psychs" "$data_root" "$study" "$p"
+
+	if [ $? = 1 ]; then # if rename script exited with an error for this patient, won't be able to run summary/dpdash QC
+		echo "Renaming script failed for patient's psychs interviews, leaving files in temporary audio folder and moving on. Should be manually addressed"
+		# back out of folder before continuing to next patient
+		cd "$data_root"/PROTECTED/"$study"
+		continue
+	fi
+	
+	# finally run main audio QC script on this patient
+	python "$func_root"/interview_audio_qc.py "psychs" "$data_root" "$study" "$p"
 
 	# back out of folder before continuing to next patient
 	cd "$data_root"/PROTECTED/"$study"

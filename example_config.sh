@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # basic path settings
-data_root="/data/sbdp/PHOENIX"
-study="BLS"
+data_root="/data/itp"
+study="ProNetTest"
 export data_root
 export study
 
@@ -27,9 +27,9 @@ export auto_send_limit_bool
 
 # settings for automatic email, again only relevant if auto transcription is on
 # first addresses for the more thorough updates on most recent files
-lab_email_list="mennis2@partners.org,ELIEBENTHAL@MCLEAN.HARVARD.EDU,jtbaker@partners.org"
+lab_email_list="mennis2@partners.org"
 # then addresses to send the TranscribeMe notification to
-transcribeme_email_list="sales_support@transcribeme.com,joshua@transcribeme.com,mennis@g.harvard.edu"
+transcribeme_email_list="mennis2@partners.org"
 # finally should also supply an email address that any answers will go to if TranscribeMe staff reply to the email alert
 transcribeme_email_reply_to="Michaela Ennis <mennis@g.harvard.edu>"
 export lab_email_list

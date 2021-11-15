@@ -9,9 +9,9 @@ import sys
 import logging
 logging.basicConfig()
 
-def transcript_push(data_root, study, ptID, username, password, pipeline=False):
+def transcript_push(interview_type, data_root, study, ptID, username, password, pipeline=False):
 	# currently only expect this to be called from wrapping bash script (possibly via main pipeline), so means there definitely will be some audio to push for this ptID
-	print("Pushing transcripts for participant " + ptID)
+	print("Pushing " + interview_type + " audio to TranscribeMe for participant " + ptID)
 	# print statement useful here because the process can be slow, will give user an idea of how far along we are
 
 	# initialize list to keep track of which audio files will need to be moved at end of patient run
@@ -22,11 +22,11 @@ def transcript_push(data_root, study, ptID, username, password, pipeline=False):
 	host = "sftp.transcribeme.com"
 
 	try:
-		directory = os.path.join(data_root, "PROTECTED", study, ptID, "offsite_interview/processed/audio_to_send")
+		directory = os.path.join(data_root, "PROTECTED", study, "processed", ptID, "interviews", interview_type, "audio_to_send")
 		os.chdir(directory) 
 	except:
 		# if this is called by pipeline or even the modular wrapping bash script the directory will exist
-		print("audio_to_send folder does not exist for patient " + ptID + ", ensure running this script from main pipeline")
+		print("audio_to_send folder does not exist for patient " + ptID + " " + interview_type + ", ensure running this script from main pipeline")
 		return
 	
 	# loop through the WAV files in to_send, push them to TranscribeMe
@@ -65,12 +65,12 @@ def transcript_push(data_root, study, ptID, username, password, pipeline=False):
 if __name__ == '__main__':
 	# Map command line arguments to function arguments.
 	try:
-		if sys.argv[6] == "Y":
+		if sys.argv[7] == "Y":
 			# if called from main pipeline want to just rename the pulled files in pending_audio here, so email script can use it before deletion
-			transcript_push(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], pipeline=True)
+			transcript_push(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6], pipeline=True)
 		else:
 			# otherwise just deleting the audio immediately
-			transcript_push(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
+			transcript_push(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6])
 	except:
 		# if pipeline argument never even provided just want to ignore, not crash
-		transcript_push(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
+		transcript_push(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6])
