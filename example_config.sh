@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # basic path settings
-data_root="/data/itp"
-study="ProNetTest"
+data_root="/data/itp/ProNetTest"
+study="PronetLA"
 export data_root
 export study
 
@@ -44,13 +44,7 @@ passwords_path="$repo_root"/.passwords.sh
 # passwords_path will be called to set the passwords as temporary environment variables within the pipeline
 # the script should contain the following lines, with correct passwords subbed in, and uncommented
 # (do not do so in this file, but in the script at passwords_path)
-# password="password1"
-# transcribeme_password="password2"
-# export password
+# only password needed as of now is the one for TranscribeMe SFTP account
+# transcribeme_password="password"
 # export transcribeme_password
-bash "$passwords_path"
-
-# now that done with settings, also load necessary modules for code to run
-module load ffmpeg
-module load Anaconda3
-conda activate audio_process
+source "$passwords_path"

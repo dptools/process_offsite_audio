@@ -17,19 +17,19 @@ else
 fi
 
 # move to study folder to loop over patients - python function defined per patient
-cd "$data_root"/PROTECTED/"$study"
+cd "$data_root"/PROTECTED/"$study"/processed
 # will do one loop for open and another for psychs
 echo "Processing new open interviews"
 for p in *; do
 	# first check that it is truly a patient ID, that has a decrypted audio folder for the offsites
-	if [[ ! -d processed/$p/interviews/open/temp_audio ]]; then
+	if [[ ! -d $p/interviews/open/temp_audio ]]; then
 		continue
 	fi
-	cd processed/"$p"/interviews/open
+	cd "$p"/interviews/open
 
 	# then check that there are some new files available for audio QC to run on this round
 	if [ -z "$(ls -A temp_audio)" ]; then
-		cd "$data_root"/PROTECTED/"$study" # back out of folder before skipping over patient
+		cd "$data_root"/PROTECTED/"$study"/processed # back out of folder before skipping over patient
 		continue
 	fi
 	cd temp_audio
@@ -53,7 +53,7 @@ for p in *; do
 	if [ $? = 1 ]; then # if rename script exited with an error for this patient, won't be able to run summary/dpdash QC
 		echo "Renaming script failed for patient's open interviews, leaving files in temporary audio folder and moving on. Should be manually addressed"
 		# back out of folder before continuing to next patient
-		cd "$data_root"/PROTECTED/"$study"
+		cd "$data_root"/PROTECTED/"$study"/processed
 		continue
 	fi
 	
@@ -61,20 +61,20 @@ for p in *; do
 	python "$func_root"/interview_audio_qc.py "open" "$data_root" "$study" "$p"
 
 	# back out of folder before continuing to next patient
-	cd "$data_root"/PROTECTED/"$study"
+	cd "$data_root"/PROTECTED/"$study"/processed
 done
 
 echo "Processing new psychs interviews"
 for p in *; do
 	# first check that it is truly a patient ID, that has a decrypted audio folder for the offsites
-	if [[ ! -d processed/$p/interviews/psychs/temp_audio ]]; then
+	if [[ ! -d $p/interviews/psychs/temp_audio ]]; then
 		continue
 	fi
-	cd processed/"$p"/interviews/psychs
+	cd "$p"/interviews/psychs
 
 	# then check that there are some new files available for audio QC to run on this round
 	if [ -z "$(ls -A temp_audio)" ]; then
-		cd "$data_root"/PROTECTED/"$study" # back out of folder before skipping over patient
+		cd "$data_root"/PROTECTED/"$study"/processed # back out of folder before skipping over patient
 		continue
 	fi
 	cd temp_audio
@@ -98,7 +98,7 @@ for p in *; do
 	if [ $? = 1 ]; then # if rename script exited with an error for this patient, won't be able to run summary/dpdash QC
 		echo "Renaming script failed for patient's psychs interviews, leaving files in temporary audio folder and moving on. Should be manually addressed"
 		# back out of folder before continuing to next patient
-		cd "$data_root"/PROTECTED/"$study"
+		cd "$data_root"/PROTECTED/"$study"/processed
 		continue
 	fi
 	
@@ -106,5 +106,5 @@ for p in *; do
 	python "$func_root"/interview_audio_qc.py "psychs" "$data_root" "$study" "$p"
 
 	# back out of folder before continuing to next patient
-	cd "$data_root"/PROTECTED/"$study"
+	cd "$data_root"/PROTECTED/"$study"/processed
 done

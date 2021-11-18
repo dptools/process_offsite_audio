@@ -38,7 +38,7 @@ def interview_mono_rename(interview_type, data_root, study, ptID):
 	raw_folder_names = [x.split("/")[-1] for x in raw_folder_paths]
 	if interview_type == "psychs":
 		# make the onsites named the same as offsites for sorting purposess
-		raw_folder_names = [x[0:4] + "-" + x[4:6] + "-" + x[6:8] + " " + x[8:10] + "." + x[10:12] + "." + x[12:14] if x.endswith(".wav") else x for x in raw_folder_names]
+		raw_folder_names = [x[0:4] + "-" + x[4:6] + "-" + x[6:8] + " " + x[8:10] + "." + x[10:12] + "." + x[12:14] if x.endswith(".WAV") else x for x in raw_folder_names]
 	raw_folder_names.sort() # the way zoom puts date/time in text in the folder name means it will always sort in chronological order
 	raw_audio_formatted = [x.split(" ")[0] + "+" + x.split(" ")[1] + ".wav" for x in raw_folder_names]
 
@@ -46,7 +46,7 @@ def interview_mono_rename(interview_type, data_root, study, ptID):
 		if not filename.endswith(".wav"): # skip any non-audio files (and folders)
 			continue
 		if len(filename.split("+")) <= 1:
-			filename_check= filename.split(" ")[0] + "+" + filename.split(" ")[1]
+			filename_check= filename[0:4] + "-" + filename[4:6] + "-" + filename[6:8] + "+" + filename[8:10] + "." + filename[10:12] + "." + filename[12:14] + ".wav"
 		else:
 			filename_check = filename
 

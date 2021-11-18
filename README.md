@@ -5,7 +5,7 @@ Code for quality control and feature extraction from offsite interview (Zoom) au
 
 For setup of the code for a particular project, see example_config.sh. The full audio side pipeline can then be run by using:
 
-	bash offsite_audio_process.sh example_config.sh
+	bash interview_audio_process.sh example_config.sh
 
 The main audio QC output CSV found on the top level of the patient's GENERAL side offsite_interview/processed folder includes the following features:
 * Metadata for DPDash formatting

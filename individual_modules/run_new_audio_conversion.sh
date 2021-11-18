@@ -18,28 +18,28 @@ else
 	func_root="$repo_root"/individual_modules/functions_called
 fi
 
-# move to study folder to loop over patients
-cd "$data_root"/PROTECTED/"$study"
+# move to study's raw folder to loop over patients
+cd "$data_root"/PROTECTED/"$study"/raw
 for p in *; do
 	# first check that it is truly a patient ID that has offsite interview data
-	if [[ ! -d raw/$p/interviews ]]; then
+	if [[ ! -d $p/interviews ]]; then
 		continue
 	fi
 
 	echo "On participant ${p}"
 	# create folders (if needed) for temporarily holding the converted files while the pipeline runs
-	if [[ ! -d processed/"$p"/interviews/open/temp_audio ]]; then
-		mkdir processed/"$p"/interviews/open/temp_audio
+	if [[ ! -d ../processed/"$p"/interviews/open/temp_audio ]]; then
+		mkdir ../processed/"$p"/interviews/open/temp_audio
 	fi
-	if [[ ! -d processed/"$p"/interviews/psychs/temp_audio ]]; then
-		mkdir processed/"$p"/interviews/psychs/temp_audio
+	if [[ ! -d ../processed/"$p"/interviews/psychs/temp_audio ]]; then
+		mkdir ../processed/"$p"/interviews/psychs/temp_audio
 	fi
 
 	# start looping through raw - interviews organized by folder
 	# do open first - these will always be zoom
 	# need to make sure each type exists, because there could be one without the other
-	if [[ -d raw/"$p"/interviews/open ]]; then
-		cd raw/"$p"/interviews/open
+	if [[ -d "$p"/interviews/open ]]; then
+		cd "$p"/interviews/open
 		for folder in *; do
 			# escape spaces and other issues in folder name
 			folder_formatted=$(printf %q "$folder")
@@ -58,7 +58,7 @@ for p in *; do
 			# also only convert if file hasn't already been processed in a previous run
 			# (look for prior output to know - sliding window QC)
 			if [[ ! -e ../../../../processed/"$p"/interviews/open/temp_audio/"$date"+"$time".wav && ! -e ../../../../processed/"$p"/interviews/open/sliding_window_audio_qc/"$date"+"$time".csv ]]; then
-				eval ffmpeg -i "$folder_formatted"/audio_only.m4a .../../../../processed/"$p"/interviews/open/temp_audio/"$date"+"$time".wav &> /dev/null
+				eval ffmpeg -i "$folder_formatted"/audio_only.m4a ../../../../processed/"$p"/interviews/open/temp_audio/"$date"+"$time".wav &> /dev/null
 			fi
 		done
 	fi
@@ -77,7 +77,7 @@ for p in *; do
 				name=$(echo "$folder" | awk -F '.' '{print $1}') 
 				# no need to eval or use folder_formatted either, as no spaces in onsite name
 				if [[ ! -e ../../../../processed/"$p"/interviews/psychs/temp_audio/"$name".wav && ! -e ../../../../processed/"$p"/interviews/psychs/sliding_window_audio_qc/"$name".csv ]]; then
-					cp "$folder" .../../../../processed/"$p"/interviews/psychs/temp_audio/"$name".wav
+					cp "$folder" ../../../../processed/"$p"/interviews/psychs/temp_audio/"$name".wav
 				fi
 				# done with file for now if it is an onsite 
 				continue
@@ -97,11 +97,11 @@ for p in *; do
 			# also only convert if file hasn't already been processed in a previous run
 			# (look for prior output to know - sliding window QC)
 			if [[ ! -e ../../../../processed/"$p"/interviews/psychs/temp_audio/"$date"+"$time".wav && ! -e ../../../../processed/"$p"/interviews/psychs/sliding_window_audio_qc/"$date"+"$time".csv ]]; then
-				eval ffmpeg -i "$folder_formatted"/audio_only.m4a .../../../../processed/"$p"/interviews/psychs/temp_audio/"$date"+"$time".wav &> /dev/null
+				eval ffmpeg -i "$folder_formatted"/audio_only.m4a ../../../../processed/"$p"/interviews/psychs/temp_audio/"$date"+"$time".wav &> /dev/null
 			fi
 		done
 	fi
 
 	# back out of pt folder when done
-	cd "$data_root"/PROTECTED/"$study"
+	cd "$data_root"/PROTECTED/"$study"/raw
 done

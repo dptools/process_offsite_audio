@@ -38,13 +38,13 @@ fi
 
 # now start going through patients for the upload - do open and psychs separately
 echo "Uploading open interviews to TranscribeMe"
-cd "$data_root"/PROTECTED/"$study"
+cd "$data_root"/PROTECTED/"$study"/processed
 for p in *; do # loop over all patients in the specified study folder
 	# first check that it is truly a patient ID that has open interview audio data to send
-	if [[ ! -d processed/$p/interviews/open/audio_to_send ]]; then # check for to_send folder
+	if [[ ! -d $p/interviews/open/audio_to_send ]]; then # check for to_send folder
 		continue
 	fi
-	cd processed/"$p"/interviews/open
+	cd "$p"/interviews/open
 
 	# create a folder of audios that have been sent to TranscribeMe, and are waiting on result
 	# (this folder will only be made for new patient/study, otherwise it will just sit empty when no pending transcripts)
@@ -55,7 +55,7 @@ for p in *; do # loop over all patients in the specified study folder
 
 	if [ -z "$(ls -A audio_to_send)" ]; then # also check that to_send isn't empty
 		rm -rf audio_to_send # if it is empty, clear it out!
-		cd "$data_root"/PROTECTED/"$study" # back out of pt folder before skipping
+		cd "$data_root"/PROTECTED/"$study"/processed # back out of pt folder before skipping
 		continue
 	fi
 
@@ -73,16 +73,16 @@ for p in *; do # loop over all patients in the specified study folder
 	fi
 
 	# back out of pt folder when done
-	cd "$data_root"/PROTECTED/"$study"
+	cd "$data_root"/PROTECTED/"$study"/processed
 done
 
 echo "Uploading psychs interviews to TranscribeMe"
 for p in *; do # loop over all patients in the specified study folder
 	# first check that it is truly a patient ID that has psychs interview audio data to send
-	if [[ ! -d processed/$p/interviews/psychs/audio_to_send ]]; then # check for to_send folder
+	if [[ ! -d $p/interviews/psychs/audio_to_send ]]; then # check for to_send folder
 		continue
 	fi
-	cd processed/"$p"/interviews/psychs
+	cd "$p"/interviews/psychs
 
 	# create a folder of audios that have been sent to TranscribeMe, and are waiting on result
 	# (this folder will only be made for new patient/study, otherwise it will just sit empty when no pending transcripts)
@@ -93,7 +93,7 @@ for p in *; do # loop over all patients in the specified study folder
 
 	if [ -z "$(ls -A audio_to_send)" ]; then # also check that to_send isn't empty
 		rm -rf audio_to_send # if it is empty, clear it out!
-		cd "$data_root"/PROTECTED/"$study" # back out of pt folder before skipping
+		cd "$data_root"/PROTECTED/"$study"/processed # back out of pt folder before skipping
 		continue
 	fi
 
@@ -111,5 +111,5 @@ for p in *; do # loop over all patients in the specified study folder
 	fi
 
 	# back out of pt folder when done
-	cd "$data_root"/PROTECTED/"$study"
+	cd "$data_root"/PROTECTED/"$study"/processed
 done

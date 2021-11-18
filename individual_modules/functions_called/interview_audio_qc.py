@@ -70,8 +70,8 @@ def interview_mono_qc(interview_type, data_root, study, ptID):
 			# may not be a second shape number when file is mono, but should check for it to exit if we encounter stereo here
 			cs = data.shape[1] 
 			if cs == 2: 
-				print("(" + filename + " is stereo, expected mono)")
-				continue
+				print("(" + filename + " is stereo, expected mono. collapsing for QC calculation)")
+				data = np.mean(data, axis=1)
 		except: # now it is definitely mono
 			pass
 			
@@ -96,7 +96,7 @@ def interview_mono_qc(interview_type, data_root, study, ptID):
 		folder_names = [x.split("/")[-1] for x in folder_paths]
 		if interview_type == "psychs":
 			# make the onsites named the same as offsites for sorting purposess
-			folder_names = [x[0:4] + "-" + x[4:6] + "-" + x[6:8] + " " + x[8:10] + "." + x[10:12] + "." + x[12:14] if x.endswith(".wav") else x for x in folder_names]
+			folder_names = [x[0:4] + "-" + x[4:6] + "-" + x[6:8] + " " + x[8:10] + "." + x[10:12] + "." + x[12:14] if x.endswith(".WAV") else x for x in folder_names]
 		folder_names.sort() # the way zoom puts date/time in text in the folder name means it will always sort in chronological order
 		cur_name = folder_names[int_num-1] # index using interview number, but adjust for 0-indexing
 		date_str = cur_name.split(" ")[0] # will use the date for getting weekday
@@ -134,7 +134,7 @@ def interview_mono_qc(interview_type, data_root, study, ptID):
 	output_paths = glob.glob(output_path_format)
 	# single existing DPDash file is expected - do concatenation and then delete old version (since naming convention will not overwrite)
 	if len(output_paths) == 1:
-		ld_df = pd.read_csv(output_paths[0])
+		old_df = pd.read_csv(output_paths[0])
 		join_csv=pd.concat([old_df, new_csv])
 		join_csv.reset_index(drop=True, inplace=True)
 		# drop any duplicates in case audio got decrypted a second time - shouldn't happen via pipeline

@@ -7,8 +7,6 @@ if [[ -z "${1}" ]]; then
 	exit
 fi
 config_path=$1
-# running config file will set up necessary environment variables
-bash config_path
 
 # start by getting the absolute path to the directory this script is in, which will be the top level of the repo
 # this way script will work even if the repo is downloaded to a new location, rather than relying on hard coded paths to where I put the repo. 
@@ -16,6 +14,9 @@ full_path=$(realpath $0)
 repo_root=$(dirname $full_path)
 # export the path to the repo for scripts called by this script to also use
 export repo_root
+
+# running config file will set up necessary environment variables
+source "$config_path"
 
 # confirm study folder exists where it should, and has the expected GENERAL/PROTECTED and raw and processed folder paths
 cd "$data_root"/PROTECTED
@@ -43,7 +44,7 @@ if [[ ! -d ../GENERAL/$study/processed ]]; then
 	echo "Study folder improperly set up"
 	exit
 fi
-cd "$study" # switch to study folder for first loop over patient list
+cd "$study"/raw # switch to study's raw folder for first loop over patient list
 
 # let user know script is starting
 echo ""
@@ -171,6 +172,7 @@ for p in *; do
 		fi
 	fi
 done
+cd "$data_root"/PROTECTED/"$study"/raw # ensure back to study's raw directory at end of loop
 
 # add current time for runtime tracking purposes
 now=$(date +"%T")
@@ -232,7 +234,7 @@ if [ $auto_send_on = "Y" ] || [ $auto_send_on = "y" ]; then
 
 	# now actually send the email notifying lab members about audio files successfully pushed, with info about any errors or excluded files. 
 	echo "Emailing status update to lab"
-	mail -s "[${study} Phone Diary Pipeline Updates] New Audio Uploaded to TranscribeMe" "$lab_email_list" < "$repo_root"/audio_lab_email_body.txt
+	mail -s "[${study} Interview Pipeline Updates] New Audio Uploaded to TranscribeMe" "$lab_email_list" < "$repo_root"/audio_lab_email_body.txt
 	rm "$repo_root"/audio_lab_email_body.txt # this will be created by email alert script above, cleared out here after email is sent
 	echo ""
 
@@ -240,7 +242,7 @@ if [ $auto_send_on = "Y" ] || [ $auto_send_on = "y" ]; then
 	if [[ -e "$repo_root"/audio_transcribeme_email_body.txt ]]; then 
 		echo "Sending email alert to TranscribeMe"
 		# use -r as part of the email command for this one so TranscribeMe will see reply address as mennis@g.harvard.edu
-		mail -s "[Baker Lab] New Audio to Transcribe" -r "$transcribeme_email_reply_to" "$transcribeme_email_list" < "$repo_root"/audio_transcribeme_email_body.txt
+		mail -s "[Yale Box] New Audio to Transcribe" -r "$transcribeme_email_reply_to" "$transcribeme_email_list" < "$repo_root"/audio_transcribeme_email_body.txt
 		rm "$repo_root"/audio_transcribeme_email_body.txt # this will also be created by email alert script above, cleared out here after email sent
 	else # if email file doesn't exist in pipeline means no new audio pushed
 		echo "No new audios uploaded, so no alert to send to TranscribeMe"
