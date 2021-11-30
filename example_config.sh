@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # basic path settings
-data_root="/data/itp/ProNetTest"
+data_root="/opt/software/Pronet_data_sync_kcho_test/PHOENIX"
 study="PronetLA"
 export data_root
 export study
@@ -11,11 +11,11 @@ auto_send_on="Y" # if "N", QC will be calculated without uploading anything to T
 export auto_send_on
 # rest of settings in this section are only relevant when auto transcription is on
 # start with transcribeme username, password setup via separate process described in next section
-transcribeme_username="partners_itp"
+transcribeme_username="zailyn.tamayo@yale.edu"
 export transcribeme_username
 # next settings are thresholds for acceptable quality level of a given audio file
 length_cutoff=0 # minimum number of seconds for an audio file to be uploaded to TranscribeMe
-db_cutoff=0 # minimum overall decibel level for an audio file to be uploaded to TranscribeMe 
+db_cutoff=40 # minimum overall decibel level for an audio file to be uploaded to TranscribeMe 
 export length_cutoff
 export db_cutoff
 # finally settings to control total cost

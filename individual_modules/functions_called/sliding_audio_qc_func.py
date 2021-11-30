@@ -35,7 +35,8 @@ def sliding_audio_qc(filename,savepath,window_size=0.05,window_increment=0.05):
 		cs = data.shape[1]
 		if cs == 2:
 			print("(" + filename + " is not mono)")
-			return
+			# still process it as if it were mono though! 
+			data = np.mean(data, axis=1)
 	except: # now it is definitely mono, good to proceed
 		pass
 
