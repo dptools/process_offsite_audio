@@ -48,7 +48,7 @@ cd "$study"/raw # switch to study's raw folder for first loop over patient list
 
 # let user know script is starting
 echo ""
-echo "Beginning script - mono offsite interview audio preprocessing for:"
+echo "Beginning script - mono interview audio preprocessing for:"
 echo "$study"
 echo "with data root:"
 echo "$data_root"
@@ -242,7 +242,7 @@ if [ $auto_send_on = "Y" ] || [ $auto_send_on = "y" ]; then
 	if [[ -e "$repo_root"/audio_transcribeme_email_body.txt ]]; then 
 		echo "Sending email alert to TranscribeMe"
 		# use -r as part of the email command for this one so TranscribeMe will see reply address as mennis@g.harvard.edu
-		mail -s "[Yale Box] New Audio to Transcribe" -r "$transcribeme_email_reply_to" "$transcribeme_email_list" < "$repo_root"/audio_transcribeme_email_body.txt
+		mail -s "[Baker Lab] New Audio to Transcribe" -r "$transcribeme_email_reply_to" "$transcribeme_email_list" < "$repo_root"/audio_transcribeme_email_body.txt
 		rm "$repo_root"/audio_transcribeme_email_body.txt # this will also be created by email alert script above, cleared out here after email sent
 	else # if email file doesn't exist in pipeline means no new audio pushed
 		echo "No new audios uploaded, so no alert to send to TranscribeMe"
