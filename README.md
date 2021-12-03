@@ -23,6 +23,7 @@ For initial setup on the ProNet server, the following steps were taken. First, I
 	* (Answered yes to bashrc question, no to Visual Studio question, other prompts kept as default by just pressing enter)
 * rm Anaconda3-5.3.1-Linux-x86_64.sh
 * source .bashrc
+
 Note ffmpeg, the other main dependency, was already working on the machine.
 
 Then I setup the repository with included Anaconda environment:
