@@ -56,7 +56,7 @@ echo ""
 
 # send email notifying lab members about transcripts successfully pulled/processed, and those we are still waiting on. 
 echo "Emailing status update to lab"
-mail -s "[Phone Diary Pipeline Updates] New Transcripts Received from TranscribeMe" "$email_list" < "$repo_root"/transcript_lab_email_body.txt
+mail -s "[Interview Transcript Pipeline Updates] New Transcripts Received from TranscribeMe" "$lab_email_list" < "$repo_root"/transcript_lab_email_body.txt
 rm "$repo_root"/transcript_lab_email_body.txt # this will be created by wrapping transcript pull script, cleared out here after email sent
 # in future will want to improve how we implement the email list, may be different for different studies
 # also may want to improve how we do the subject line so it's less repetitive (include date info possibly? and/or give info on total number of new transcripts? even just study name?)

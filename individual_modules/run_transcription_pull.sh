@@ -22,7 +22,7 @@ if [ $pipeline = "Y" ]; then
 	echo "Transcription Pull Updates for ${study}:" > "$repo_root"/transcript_lab_email_body.txt 
 	echo "" >> "$repo_root"/transcript_lab_email_body.txt # add blank line after main header. no need to add another below because those are automatically added before each patient header
 	# give some additional context for what will be inside this email
-	echo "Each newly pulled phone diary transcript and each phone transcript still being waited on are listed below, split by patient ID. Additionally, if warnings were encountered during the process of pulling an available transcript, they will be listed under the corresponding patient section." >> "$repo_root"/transcript_lab_email_body.txt
+	echo "Each newly pulled interview transcript and each transcript still being waited on are listed below, split by patient ID. Additionally, if warnings were encountered during the process of pulling an available transcript, they will be listed under the corresponding patient section." >> "$repo_root"/transcript_lab_email_body.txt
 fi
 
 # now start going through patients for the download - do open and psychs separately
@@ -57,7 +57,7 @@ for p in *; do # loop over all patients in the specified study folder on PHOENIX
 	python "$func_root"/interview_transcribeme_sftp_pull.py "open" "$data_root" "$study" "$p" "$transcribeme_username" "$transcribeme_password" "$pipeline" "$repo_root"/transcript_lab_email_body.txt
 
 	# now add new info about this patient to email alert body (if this is part of pipeline and there was pending audio)
-	if [[ $pipeline = "Y" && -d pending_audio && -z "$(ls -A pending_audio)" ]]; then
+	if [[ $pipeline = "Y" && -d pending_audio && ! -z "$(ls -A pending_audio)" ]]; then
 		# pending_audio folder will contain all necessary info
 		cd pending_audio
 
@@ -93,7 +93,7 @@ for p in *; do # loop over all patients in the specified study folder on PHOENIX
 	python "$func_root"/interview_transcribeme_sftp_pull.py "psychs" "$data_root" "$study" "$p" "$transcribeme_username" "$transcribeme_password" "$pipeline" "$repo_root"/transcript_lab_email_body.txt
 
 	
-	if [[ $pipeline = "Y" && -d pending_audio && -z "$(ls -A pending_audio)" ]]; then
+	if [[ $pipeline = "Y" && -d pending_audio && ! -z "$(ls -A pending_audio)" ]]; then
 		# pending_audio folder will contain all necessary info
 		cd pending_audio
 
