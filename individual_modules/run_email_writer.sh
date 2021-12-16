@@ -100,38 +100,45 @@ for p in *; do
 	# now list the ones that have been newly pushed in a similar manner - again starting with open, then psychs
 	# in this case though, will create a header even if the total is 0, as could still be useful information on per-patient basis
 	# loop will also remove the prepended "new+" marker once it is done with a file
-	cd pending_audio
-	num_pushed=$(find . -maxdepth 1 -name "new+*" -printf '.' | wc -m) # find new ones (from this run) by prepended code word
-	echo "" >> "$repo_root"/audio_lab_email_body.txt # want a blank line in between the different patient headers
-	echo "Participant ${p} Open Interviews Pushed to TranscribeMe (${num_pushed} Total) - " >> "$repo_root"/audio_lab_email_body.txt
-	shopt -s nullglob # if there are no new pending files, this will keep it from running empty loop
-	for file in new+*; do 
-		# get true filename, without the temporarily added new marker:
-		# + will never appear in the transcript naming convention, so splitting by the + will directly remove the prepended new code word
-		orig_name=$(echo "$file" | awk -F '+' '{print $2}')
-		# will use the real name in the email blast
-		echo "$orig_name" >> "$repo_root"/audio_lab_email_body.txt
-		# will also use the real name to rename this file now that we're done with it
-		mv "$file" "$orig_name"
-	done
-	cd ../../psychs
+	if [[ -d pending_audio ]]; then
+		cd pending_audio
+		num_pushed=$(find . -maxdepth 1 -name "new+*" -printf '.' | wc -m) # find new ones (from this run) by prepended code word
+		echo "" >> "$repo_root"/audio_lab_email_body.txt # want a blank line in between the different patient headers
+		echo "Participant ${p} Open Interviews Pushed to TranscribeMe (${num_pushed} Total) - " >> "$repo_root"/audio_lab_email_body.txt
+		shopt -s nullglob # if there are no new pending files, this will keep it from running empty loop
+		for file in new+*; do 
+			# get true filename, without the temporarily added new marker:
+			# + will never appear in the transcript naming convention, so splitting by the + will directly remove the prepended new code word
+			orig_name=$(echo "$file" | awk -F '+' '{print $2}')
+			# will use the real name in the email blast
+			echo "$orig_name" >> "$repo_root"/audio_lab_email_body.txt
+			# will also use the real name to rename this file now that we're done with it
+			mv "$file" "$orig_name"
+		done
+		cd ..
+	fi
+
+	cd ../psychs
 	# repeating for psychs
-	cd pending_audio
-	num_pushed=$(find . -maxdepth 1 -name "new+*" -printf '.' | wc -m) # find new ones (from this run) by prepended code word
-	echo "" >> "$repo_root"/audio_lab_email_body.txt # want a blank line in between the different patient headers
-	echo "Participant ${p} Psychs Interviews Pushed to TranscribeMe (${num_pushed} Total) - " >> "$repo_root"/audio_lab_email_body.txt
-	shopt -s nullglob # if there are no new pending files, this will keep it from running empty loop
-	for file in new+*; do 
-		# get true filename, without the temporarily added new marker:
-		# + will never appear in the transcript naming convention, so splitting by the + will directly remove the prepended new code word
-		orig_name=$(echo "$file" | awk -F '+' '{print $2}')
-		# will use the real name in the email blast
-		echo "$orig_name" >> "$repo_root"/audio_lab_email_body.txt
-		# will also use the real name to rename this file now that we're done with it
-		mv "$file" "$orig_name"
-		# pull script will move to a completed folder later on
-	done
-	cd ../../open
+	if [[ -d pending_audio ]]; then
+		cd pending_audio
+		num_pushed=$(find . -maxdepth 1 -name "new+*" -printf '.' | wc -m) # find new ones (from this run) by prepended code word
+		echo "" >> "$repo_root"/audio_lab_email_body.txt # want a blank line in between the different patient headers
+		echo "Participant ${p} Psychs Interviews Pushed to TranscribeMe (${num_pushed} Total) - " >> "$repo_root"/audio_lab_email_body.txt
+		shopt -s nullglob # if there are no new pending files, this will keep it from running empty loop
+		for file in new+*; do 
+			# get true filename, without the temporarily added new marker:
+			# + will never appear in the transcript naming convention, so splitting by the + will directly remove the prepended new code word
+			orig_name=$(echo "$file" | awk -F '+' '{print $2}')
+			# will use the real name in the email blast
+			echo "$orig_name" >> "$repo_root"/audio_lab_email_body.txt
+			# will also use the real name to rename this file now that we're done with it
+			mv "$file" "$orig_name"
+			# pull script will move to a completed folder later on
+		done
+		cd ..
+	fi
+	cd ../open
 
 	# finally list the ones that got rejected for this patient, again in similar manner
 	# add additional information after each file name with reason for the rejection
