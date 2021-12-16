@@ -48,7 +48,14 @@ for p in *; do
 			# check for lack of existence of old format Zoom naming convention first
 			# if so then look for new format, print error message if can't find that either
 			if eval [[ ! -e ${folder_formatted}/audio_only.m4a ]]; then
-				eval cd ${folder_formatted} # go into interview folder to check
+				if eval [[ ! -d ${folder_formatted} ]]; then
+					# don't hit issue where we try to cd but can't
+					# everything in open should be organized via interview folders, but need to make sure of this
+					echo "(open offsite interview ${folder} is a single file instead of a folder, this is not expected for the open datatype - skipping for now)"
+					continue
+				fi
+
+				eval cd ${folder_formatted} # go into interview folder to check now that we know it is a folder
 
 				# want exactly one audio file on the top level of Zoom folder here, as no one should be modifying the output returned by Zoom
 				num_mono=$(find . -maxdepth 1 -name "audio*.m4a" -printf '.' | wc -m)
@@ -110,11 +117,27 @@ for p in *; do
 			if eval [[ ! -d ${folder_formatted} ]]; then
 				# in this case take totally different approach - just copy over the file as is for now, as long as it hasn't been processed yet
 				name=$(echo "$folder" | awk -F '.' '{print $1}') 
-				# no need to eval or use folder_formatted either, as no spaces in onsite name
+				ext=$(echo "$folder" | awk -F '.' '{print $2}') 
+
+				if [[ ${#name} != 14 ]]; then
+					# note the pipeline will have issues later on if this WAV file does not conform to the expected date/time naming convention standard
+					# using this as a crude way to check for now that the file has the expected info by checking for the expected number of digits (which should be static)
+					echo "(psychs interview ${folder} is incorrectly named, skipping)"
+					continue
+				fi
+				if [[ ${ext} != "WAV" ]]; then
+					# also confirm the file type is actually right
+					echo "(psychs interview ${folder} is the wrong file format, skipping)"
+					continue
+				fi
+
+				# now proceed with copying the file if it meets checks
+				# no need to eval or use folder_formatted either, as no spaces should appear in onsite name
 				if [[ ! -e ../../../../processed/"$p"/interviews/psychs/temp_audio/"$name".wav && ! -e ../../../../processed/"$p"/interviews/psychs/sliding_window_audio_qc/"$name".csv ]]; then
 					cp "$folder" ../../../../processed/"$p"/interviews/psychs/temp_audio/"$name".wav
 				fi
-				# done with file for now if it is an onsite 
+
+				# done with file for now if it is a standalone onsite 
 				continue
 			fi
 
@@ -122,7 +145,7 @@ for p in *; do
 			# check for lack of existence of old format Zoom naming convention first
 			# if so then look for new format, print error message if can't find that either
 			if eval [[ ! -e ${folder_formatted}/audio_only.m4a ]]; then
-				eval cd ${folder_formatted} # go into interview folder to check
+				eval cd ${folder_formatted} # go into interview folder to check - know it must be a folder if we are here
 
 				# want exactly one audio file on the top level of Zoom folder here, as no one should be modifying the output returned by Zoom
 				num_mono=$(find . -maxdepth 1 -name "audio*.m4a" -printf '.' | wc -m)
