@@ -45,20 +45,55 @@ for p in *; do
 			folder_formatted=$(printf %q "$folder")
 
 			# need to use eval along with the %q command
+			# check for lack of existence of old format Zoom naming convention first
+			# if so then look for new format, print error message if can't find that either
 			if eval [[ ! -e ${folder_formatted}/audio_only.m4a ]]; then
-				echo "(offsite ${folder} is missing a properly formatted interview audio file)"
-				continue
-			fi
+				eval cd ${folder_formatted} # go into interview folder to check
 
-			# get metadata info
-			date=$(echo "$folder" | awk -F ' ' '{print $1}') 
-			time=$(echo "$folder" | awk -F ' ' '{print $2}')
+				# want exactly one audio file on the top level of Zoom folder here, as no one should be modifying the output returned by Zoom
+				num_mono=$(find . -maxdepth 1 -name "audio*.m4a" -printf '.' | wc -m)
+				if [[ num_mono == 0 ]]; then
+					# still possible to be missing audio entirely
+					echo "(open offsite interview ${folder} is missing a properly formatted interview audio file)"
+					cd .. # leave interview folder before continuing
+					continue
+				fi
+				if [[ num_mono -gt 1 ]]; then
+					# this can happen if a Zoom session remains open but recording is stoppped and restarted
+					# doesn't fit with current naming conventions, so this is against the SOP, should be dealt with manually if it happens by accident
+					echo "(open offsite interview ${folder} contains multiple mono interview audio files, skipping for now)"
+					cd .. # leave interview folder before continuing
+					continue
+				fi
 
-			# don't reconvert if already converted for this batch! (in case resuming code after some disruption for example)
-			# also only convert if file hasn't already been processed in a previous run
-			# (look for prior output to know - sliding window QC)
-			if [[ ! -e ../../../../processed/"$p"/interviews/open/temp_audio/"$date"+"$time".wav && ! -e ../../../../processed/"$p"/interviews/open/sliding_window_audio_qc/"$date"+"$time".csv ]]; then
-				eval ffmpeg -i "$folder_formatted"/audio_only.m4a ../../../../processed/"$p"/interviews/open/temp_audio/"$date"+"$time".wav &> /dev/null
+				# at this point can now process the mono audio that was identified
+				# this "loop" will just go through the 1 file
+				for file in audio*.m4a; do
+					# get metadata info for naming converted file
+					date=$(echo "$folder" | awk -F ' ' '{print $1}') 
+					time=$(echo "$folder" | awk -F ' ' '{print $2}')
+
+					# don't reconvert if already converted for this batch! (in case resuming code after some disruption for example)
+					# also only convert if file hasn't already been processed in a previous run
+					# (look for prior output to know - sliding window QC)
+					if [[ ! -e ../../../../../processed/"$p"/interviews/open/temp_audio/"$date"+"$time".wav && ! -e ../../../../../processed/"$p"/interviews/open/sliding_window_audio_qc/"$date"+"$time".csv ]]; then
+						eval ffmpeg -i "$file" ../../../../../processed/"$p"/interviews/open/temp_audio/"$date"+"$time".wav &> /dev/null
+					fi
+				done
+
+				cd .. # leave interview folder at end of loop
+
+			else # handle old Zoom audio case when it occurs
+				# get metadata info
+				date=$(echo "$folder" | awk -F ' ' '{print $1}') 
+				time=$(echo "$folder" | awk -F ' ' '{print $2}')
+
+				# don't reconvert if already converted for this batch! (in case resuming code after some disruption for example)
+				# also only convert if file hasn't already been processed in a previous run
+				# (look for prior output to know - sliding window QC)
+				if [[ ! -e ../../../../processed/"$p"/interviews/open/temp_audio/"$date"+"$time".wav && ! -e ../../../../processed/"$p"/interviews/open/sliding_window_audio_qc/"$date"+"$time".csv ]]; then
+					eval ffmpeg -i "$folder_formatted"/audio_only.m4a ../../../../processed/"$p"/interviews/open/temp_audio/"$date"+"$time".wav &> /dev/null
+				fi
 			fi
 		done
 	fi
@@ -84,20 +119,55 @@ for p in *; do
 			fi
 
 			# once we know it is a folder, confirm it is an okay offsite
+			# check for lack of existence of old format Zoom naming convention first
+			# if so then look for new format, print error message if can't find that either
 			if eval [[ ! -e ${folder_formatted}/audio_only.m4a ]]; then
-				echo "(offsite ${folder} is missing a properly formatted interview audio file)"
-				continue
-			fi
+				eval cd ${folder_formatted} # go into interview folder to check
 
-			# get metadata info
-			date=$(echo "$folder" | awk -F ' ' '{print $1}') 
-			time=$(echo "$folder" | awk -F ' ' '{print $2}')
+				# want exactly one audio file on the top level of Zoom folder here, as no one should be modifying the output returned by Zoom
+				num_mono=$(find . -maxdepth 1 -name "audio*.m4a" -printf '.' | wc -m)
+				if [[ num_mono == 0 ]]; then
+					# still possible to be missing audio entirely
+					echo "(psychs offsite interview ${folder} is missing a properly formatted interview audio file)"
+					cd .. # leave interview folder before continuing
+					continue
+				fi
+				if [[ num_mono -gt 1 ]]; then
+					# this can happen if a Zoom session remains open but recording is stoppped and restarted
+					# doesn't fit with current naming conventions, so this is against the SOP, should be dealt with manually if it happens by accident
+					echo "(psychs offsite interview ${folder} contains multiple mono interview audio files, skipping for now)"
+					cd .. # leave interview folder before continuing
+					continue
+				fi
 
-			# don't reconvert if already converted for this batch! (in case resuming code after some disruption for example)
-			# also only convert if file hasn't already been processed in a previous run
-			# (look for prior output to know - sliding window QC)
-			if [[ ! -e ../../../../processed/"$p"/interviews/psychs/temp_audio/"$date"+"$time".wav && ! -e ../../../../processed/"$p"/interviews/psychs/sliding_window_audio_qc/"$date"+"$time".csv ]]; then
-				eval ffmpeg -i "$folder_formatted"/audio_only.m4a ../../../../processed/"$p"/interviews/psychs/temp_audio/"$date"+"$time".wav &> /dev/null
+				# at this point can now process the mono audio that was identified
+				# this "loop" will just go through the 1 file
+				for file in audio*.m4a; do
+					# get metadata info for naming converted file
+					date=$(echo "$folder" | awk -F ' ' '{print $1}') 
+					time=$(echo "$folder" | awk -F ' ' '{print $2}')
+
+					# don't reconvert if already converted for this batch! (in case resuming code after some disruption for example)
+					# also only convert if file hasn't already been processed in a previous run
+					# (look for prior output to know - sliding window QC)
+					if [[ ! -e ../../../../../processed/"$p"/interviews/psychs/temp_audio/"$date"+"$time".wav && ! -e ../../../../../processed/"$p"/interviews/psychs/sliding_window_audio_qc/"$date"+"$time".csv ]]; then
+						eval ffmpeg -i "$file" ../../../../../processed/"$p"/interviews/psychs/temp_audio/"$date"+"$time".wav &> /dev/null
+					fi
+				done
+
+				cd .. # leave interview folder at end of loop
+
+			else # handle old Zoom audio case when it occurs
+				# get metadata info
+				date=$(echo "$folder" | awk -F ' ' '{print $1}') 
+				time=$(echo "$folder" | awk -F ' ' '{print $2}')
+
+				# don't reconvert if already converted for this batch! (in case resuming code after some disruption for example)
+				# also only convert if file hasn't already been processed in a previous run
+				# (look for prior output to know - sliding window QC)
+				if [[ ! -e ../../../../processed/"$p"/interviews/psychs/temp_audio/"$date"+"$time".wav && ! -e ../../../../processed/"$p"/interviews/psychs/sliding_window_audio_qc/"$date"+"$time".csv ]]; then
+					eval ffmpeg -i "$folder_formatted"/audio_only.m4a ../../../../processed/"$p"/interviews/psychs/temp_audio/"$date"+"$time".wav &> /dev/null
+				fi
 			fi
 		done
 	fi
