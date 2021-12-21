@@ -34,6 +34,7 @@ for p in *; do # loop over all patients in the specified study folder on PHOENIX
 	cd "$p"/interviews
 
 	if [[ -d open ]]; then
+		cd open
 		# create transcripts folder if it hasn't been done for this patient yet
 		if [[ ! -d transcripts ]]; then
 			mkdir transcripts
@@ -106,8 +107,8 @@ for p in *; do # loop over all patients in the specified study folder on PHOENIX
 	# same process for psychs
 	if [[ -d psychs ]]; then 
 		cd psychs
-		python "$func_root"/interview_transcribeme_sftp_pull.py "psychs" "$data_root" "$study" "$p" "$transcribeme_username" "$transcribeme_password" "$pipeline" "$repo_root"/transcript_lab_email_body.txt
 
+		python "$func_root"/interview_transcribeme_sftp_pull.py "psychs" "$data_root" "$study" "$p" "$transcribeme_username" "$transcribeme_password" "$pipeline" "$repo_root"/transcript_lab_email_body.txt
 		
 		if [[ $pipeline = "Y" && -d pending_audio && ! -z "$(ls -A pending_audio)" ]]; then
 			# pending_audio folder will contain all necessary info
