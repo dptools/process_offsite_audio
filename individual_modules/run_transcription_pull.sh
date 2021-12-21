@@ -82,7 +82,7 @@ for p in *; do # loop over all patients in the specified study folder on PHOENIX
 			for file in done+*; do 
 				orig_name=$(echo "$file" | awk -F '+' '{print $2}') # splitting on + now
 				echo "$orig_name" >> "$repo_root"/transcript_lab_email_body.txt
-				mv "$file" ../completed_audio/"orig_name"
+				mv "$file" ../completed_audio/"$orig_name"
 				# also move corresponding transcript to the box push folder!
 				root_name=$(echo "$orig_name" | awk -F '.' '{print $1}')
 				cp ../transcripts/"$root_name".txt "$data_root"/PROTECTED/box_transfer/transcripts/"$root_name".txt
@@ -124,7 +124,7 @@ for p in *; do # loop over all patients in the specified study folder on PHOENIX
 			for file in done+*; do 
 				orig_name=$(echo "$file" | awk -F '+' '{print $2}') # splitting on + now
 				echo "$orig_name" >> "$repo_root"/transcript_lab_email_body.txt
-				mv "$file" ../completed_audio/"orig_name"
+				mv "$file" ../completed_audio/"$orig_name"
 				# also move corresponding transcript to the box push folder!
 				root_name=$(echo "$orig_name" | awk -F '.' '{print $1}')
 				cp ../transcripts/"$root_name".txt "$data_root"/PROTECTED/box_transfer/transcripts/"$root_name".txt
