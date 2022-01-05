@@ -147,7 +147,7 @@ def interview_transcript_qc(interview_type, data_root, study, ptID):
 		words_per = [len(x.split(" ")) for x in cur_sentences]
 		inaud_per = [x.count("[inaudible]") for x in cur_sentences]
 		quest_per = [x.count("?]") for x in cur_sentences] # assume bracket should never follow a ? unless the entire word is bracketed in
-		redact_per = [x.count("REDACTED") for x in cur_sentences]
+		redact_per = [x.count("redacted") for x in cur_sentences]
 		commas_per = [x.count(",") for x in cur_sentences]
 		dash_per = [x.count("-") for x in cur_sentences]
 		ninaud.append(np.nansum(inaud_per))
