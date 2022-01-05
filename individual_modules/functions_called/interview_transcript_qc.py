@@ -4,6 +4,7 @@ import os
 import pandas as pd 
 import numpy as np 
 import sys
+import glob
 
 # Function to generate summary values for each available transcript csv
 # Output will primarily serve as QC for transcription process, to be used in conjunction with audio QC
