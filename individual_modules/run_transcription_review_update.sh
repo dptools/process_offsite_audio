@@ -21,7 +21,7 @@ fi
 if [[ $pipeline = "Y" ]]; then
 	# add header info to email body about newly reviewed transcripts
 	echo "" >> "$repo_root"/transcript_lab_email_body.txt # blank line for spacing first
-	echo "List of all study transcripts newly returned by site review:" >> "$repo_root"/transcript_lab_email_body.txt
+	echo "-- List of all study transcripts newly returned by site review --" >> "$repo_root"/transcript_lab_email_body.txt
 fi
 
 # move to study's raw folder to loop over patients

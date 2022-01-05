@@ -53,9 +53,9 @@ for p in *; do
 	cd "$p"/interviews/open
 	# also check that something new has happened with this patient
 	# (technically if there is outstanding pending audio but no new files this will not catch, but that should be relatively rare and only include still generally active patients)
-	if [ ! -d audio_to_send ] && [ -z "$(ls -A temp_audio)" ] && [ -z "$(ls -A pending_audio)" ]; then
+	if [ ! -d audio_to_send ] && [ -z "$(ls -A temp_audio 2> /dev/null)" ] && [ -z "$(ls -A pending_audio 2> /dev/null)" ]; then
 		cd ../psychs # need to check nothing new happened in psychs either, otherwise don't want to skip
-		if [ ! -d audio_to_send ] && [ -z "$(ls -A temp_audio)" ] && [ -z "$(ls -A pending_audio)" ]; then
+		if [ ! -d audio_to_send ] && [ -z "$(ls -A temp_audio 2> /dev/null)" ] && [ -z "$(ls -A pending_audio 2> /dev/null)" ]; then
 			cd "$data_root"/PROTECTED/"$study"/processed # back out of pt folder before skipping
 			continue
 		fi
