@@ -29,6 +29,7 @@ def redact_transcript(filename, savepath):
 		pre_redact_list = line.split("{")
 		if len(pre_redact_list) == 1: # if no redaction at all in this line write it as is and continue
 			output_file.write(pre_redact_list[0])
+			output_file.write("\n") # add a new line after each line is written! good for reading in txt file, csv conversion script will strip
 			continue
 		# handle anything that comes before the first redaction, start string that will be written to new file for this line
 		modified_line = pre_redact_list[0] + "{"
