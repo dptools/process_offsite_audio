@@ -192,7 +192,7 @@ def interview_transcript_qc(interview_type, data_root, study, ptID):
 	times = [np.nan for x in range(len(fnames))]
 
 	# construct CSV - always includes all transcripts for this patient/interview type, and will be overwritten each time
-	values = [ref_times, study_days, times, week_days, studies, patients, nsubjs, 
+	values = [ref_times, study_days, times, week_days, studies, patients, int_nums, fnames, nsubjs, 
 			  nsens_S1, nwords_S1, minwordsper_S1, maxwordsper_S1,
 			  nsens_S2, nwords_S2, minwordsper_S2, maxwordsper_S2,
 			  nsens_S3, nwords_S3, minwordsper_S3, maxwordsper_S3,
