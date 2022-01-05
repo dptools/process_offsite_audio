@@ -25,7 +25,8 @@ if [ $pipeline = "Y" ]; then
 	echo "Transcription Pull Updates for ${study}:" > "$repo_root"/transcript_lab_email_body.txt 
 	echo "" >> "$repo_root"/transcript_lab_email_body.txt # add blank line after main header. no need to add another below because those are automatically added before each patient header
 	# give some additional context for what will be inside this email
-	echo "Each newly pulled interview transcript and each transcript still being waited on are listed below, split by patient ID. Additionally, if warnings were encountered during the process of pulling an available transcript, they will be listed under the corresponding patient section." >> "$repo_root"/transcript_lab_email_body.txt
+	echo "Each newly pulled interview transcript and each transcript still being waited on are listed below, split by patient ID. If warnings were encountered during the process of pulling an available transcript, they will be listed under the corresponding patient section." >> "$repo_root"/transcript_lab_email_body.txt
+	echo "Additionally, any transcript files newly returned from this site's manual redaction review process will be listed at the end of this email. If any of the final redacted transcripts appear to require manual review, a warning will be appended below." >> "$repo_root"/transcript_lab_email_body.txt
 fi
 
 # now start going through patients for the download - do open and psychs separately

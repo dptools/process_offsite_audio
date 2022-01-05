@@ -27,6 +27,16 @@ if [[ ! -d $study ]]; then
 	exit
 fi
 
+# make directory for logs if needed
+if [[ ! -d ${repo_root}/logs ]]; then
+	mkdir "$repo_root"/logs
+fi
+# save with unique timestamp (unix seconds)
+log_timestamp=`date +%s`
+# test using console and log file simultaneously
+exec >  >(tee -ia "$repo_root"/logs/transcript_process_logging_"$log_timestamp".txt)
+exec 2> >(tee -ia "$repo_root"/logs/transcript_process_logging_"$log_timestamp".txt >&2)
+
 # let user know script is starting
 echo ""
 echo "Beginning script - interview transcript preprocessing for:"
@@ -100,10 +110,12 @@ echo ""
 
 # send email notifying lab members about transcripts successfully pulled/processed, and those we are still waiting on. 
 echo "Emailing status update to lab"
-mail -s "[Interview Transcript Pipeline Updates] New Transcripts Received from TranscribeMe" "$lab_email_list" < "$repo_root"/transcript_lab_email_body.txt
-rm "$repo_root"/transcript_lab_email_body.txt # this will be created by wrapping transcript pull script, cleared out here after email sent
 # in future will want to improve how we implement the email list, may be different for different studies
 # also may want to improve how we do the subject line so it's less repetitive (include date info possibly? and/or give info on total number of new transcripts? even just study name?)
+mail -s "[Interview Transcript Pipeline Updates] New Transcripts Received from TranscribeMe" "$lab_email_list" < "$repo_root"/transcript_lab_email_body.txt
+#rm "$repo_root"/transcript_lab_email_body.txt # this will be created by wrapping transcript pull script, cleared out here after email sent
+# for now don't delete the email, as it isn't sending on dev server. instead save it to logs folder
+mv "$repo_root"/transcript_lab_email_body.txt "$repo_root"/logs/transcript_lab_email_body_"$log_timestamp".txt
 echo ""
 
 # add current time for runtime tracking purposes
