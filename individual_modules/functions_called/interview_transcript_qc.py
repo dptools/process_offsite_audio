@@ -218,4 +218,4 @@ def interview_transcript_qc(interview_type, data_root, study, ptID):
 			
 if __name__ == '__main__':
     # Map command line arguments to function arguments.
-    interview_transcript_qc(sys.argv[1], sys.argv[2])
+    interview_transcript_qc(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])
