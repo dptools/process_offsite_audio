@@ -25,15 +25,14 @@ for p in *; do
 	if [[ ! -d $p/interviews/open/transcripts ]]; then
 		continue
 	fi
-	cd "$p"/interviews/open
+	cd "$p"/interviews/open/transcripts
 
 
 	# then check that there are some top level PROTECTED transcript files available for this patient
-	if [ -z "$(ls -A transcripts/*.txt)" ]; then
+	if [ -z "$(ls -A *.txt 2> /dev/null)" ]; then 
 		cd "$data_root"/PROTECTED/"$study"/processed # back out of folder before skipping over patient
 		continue
 	fi
-	cd transcripts
 
 	# now get started
 	echo "On patient ${p}"
@@ -65,15 +64,13 @@ for p in *; do
 	if [[ ! -d $p/interviews/psychs/transcripts ]]; then
 		continue
 	fi
-	cd "$p"/interviews/psychs
-
+	cd "$p"/interviews/psychs/transcripts
 
 	# then check that there are some top level PROTECTED transcript files available for this patient
-	if [ -z "$(ls -A transcripts/*.txt)" ]; then
+	if [ -z "$(ls -A *.txt 2> /dev/null)" ]; then
 		cd "$data_root"/PROTECTED/"$study"/processed # back out of folder before skipping over patient
 		continue
 	fi
-	cd transcripts
 
 	# now get started
 	echo "On patient ${p}"

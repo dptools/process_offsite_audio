@@ -18,9 +18,9 @@ def redact_transcript(filename, savepath):
 
 	# get a list of the lines in the input transcript txt file
 	with open(filename, 'r') as input_file: # read mode
-    	input_lines = input_file.readlines()
-    	# remove white space characters from the ends of the lines for cleaning
-    	input_lines = [line.rstrip() for line in input_lines]
+		input_lines = input_file.readlines()
+		# remove white space characters from the ends of the lines for cleaning
+		input_lines = [line.rstrip() for line in input_lines]
 
 	# now go line by line through the input and write a modified version to the output file
 	output_file = open(savepath, 'w') # write mode
@@ -84,5 +84,5 @@ def redact_transcript(filename, savepath):
 	return
 
 if __name__ == '__main__':
-    # Map command line arguments to function arguments.
+	# Map command line arguments to function arguments.
 	redact_transcript(sys.argv[1], sys.argv[2])
