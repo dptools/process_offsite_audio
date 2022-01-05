@@ -71,6 +71,10 @@ for p in *; do # loop over all patients in the specified study folder on PHOENIX
 			continue 
 		fi
 
+		# substitute tabs with single space for easier parsing (returned by transcribeme see a mix!)
+		# this file will be kept only temporarily
+		sed 's/\t/ /g' "$file" > "$name"_noTABS.txt
+
 		# prep CSV with column headers
 		# (no reason to have DPDash formatting for a transcript CSV, so I choose these columns)
 		# (some of them are just for ease of future concat/merge operations)
@@ -101,7 +105,10 @@ for p in *; do # loop over all patients in the specified study folder on PHOENIX
 			text=$(echo "$text" | tr -d '"') # remove extra characters at end of each sentence
 			text=$(echo "$text" | tr -d '\r') # remove extra characters at end of each sentence
 			echo "${study},${p},${name},${sub},${time},\"${text}\"" >> csv/"$name".csv # add the line to CSV
-		done < "$file"
+		done < "$name"_noTABS.txt
+
+		# remove the temporary file
+		rm "$name"_noTABS.txt
 	done
 
 	if [[ "$pt_has_new" = true ]]; then
