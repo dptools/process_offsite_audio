@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import os
+import sys
 
 # helper function takes path (filename) to raw transcript txt file and saves a new copy with PII redacted at savepath
 # relies on PII marked within curly brackets. each instance of curly brackets will have all words within (separated on spaces) replaced with "REDACTED"
