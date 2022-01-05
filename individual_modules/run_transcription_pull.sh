@@ -1,9 +1,12 @@
 #!/bin/bash
 
 # will call this module with arguments in main pipeline, root then study then transcribeme username and password
+data_root="$1"
 study="$2"
 transcribeme_username="$3"
 transcribeme_password="$4"
+
+echo "Beginning TranscribeMe pull script for study ${study}"
 
 # allow module to be called stand alone as well as from main pipeline
 if [[ -z "${repo_root}" ]]; then
@@ -39,7 +42,12 @@ for p in *; do # loop over all patients in the specified study folder on PHOENIX
 		if [[ ! -d transcripts ]]; then
 			mkdir transcripts
 		fi
-		# also create a folder for the completed audio if needed
+		# also make a subfolder for transcripts that will be reviewed by sites
+		# helps with tracking, but also allows us to maintain original transcript returned by TranscribeMe on server, in case ever need to refer back
+		if [[ ! -d transcripts/prescreening ]]; then
+			mkdir transcripts/prescreening
+		fi
+		# create a folder for the completed audio if needed
 		if [[ ! -d completed_audio ]]; then
 			mkdir completed_audio
 		fi
@@ -52,7 +60,12 @@ for p in *; do # loop over all patients in the specified study folder on PHOENIX
 		if [[ ! -d transcripts ]]; then
 			mkdir transcripts
 		fi
-		# also create a folder for the completed audio if needed
+		# also make a subfolder for transcripts that will be reviewed by sites
+		# helps with tracking, but also allows us to maintain original transcript returned by TranscribeMe on server, in case ever need to refer back
+		if [[ ! -d transcripts/prescreening ]]; then
+			mkdir transcripts/prescreening
+		fi
+		# create a folder for the completed audio if needed
 		if [[ ! -d completed_audio ]]; then
 			mkdir completed_audio
 		fi
@@ -83,9 +96,11 @@ for p in *; do # loop over all patients in the specified study folder on PHOENIX
 				orig_name=$(echo "$file" | awk -F '+' '{print $2}') # splitting on + now
 				echo "$orig_name" >> "$repo_root"/transcript_lab_email_body.txt
 				mv "$file" ../completed_audio/"$orig_name"
-				# also move corresponding transcript to the box push folder!
+				# also move corresponding transcript to the box push folder! for now do for all
+				# at some point this will become based on whether the file exists in prescreening though, as eventually only a random subset will be put there
+				# could add some info about this to the email summary as well!
 				root_name=$(echo "$orig_name" | awk -F '.' '{print $1}')
-				cp ../transcripts/"$root_name".txt "$data_root"/PROTECTED/box_transfer/transcripts/"$root_name".txt
+				cp ../transcripts/prescreening/"$root_name".txt "$data_root"/PROTECTED/box_transfer/transcripts/"$root_name".txt
 			done
 
 			# then list transcripts that remain pending
@@ -125,9 +140,11 @@ for p in *; do # loop over all patients in the specified study folder on PHOENIX
 				orig_name=$(echo "$file" | awk -F '+' '{print $2}') # splitting on + now
 				echo "$orig_name" >> "$repo_root"/transcript_lab_email_body.txt
 				mv "$file" ../completed_audio/"$orig_name"
-				# also move corresponding transcript to the box push folder!
+				# also move corresponding transcript to the box push folder! for now do for all
+				# at some point this will become based on whether the file exists in prescreening though, as eventually only a random subset will be put there
+				# could add some info about this to the email summary as well!
 				root_name=$(echo "$orig_name" | awk -F '.' '{print $1}')
-				cp ../transcripts/"$root_name".txt "$data_root"/PROTECTED/box_transfer/transcripts/"$root_name".txt
+				cp ../transcripts/prescreening/"$root_name".txt "$data_root"/PROTECTED/box_transfer/transcripts/"$root_name".txt
 			done
 
 			# then list transcripts that remain pending

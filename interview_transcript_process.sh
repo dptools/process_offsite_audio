@@ -42,6 +42,7 @@ now=$(date +"%T")
 echo "Current time: ${now}"
 echo ""
 
+# run transcript pull script, also puts together bulk of email update
 bash "$repo_root"/individual_modules/run_transcription_pull.sh "$data_root" "$study" "$transcribeme_username" "$transcribeme_password"
 echo ""
 echo "Transcript pull complete"
@@ -52,7 +53,50 @@ now=$(date +"%T")
 echo "Current time: ${now}"
 echo ""
 
-# TODO - will have other processing steps inserted here once more transcript logistics have been worked out
+# put copies of any newly reviewed transcripts (returned via Lochness) from raw to appropriate processed folder location here
+# info on newly reviewed transcripts also appended to email
+bash "$repo_root"/individual_modules/run_transcription_review_update.sh "$data_root" "$study" 
+echo ""
+echo "Transcript review updates complete"
+echo ""
+
+# add current time for runtime tracking purposes
+now=$(date +"%T")
+echo "Current time: ${now}"
+echo ""
+
+# run script to get redacted copies of the transcripts into GENERAL
+bash "$repo_root"/individual_modules/run_transcript_redaction.sh "$data_root" "$study"
+echo ""
+echo "Any newly reviewed transcripts have been redacted"
+echo ""
+
+# add current time for runtime tracking purposes
+now=$(date +"%T")
+echo "Current time: ${now}"
+echo ""
+
+# run script to convert new transcripts in GENERAL to CSV
+bash "$repo_root"/individual_modules/run_transcript_csv_conversion.sh "$data_root" "$study"
+echo ""
+echo "CSV conversion completed for newly redacted transcripts"
+echo ""
+
+# add current time for runtime tracking purposes
+now=$(date +"%T")
+echo "Current time: ${now}"
+echo ""
+
+# run transcript QC
+bash "$repo_root"/individual_modules/run_transcript_qc.sh "$data_root" "$study"
+echo ""
+echo "Transcript QC completed"
+echo ""
+
+# add current time for runtime tracking purposes
+now=$(date +"%T")
+echo "Current time: ${now}"
+echo ""
 
 # send email notifying lab members about transcripts successfully pulled/processed, and those we are still waiting on. 
 echo "Emailing status update to lab"

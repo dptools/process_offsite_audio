@@ -36,7 +36,8 @@ def transcript_pull(interview_type, data_root, study, ptID, username, password, 
 		rootname = filename.split(".")[0]
 		transname = rootname + ".txt"
 		src_path = os.path.join(source_directory, transname)
-		local_path = os.path.join(data_root, "PROTECTED", study, "processed", ptID, "interviews", interview_type, "transcripts", transname)
+		# for now put all pulled transcripts into the prescreening folder. eventually that will change though, will need to be random process for sites that have completed initial reviews
+		local_path = os.path.join(data_root, "PROTECTED", study, "processed", ptID, "interviews", interview_type, "transcripts", "prescreening", transname)
 		# now actually attempt the pull. will hit the except in all cases where the transcript isn't available yet, but don't want that to crash rest of code obviously
 		try:
 			cnopts = pysftp.CnOpts()
