@@ -48,6 +48,8 @@ def interview_mono_qc(interview_type, data_root, study, ptID):
 		print("Haven't converted any new audio files yet for input patient " + ptID + " " + interview_type)
 		return
 
+
+	cur_files.sort() # go in order, although can also always sort CSV later.
 	for filename in cur_files:
 		if not filename.endswith(".wav"): # skip any non-audio files (and folders)
 			continue
