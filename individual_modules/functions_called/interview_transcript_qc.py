@@ -18,7 +18,7 @@ def interview_transcript_qc(interview_type, data_root, study, ptID):
 			 "num_sentences_S1","num_words_S1","min_words_in_sen_S1","max_words_in_sen_S1", # per subject speaking amount stats
 			 "num_sentences_S2","num_words_S2","min_words_in_sen_S2","max_words_in_sen_S2", # generally should have S1 and S2 as main interviewer and patient
 			 "num_sentences_S3","num_words_S3","min_words_in_sen_S3","max_words_in_sen_S3", # expect at most 3 relevant subject IDs usually
-			 "num_inaudible","num_questionable","num_redacted","num_commas","num_dashes", # transcription accuracy related measures
+			 "num_inaudible","num_questionable","num_crosstalk","num_redacted","num_commas","num_dashes", # transcription accuracy related measures
 			 "final_timestamp","min_timestamp_space","max_timestamp_space","min_timestamp_space_per_word","max_timestamp_space_per_word"] # timestamp accuracy related measures
 
 	# initialize lists to fill in df
@@ -46,6 +46,7 @@ def interview_transcript_qc(interview_type, data_root, study, ptID):
 	# transcript quality
 	ninaud=[]
 	nquest=[]
+	ncross=[]
 	nredact=[]
 	ncommas=[]
 	ndashes = []
@@ -147,11 +148,13 @@ def interview_transcript_qc(interview_type, data_root, study, ptID):
 		words_per = [len(x.split(" ")) for x in cur_sentences]
 		inaud_per = [x.count("[inaudible]") for x in cur_sentences]
 		quest_per = [x.count("?]") for x in cur_sentences] # assume bracket should never follow a ? unless the entire word is bracketed in
+		cross_per = [x.count("[crosstalk]") for x in cur_sentences]
 		redact_per = [x.count("redacted") for x in cur_sentences]
 		commas_per = [x.count(",") for x in cur_sentences]
 		dash_per = [x.count("-") for x in cur_sentences]
 		ninaud.append(np.nansum(inaud_per))
 		nquest.append(np.nansum(quest_per))
+		ncross.append(np.nansum(cross_per))
 		nredact.append(np.nansum(redact_per))
 		ncommas.append(np.nansum(commas_per))
 		ndashes.append(np.nansum(dash_per))
@@ -197,7 +200,7 @@ def interview_transcript_qc(interview_type, data_root, study, ptID):
 			  nsens_S1, nwords_S1, minwordsper_S1, maxwordsper_S1,
 			  nsens_S2, nwords_S2, minwordsper_S2, maxwordsper_S2,
 			  nsens_S3, nwords_S3, minwordsper_S3, maxwordsper_S3,
-			  ninaud, nquest, nredact, ncommas, ndashes, 
+			  ninaud, nquest, ncross, nredact, ncommas, ndashes, 
 			  fintimes, minspaces, maxspaces, minspacesweighted, maxspacesweighted]
 	new_csv = pd.DataFrame()
 	for i in range(len(headers)):
