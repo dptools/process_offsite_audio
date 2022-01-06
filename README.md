@@ -37,6 +37,7 @@ The pipeline expects to work within a PHOENIX data structure matching the conven
 	<summary>The basic input assumptions are as follows:</summary>
 The audio side looks for interviews/psychs and interviews/open datatypes on the PROTECTED side of raw, which should be (exclusively) populated by Lochness. Any data under these folders is expected to match one of two conventions - either a folder produced by Zoom uploaded as is or a standalone audio file recorded using a single physical device named according to the convention YYYYMMDDHHMMSS.WAV. For the Zoom interviews, the code currently only processes the single combined audio file provided. 
 
+
 The transcript side of the pipeline primarily relies on outputs from the audio side. It also expects a box_transfer/transcripts folder on the top level of the PHOENIX structure's PROTECTED side, to facilitate transfering completed transcripts to the corresponding sites for correctness review. In finalizing the transcripts that are subsequently returned by sites, it looks for interviews/transcripts datatype on the PROTECTED side of raw. 
 
 The code also requires a metadata file under the study level of GENERAL, and will only process a particular patient ID if that ID appears as a row in the metadata file containing a valid consent date (per Lochness guidelines). If there are issues encountered with the basic study setup appropriate error messages will be logged.
