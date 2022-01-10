@@ -56,6 +56,8 @@ The transcript side of the pipeline can be run using the same settings file with
 
 Each major step is initiated by the pipeline using a script in the individual_modules folder, see this folder if specific steps need to be run independently. 
 
+For use on ProNet, config files are already generated for each site in the pronet_site_configs subfolder, and can be edited as needed. The all_sites_cron_script.sh runs the audio and transcript sides of the pipeline for each of these configs, used for running the code across sites (currently on the ProNet dev server at 4pm daily).
+
 ### Audio Processing Details
 The major steps of the audio side of the pipeline are:
 1. Identify new audio files in raw by checking against existing QC outputs

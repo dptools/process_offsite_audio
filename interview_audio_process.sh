@@ -50,11 +50,15 @@ cd "$study"/raw # switch to study's raw folder for first loop over patient list
 if [[ ! -d ${repo_root}/logs ]]; then
 	mkdir "$repo_root"/logs
 fi
+# keep logs in individual directories per study
+if [[ ! -d ${repo_root}/logs/${study} ]]; then
+	mkdir "$repo_root"/logs/"$study"
+fi
 # save with unique timestamp (unix seconds)
 log_timestamp=`date +%s`
 # test using console and log file simultaneously
-exec >  >(tee -ia "$repo_root"/logs/audio_process_logging_"$log_timestamp".txt)
-exec 2> >(tee -ia "$repo_root"/logs/audio_process_logging_"$log_timestamp".txt >&2)
+exec >  >(tee -ia "$repo_root"/logs/"$study"/audio_process_logging_"$log_timestamp".txt)
+exec 2> >(tee -ia "$repo_root"/logs/"$study"/audio_process_logging_"$log_timestamp".txt >&2)
 
 # let user know script is starting
 echo ""
@@ -247,7 +251,7 @@ if [ $auto_send_on = "Y" ] || [ $auto_send_on = "y" ]; then
 	mail -s "[${study} Interview Pipeline Updates] New Audio Uploaded to TranscribeMe" "$lab_email_list" < "$repo_root"/audio_lab_email_body.txt
 	#rm "$repo_root"/audio_lab_email_body.txt # this will be created by email alert script above, cleared out here after email is sent
 	# for now don't delete the email, as it isn't sending on dev server. instead save it to logs folder
-	mv "$repo_root"/audio_lab_email_body.txt "$repo_root"/logs/audio_lab_email_body_"$log_timestamp".txt
+	mv "$repo_root"/audio_lab_email_body.txt "$repo_root"/logs/"$study"/audio_lab_email_body_"$log_timestamp".txt
 	echo ""
 
 	# finally, send an email to TranscribeMe so they know new audio has been uploaded and how much - but of course only if there was some new audio uploaded successfully
@@ -257,7 +261,7 @@ if [ $auto_send_on = "Y" ] || [ $auto_send_on = "y" ]; then
 		mail -s "[Baker Lab] New Audio to Transcribe" -r "$transcribeme_email_reply_to" "$transcribeme_email_list" < "$repo_root"/audio_transcribeme_email_body.txt
 		#rm "$repo_root"/audio_transcribeme_email_body.txt # this will also be created by email alert script above, cleared out here after email sent
 		# for now don't delete the email, as it isn't sending on dev server. instead save it to logs folder
-		mv "$repo_root"/audio_transcribeme_email_body.txt "$repo_root"/logs/audio_transcribeme_email_body_"$log_timestamp".txt
+		mv "$repo_root"/audio_transcribeme_email_body.txt "$repo_root"/logs/"$study"/audio_transcribeme_email_body_"$log_timestamp".txt
 	else # if email file doesn't exist in pipeline means no new audio pushed
 		echo "No new audios uploaded, so no alert to send to TranscribeMe"
 	fi	

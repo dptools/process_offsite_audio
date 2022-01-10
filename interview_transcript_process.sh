@@ -31,11 +31,15 @@ fi
 if [[ ! -d ${repo_root}/logs ]]; then
 	mkdir "$repo_root"/logs
 fi
+# keep logs in individual directories per study
+if [[ ! -d ${repo_root}/logs/${study} ]]; then
+	mkdir "$repo_root"/logs/"$study"
+fi
 # save with unique timestamp (unix seconds)
 log_timestamp=`date +%s`
 # test using console and log file simultaneously
-exec >  >(tee -ia "$repo_root"/logs/transcript_process_logging_"$log_timestamp".txt)
-exec 2> >(tee -ia "$repo_root"/logs/transcript_process_logging_"$log_timestamp".txt >&2)
+exec >  >(tee -ia "$repo_root"/logs/"$study"/transcript_process_logging_"$log_timestamp".txt)
+exec 2> >(tee -ia "$repo_root"/logs/"$study"/transcript_process_logging_"$log_timestamp".txt >&2)
 
 # let user know script is starting
 echo ""
@@ -115,7 +119,7 @@ echo "Emailing status update to lab"
 mail -s "[Interview Transcript Pipeline Updates] New Transcripts Received from TranscribeMe" "$lab_email_list" < "$repo_root"/transcript_lab_email_body.txt
 #rm "$repo_root"/transcript_lab_email_body.txt # this will be created by wrapping transcript pull script, cleared out here after email sent
 # for now don't delete the email, as it isn't sending on dev server. instead save it to logs folder
-mv "$repo_root"/transcript_lab_email_body.txt "$repo_root"/logs/transcript_lab_email_body_"$log_timestamp".txt
+mv "$repo_root"/transcript_lab_email_body.txt "$repo_root"/logs/"$study"/transcript_lab_email_body_"$log_timestamp".txt
 echo ""
 
 # add current time for runtime tracking purposes
