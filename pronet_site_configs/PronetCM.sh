@@ -2,7 +2,7 @@
 
 # basic path settings
 data_root="/opt/software/Pronet_data_sync/PHOENIX"
-study="PronetCH"
+study="PronetCM"
 export data_root
 export study
 

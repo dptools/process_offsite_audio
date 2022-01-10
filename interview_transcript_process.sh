@@ -18,14 +18,33 @@ export repo_root
 # running config file will set up necessary environment variables
 source "$config_path"
 
-# confirm study folder exists where it should
-# most of the other checks should be unnecessary though - processed folders should have been set up by push side script
-# (if that hasn't been run yet, transcript pull just won't have anything to check for and will exit naturally, not a big deal)
+# confirm study folder exists where it should, and has the expected GENERAL/PROTECTED and raw and processed folder paths
 cd "$data_root"/PROTECTED
 if [[ ! -d $study ]]; then
 	echo "Invalid data root path or study ID"
 	exit
 fi
+if [[ ! -d ../GENERAL/$study ]]; then
+	echo "Invalid data root path or study ID"
+	exit
+fi
+if [[ ! -d $study/raw ]]; then
+	echo "Study folder improperly set up"
+	exit
+fi
+if [[ ! -d $study/processed ]]; then
+	echo "Study folder improperly set up"
+	exit
+fi
+if [[ ! -d ../GENERAL/$study/raw ]]; then
+	echo "Study folder improperly set up"
+	exit
+fi
+if [[ ! -d ../GENERAL/$study/processed ]]; then
+	echo "Study folder improperly set up"
+	exit
+fi
+cd "$study"/raw # switch to study's raw folder for first loop over patient list
 
 # make directory for logs if needed
 if [[ ! -d ${repo_root}/logs ]]; then
