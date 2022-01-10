@@ -21,31 +21,31 @@ source "$config_path"
 # confirm study folder exists where it should, and has the expected GENERAL/PROTECTED and raw and processed folder paths
 cd "$data_root"/PROTECTED
 if [[ ! -d $study ]]; then
-	echo "Invalid data root path or study ID"
+	echo "Invalid data root path ${data_root} or study ID ${study}"
 	exit
 fi
 if [[ ! -d ../GENERAL/$study ]]; then
-	echo "Invalid data root path or study ID"
+	echo "Invalid data root path ${data_root} or study ID  ${study}"
 	exit
 fi
 if [[ ! -d $study/raw ]]; then
-	echo "Study folder improperly set up"
+	echo "Study folder ${study} improperly set up"
 	exit
 fi
 if [[ ! -d $study/processed ]]; then
-	echo "Study folder improperly set up"
+	echo "Study folder ${study} improperly set up"
 	exit
 fi
 if [[ ! -d ../GENERAL/$study/raw ]]; then
-	echo "Study folder improperly set up"
+	echo "Study folder ${study} improperly set up"
 	exit
 fi
 if [[ ! -d ../GENERAL/$study/processed ]]; then
-	echo "Study folder improperly set up"
+	echo "Study folder ${study} improperly set up"
 	exit
 fi
 if [[ ! -e ../GENERAL/${study}/${study}_metadata.csv ]]; then
-	echo "Study missing metadata"
+	echo "Study ${study} missing metadata"
 	exit
 fi
 cd "$study"/raw # switch to study's raw folder for first loop over patient list

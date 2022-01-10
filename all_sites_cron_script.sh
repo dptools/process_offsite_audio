@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # activate python environment
-source activate audio_process
+. /home/mme36/anaconda3/etc/profile.d/conda.sh
+conda activate audio_process
 
 # run audio side code for each config
 for file in /opt/software/process_offsite_audio/pronet_site_configs/*.sh; do
