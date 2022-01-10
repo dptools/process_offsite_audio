@@ -44,6 +44,10 @@ if [[ ! -d ../GENERAL/$study/processed ]]; then
 	echo "Study folder improperly set up"
 	exit
 fi
+if [[ ! -e ../GENERAL/${study}/${study}_metadata.csv ]]; then
+	echo "Study missing metadata"
+	exit
+fi
 cd "$study"/raw # switch to study's raw folder for first loop over patient list
 
 # make directory for logs if needed

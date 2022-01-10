@@ -44,7 +44,12 @@ if [[ ! -d ../GENERAL/$study/processed ]]; then
 	echo "Study folder improperly set up"
 	exit
 fi
-cd "$study"/raw # switch to study's raw folder for first loop over patient list
+if [[ ! -e ../GENERAL/${study}/${study}_metadata.csv ]]; then
+	echo "Study missing metadata"
+	exit
+fi
+# don't repeat further folder setup here though, because audio side of pipeline should really always be run before transcript
+# just want basic check to make sure invalid site IDs don't get traversed
 
 # make directory for logs if needed
 if [[ ! -d ${repo_root}/logs ]]; then
