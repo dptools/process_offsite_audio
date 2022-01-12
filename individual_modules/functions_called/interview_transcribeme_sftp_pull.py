@@ -8,7 +8,7 @@ import sys
 import logging
 logging.basicConfig()
 
-def transcript_pull(interview_type, data_root, study, ptID, username, password, pipeline=False, lab_email_path=None):
+def transcript_pull(interview_type, data_root, study, ptID, username, password, transcription_language, pipeline=False, lab_email_path=None):
 	# track transcripts that got properly pulled this time, for use in cleaning up server later
 	successful_transcripts = []
 
@@ -35,7 +35,8 @@ def transcript_pull(interview_type, data_root, study, ptID, username, password, 
 		# setup expected source filepath and desired destination filepath
 		rootname = filename.split(".")[0]
 		transname = rootname + ".txt"
-		src_path = os.path.join(source_directory, transname)
+		transname_lookup = rootname.split("session")[0] + transcription_language + "_session" + rootname.split("session")[1] + ".txt"
+		src_path = os.path.join(source_directory, transname_lookup)
 		# for now put all pulled transcripts into the prescreening folder. eventually that will change though, will need to be random process for sites that have completed initial reviews
 		local_path = os.path.join(data_root, "PROTECTED", study, "processed", ptID, "interviews", interview_type, "transcripts", "prescreening", transname)
 		# now actually attempt the pull. will hit the except in all cases where the transcript isn't available yet, but don't want that to crash rest of code obviously
@@ -44,7 +45,7 @@ def transcript_pull(interview_type, data_root, study, ptID, username, password, 
 			cnopts.hostkeys = None # ignore hostkey
 			with pysftp.Connection(host, username=username, password=password, cnopts=cnopts) as sftp:
 				sftp.get(src_path, local_path)
-			successful_transcripts.append(transname) # if we reach this line it means transcript has been successfully pulled onto PHOENIX
+			successful_transcripts.append(transname_lookup) # if we reach this line it means transcript has been successfully pulled onto PHOENIX
 			# this audio is no longer pending then, decrypted copy should be deleted from briefcase
 			if pipeline:
 				pending_rename = "done+" + filename # + not used in transcript names, so will make it easy to separate prepended info back out
@@ -99,14 +100,14 @@ def transcript_pull(interview_type, data_root, study, ptID, username, password, 
 if __name__ == '__main__':
 	# Map command line arguments to function arguments.
 	try:
-		if sys.argv[7] == "Y":
+		if sys.argv[8] == "Y":
 			# if called from main pipeline want to just rename the pulled files in pending_audio here, so email script can use it before deletion
-			transcript_pull(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6], pipeline=True, lab_email_path=sys.argv[8])
+			transcript_pull(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6], sys.argv[7], pipeline=True, lab_email_path=sys.argv[9])
 			# should always expect a 5th argument if here, as that means coming from pipeline. otherwise no need to even enter the lab_email_path setting
 		else:
 			# otherwise just deleting the audio immediately
-			transcript_pull(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6])
+			transcript_pull(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6], sys.argv[7])
 	except:
 		# if pipeline argument never even provided just want to ignore, not crash
-		transcript_pull(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6])
+		transcript_pull(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6], sys.argv[7])
     

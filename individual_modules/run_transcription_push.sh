@@ -5,8 +5,9 @@ data_root="$1"
 study="$2"
 transcribeme_username="$3"
 transcribeme_password="$4"
-auto_send_limit_bool="$5"
-auto_send_limit="$6"
+transcription_language="$5"
+auto_send_limit_bool="$6"
+auto_send_limit="$7"
 
 echo "Beginning audio SFTP script for study ${study}"
 
@@ -61,7 +62,7 @@ for p in *; do # loop over all patients in the specified study folder
 
 	# this script will go through the files in to_send and send them to transcribeme, moving them to pending_audio if push was successful
 	# behaves slightly differently whether this is called individually or via pipeline, because when called via pipeline have email alert related work to do
-	python "$func_root"/interview_transcribeme_sftp_push.py "open" "$data_root" "$study" "$p" "$transcribeme_username" "$transcribeme_password" "$pipeline"
+	python "$func_root"/interview_transcribeme_sftp_push.py "open" "$data_root" "$study" "$p" "$transcribeme_username" "$transcribeme_password" "$transcription_language" "$pipeline"
 
 	# check if to_send is empty now - if so delete it, if not print an error message
 	if [ -z "$(ls -A audio_to_send)" ]; then
@@ -99,7 +100,7 @@ for p in *; do # loop over all patients in the specified study folder
 
 	# this script will go through the files in to_send and send them to transcribeme, moving them to pending_audio if push was successful
 	# behaves slightly differently whether this is called individually or via pipeline, because when called via pipeline have email alert related work to do
-	python "$func_root"/interview_transcribeme_sftp_push.py "psychs" "$data_root" "$study" "$p" "$transcribeme_username" "$transcribeme_password" "$pipeline"
+	python "$func_root"/interview_transcribeme_sftp_push.py "psychs" "$data_root" "$study" "$p" "$transcribeme_username" "$transcribeme_password" "$transcription_language" "$pipeline"
 
 	# check if to_send is empty now - if so delete it, if not print an error message
 	if [ -z "$(ls -A audio_to_send)" ]; then

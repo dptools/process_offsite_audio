@@ -237,7 +237,7 @@ if [ $auto_send_on = "Y" ] || [ $auto_send_on = "y" ]; then
 	echo "Hi," > "$repo_root"/audio_transcribeme_email_body.txt
 
 	# run push script
-	bash "$repo_root"/individual_modules/run_transcription_push.sh "$data_root" "$study" "$transcribeme_username" "$transcribeme_password" "$auto_send_limit_bool" "$auto_send_limit"
+	bash "$repo_root"/individual_modules/run_transcription_push.sh "$data_root" "$study" "$transcribeme_username" "$transcribeme_password" "$transcription_language" "$auto_send_limit_bool" "$auto_send_limit"
 	echo ""
 
 	# add current time for runtime tracking purposes

@@ -65,7 +65,7 @@ The major steps of the audio side of the pipeline are:
 3. Rename the new audio file copies to match SOP convention
 4. Run audio QC on the new audio files
 5. Check for sufficient volume levels and acceptable interview lengths
-6. Upload all approved new audio files to TranscribeMe
+6. Upload all approved new audio files to TranscribeMe (with temporarily added site-based language marker, to assist TranscribeMe in assigning transcribers)
 7. Send email listing all files that were newly processed, indicating which were successfully uploaded to TranscribeMe and otherwise documenting possible issues
 
 <details>
@@ -140,10 +140,10 @@ Interfacing with TranscribeMe is done using the same SFTP protocol as described 
 ### Next Steps
 * Move from ProNet development server to ProNet production server
 * Complete security review and prod server testing
-* Implement tracking of audio language for TranscribeMe
 * Implement the random selection stage for site review of returned transcripts
-* Handle equipment/software edge cases (such as site using Microsoft Teams?)
+* Handle equipment/software edge cases (such as site using Microsoft Teams? Maybe Cisco WebEx?)
+* Add some basic video QC functionality
 * Finalize plans for code monitoring and manual intervention protocols
 * Replicate setup for Prescient
 
-Aim is to launch this workflow for real data collection at sites beginning in late January 2022. 
+Aim is to launch this workflow for real data collection at sites beginning in late January 2022. Once dataflow and quality control are successfully running, we will then come up with a plan for writing more intensive feature extraction code for this interview datatype.

@@ -32,9 +32,12 @@ lab_email_list="mennis2@partners.org"
 transcribeme_email_list="mennis2@partners.org"
 # finally should also supply an email address that any answers will go to if TranscribeMe staff reply to the email alert
 transcribeme_email_reply_to="Michaela Ennis <mennis@g.harvard.edu>"
+# for U24 now have language marker setting to add to the files that are uploaded to TranscribeMe, to alert them of what language the audio will be in
+transcription_language="ENGLISH"
 export lab_email_list
 export transcribeme_email_list
 export transcribeme_email_reply_to
+export transcription_language
 
 # finally setup the secure passwords
 # provide path to a hidden .sh file that should be viewable only be the user calling the pipeline

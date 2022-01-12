@@ -9,7 +9,7 @@ import sys
 import logging
 logging.basicConfig()
 
-def transcript_push(interview_type, data_root, study, ptID, username, password, pipeline=False):
+def transcript_push(interview_type, data_root, study, ptID, username, password, transcription_language, pipeline=False):
 	# currently only expect this to be called from wrapping bash script (possibly via main pipeline), so means there definitely will be some audio to push for this ptID
 	print("Pushing " + interview_type + " audio to TranscribeMe for participant " + ptID)
 	# print statement useful here because the process can be slow, will give user an idea of how far along we are
@@ -35,7 +35,8 @@ def transcript_push(interview_type, data_root, study, ptID, username, password, 
 			continue
 		
 		# source filepath is just filename, setup desired destination path
-		dest_path = os.path.join(destination_directory, filename)
+		filename_with_lang = filename.split("session")[0] + transcription_language + "_session" + filename.split("session")[1]
+		dest_path = os.path.join(destination_directory, filename_with_lang)
 
 		# now actually attempt the push - should work unless there is an unexpected error, but of course will catch those so entire script doesn't fail
 		try:
@@ -65,12 +66,12 @@ def transcript_push(interview_type, data_root, study, ptID, username, password, 
 if __name__ == '__main__':
 	# Map command line arguments to function arguments.
 	try:
-		if sys.argv[7] == "Y":
+		if sys.argv[8] == "Y":
 			# if called from main pipeline want to just rename the pulled files in pending_audio here, so email script can use it before deletion
-			transcript_push(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6], pipeline=True)
+			transcript_push(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6], sys.argv[7], pipeline=True)
 		else:
 			# otherwise just deleting the audio immediately
-			transcript_push(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6])
+			transcript_push(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6], sys.argv[7])
 	except:
 		# if pipeline argument never even provided just want to ignore, not crash
-		transcript_push(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6])
+		transcript_push(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6], sys.argv[7])

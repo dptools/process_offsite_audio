@@ -5,6 +5,7 @@ data_root="$1"
 study="$2"
 transcribeme_username="$3"
 transcribeme_password="$4"
+transcription_language="$5"
 
 echo "Beginning TranscribeMe pull script for study ${study}"
 
@@ -81,7 +82,7 @@ for p in *; do # loop over all patients in the specified study folder on PHOENIX
 		# this script will go through the pending_audio folder for this patient, check for corresponding named outputs on the transcribeme server, pulling them if available
 		# it will also do file management on the server, update the pending_audio folder accordingly
 		# behaves slightly differently whether this is called individually or via pipeline, because when called via pipeline have email alert related work to do
-		python "$func_root"/interview_transcribeme_sftp_pull.py "open" "$data_root" "$study" "$p" "$transcribeme_username" "$transcribeme_password" "$pipeline" "$repo_root"/transcript_lab_email_body.txt
+		python "$func_root"/interview_transcribeme_sftp_pull.py "open" "$data_root" "$study" "$p" "$transcribeme_username" "$transcribeme_password" "$transcription_language" "$pipeline" "$repo_root"/transcript_lab_email_body.txt
 
 		# now add new info about this patient to email alert body (if this is part of pipeline and there was pending audio)
 		if [[ $pipeline = "Y" && -d pending_audio && ! -z "$(ls -A pending_audio)" ]]; then
@@ -126,7 +127,7 @@ for p in *; do # loop over all patients in the specified study folder on PHOENIX
 	if [[ -d psychs ]]; then 
 		cd psychs
 
-		python "$func_root"/interview_transcribeme_sftp_pull.py "psychs" "$data_root" "$study" "$p" "$transcribeme_username" "$transcribeme_password" "$pipeline" "$repo_root"/transcript_lab_email_body.txt
+		python "$func_root"/interview_transcribeme_sftp_pull.py "psychs" "$data_root" "$study" "$p" "$transcribeme_username" "$transcribeme_password" "$transcription_language" "$pipeline" "$repo_root"/transcript_lab_email_body.txt
 		
 		if [[ $pipeline = "Y" && -d pending_audio && ! -z "$(ls -A pending_audio)" ]]; then
 			# pending_audio folder will contain all necessary info

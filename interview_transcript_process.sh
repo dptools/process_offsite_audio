@@ -81,7 +81,7 @@ echo "Current time: ${now}"
 echo ""
 
 # run transcript pull script, also puts together bulk of email update
-bash "$repo_root"/individual_modules/run_transcription_pull.sh "$data_root" "$study" "$transcribeme_username" "$transcribeme_password"
+bash "$repo_root"/individual_modules/run_transcription_pull.sh "$data_root" "$study" "$transcribeme_username" "$transcribeme_password" "$transcription_language"
 echo ""
 echo "Transcript pull complete"
 echo ""
