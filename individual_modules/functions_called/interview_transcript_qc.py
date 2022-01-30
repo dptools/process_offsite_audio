@@ -213,7 +213,10 @@ def interview_transcript_qc(interview_type, data_root, study, ptID):
 	output_path_format = study+"-"+ptID+"-interviewRedactedTranscriptQC-" + interview_type + "-day*.csv"
 	output_paths = glob.glob(output_path_format)
 	# delete any old DPDash transcript CSVs
+	cur_day_string = str(study_days[0]) + "to" + str(study_days[-1]) + '.csv' # check to see if the new one is actually new though
 	for old_dp in output_paths:
+		if old_dp.split("-day")[-1] == cur_day_string:
+			return # do nothing if we already have!
 		os.remove(old_dp)
 	# save the current one finally
 	output_path_cur = study + "-" + ptID + "-interviewRedactedTranscriptQC-" + interview_type + "-day" + str(study_days[0]) + "to" + str(study_days[-1]) + '.csv'
