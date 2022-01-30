@@ -36,7 +36,7 @@ def interview_mono_rename(interview_type, data_root, study, ptID):
 	# if reach this point, there should definitely be corresponding raw audio folders
 	raw_folder_paths = os.listdir(os.path.join(data_root, "PROTECTED", study, "raw", ptID, "interviews", interview_type))
 	raw_folder_names_int = [x.split("/")[-1] for x in raw_folder_paths]
-	raw_folder_names = [x for x in raw_folder_names_int if (os.path.isdir(x) and len(x.split(" ")) > 1 and len(x.split(" ")[0]) == 10 and len(x.split(" ")[1] == 8)) or (x.endswith(".WAV") and len(x) == 18)] # keep only files that seem to meet the convention
+	raw_folder_names = [x for x in raw_folder_names_int if (os.path.isdir(os.path.join(data_root, "PROTECTED", study, "raw", ptID, "interviews", interview_type, x)) and len(x.split(" ")) > 1 and len(x.split(" ")[0]) == 10 and len(x.split(" ")[1] == 8)) or (x.endswith(".WAV") and len(x) == 18)] # keep only files that seem to meet the convention
 	if interview_type == "psychs":
 		# make the onsites named the same as offsites for sorting purposess
 		raw_folder_names = [x[0:4] + "-" + x[4:6] + "-" + x[6:8] + " " + x[8:10] + "." + x[10:12] + "." + x[12:14] if x.endswith(".WAV") else x for x in raw_folder_names]
