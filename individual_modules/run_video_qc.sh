@@ -34,6 +34,22 @@ for p in *; do
 	fi
 	cd video_frames
 
+	for subfolder in *; do
+		# delete any empty extracted frames folders
+		if [ -z "$(ls -A ${subfolder})" ]; then
+			rm -rf "$subfolder"
+		fi
+	done
+
+	# confirm once more the video frames folder for this ID isn't empty
+	cd ..
+	if [ -z "$(ls -A video_frames)" ]; then
+		cd "$data_root"/PROTECTED/"$study"/processed # back out of folder before skipping over patient
+		continue
+	fi
+	cd video_frames
+
+	# now safe to start
 	echo "On patient ${p}"
 	
 	# now can run main video QC script on this patient
@@ -58,6 +74,22 @@ for p in *; do
 	fi
 	cd video_frames
 
+	for subfolder in *; do
+		# delete any empty extracted frames folders
+		if [ -z "$(ls -A ${subfolder})" ]; then
+			rm -rf "$subfolder"
+		fi
+	done
+
+	# confirm once more the video frames folder for this ID isn't empty
+	cd ..
+	if [ -z "$(ls -A video_frames)" ]; then
+		cd "$data_root"/PROTECTED/"$study"/processed # back out of folder before skipping over patient
+		continue
+	fi
+	cd video_frames
+
+	# now safe to start
 	echo "On patient ${p}"
 	
 	# now can run main video QC script on this patient
