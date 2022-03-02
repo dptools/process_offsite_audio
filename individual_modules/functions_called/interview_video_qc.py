@@ -48,7 +48,8 @@ def interview_video_qc(interview_type, data_root, study, ptID):
 	cur_folders_unprocessed.sort()
 
 	# set up PyFeat
-	detector = Detector() # ok to use default models for this
+	# ok to use default models for what we are tracking, need None for the others to avoid memory issues!
+	detector = Detector(au_model=None,emotion_model=None)
 
 	# loop through folders to actually process, keeping track of bare bones features for now
 	num_frames = []
