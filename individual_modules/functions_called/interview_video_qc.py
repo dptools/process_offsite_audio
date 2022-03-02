@@ -147,7 +147,7 @@ def interview_video_qc(interview_type, data_root, study, ptID):
 		week_days.append(dpdash_weekday)
 
 		# time of day
-		time_str = cur_name.split(" ")[1]
+		time_str = folder.split("+")[1]
 		final_time = ":".join(time_str.split("."))
 		times.append(final_time)
 	# final static columns
