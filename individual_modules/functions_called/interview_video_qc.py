@@ -72,13 +72,19 @@ def interview_video_qc(interview_type, data_root, study, ptID):
 				# actually load in the image
 				cur_image = cv2.imread(file)
 				# run PyFeat
-				image_results = detector.detect_image(cur_image)
+				image_results = detector.detect_faces(cur_image)
 			except:
 				print("Problem running PyFeat on frame " + file + " - it will be excluded from stats for " + folder)
 				continue
 			# save only the most relevant features for QC for right now
-			image_core_faces = image_results.facebox()
-			image_core_faces["face_number"] = range(image_core_faces.shape[0])
+			# image results is a list of lists containing the basic features for each detected face, make it into a DF first
+			image_core_faces = pd.DataFrame()
+			image_core_faces["FaceRectX"] = [x[0] for x in image_results]
+			image_core_faces["FaceRectY"] = [x[1] for x in image_results]
+			image_core_faces["FaceRectWidth"] = [x[2] for x in image_results]
+			image_core_faces["FaceRectHeight"] = [x[3] for x in image_results]
+			image_core_faces["FaceScore"] = [x[4] for x in image_results]
+			image_core_faces["FaceNumber"] = range(image_core_faces.shape[0])
 			# one file per image
 			image_core_faces.to_csv("PyFeatOutputs/" + file.split(".")[0] + ".csv", index=False)
 			# increment stats now
