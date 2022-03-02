@@ -46,7 +46,7 @@ def audio_length_check(data_root, study, length_limit):
 			print("Problem with GENERAL processed audio folder for " + ptID + " " + interview_type + ", continuing")
 			continue
 
-		dpdash_name_format = study + "-" + ptID + "-interviewMonoAudioQC-" + interview_type + "-day*to*.csv"
+		dpdash_name_format = study + "-" + ptID + "-interviewMonoAudioQC_" + interview_type + "-day*to*.csv"
 		try:
 			dpdash_name = glob.glob(dpdash_name_format)[0] # DPDash script deletes any older days in this subfolder, so should only get 1 match each time
 			dpdash_qc = pd.read_csv(dpdash_name) 

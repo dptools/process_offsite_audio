@@ -210,7 +210,7 @@ def interview_transcript_qc(interview_type, data_root, study, ptID):
 
 	# now prepare to save new CSV for this patient
 	os.chdir(os.path.join(data_root, "GENERAL", study, "processed", ptID, "interviews", interview_type))
-	output_path_format = study+"-"+ptID+"-interviewRedactedTranscriptQC-" + interview_type + "-day*.csv"
+	output_path_format = study+"-"+ptID+"-interviewRedactedTranscriptQC_" + interview_type + "-day*.csv"
 	output_paths = glob.glob(output_path_format)
 	# delete any old DPDash transcript CSVs
 	cur_day_string = str(study_days[0]) + "to" + str(study_days[-1]) + '.csv' # check to see if the new one is actually new though
@@ -219,7 +219,7 @@ def interview_transcript_qc(interview_type, data_root, study, ptID):
 			return # do nothing if we already have!
 		os.remove(old_dp)
 	# save the current one finally
-	output_path_cur = study + "-" + ptID + "-interviewRedactedTranscriptQC-" + interview_type + "-day" + str(study_days[0]) + "to" + str(study_days[-1]) + '.csv'
+	output_path_cur = study + "-" + ptID + "-interviewRedactedTranscriptQC_" + interview_type + "-day" + str(study_days[0]) + "to" + str(study_days[-1]) + '.csv'
 	new_csv.to_csv(output_path_cur,index=False)
 	return
 			
