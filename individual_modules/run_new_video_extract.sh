@@ -59,13 +59,13 @@ for p in *; do
 			num_new=$(find . -maxdepth 1 -name "video*.mp4" -printf '.' | wc -m)
 			num_old=$(find . -maxdepth 1 -name "zoom*.mp4" -printf '.' | wc -m)
 			num_total=$(($num_new + $num_old))
-			if [[ num_total == 0 ]]; then
+			if [[ $num_total == 0 ]]; then
 				# still possible to be missing audio entirely
 				echo "(open interview ${folder} is missing a properly formatted interview video file)"
 				cd .. # leave interview folder before continuing
 				continue
 			fi
-			if [[ num_total -gt 1 ]]; then
+			if [[ $num_total -gt 1 ]]; then
 				# this can happen if a Zoom session remains open but recording is stoppped and restarted
 				# doesn't fit with current naming conventions, so this is against the SOP, should be dealt with manually if it happens by accident
 				echo "(open interview ${folder} contains multiple interview video files, skipping for now)"
@@ -139,13 +139,13 @@ for p in *; do
 			num_new=$(find . -maxdepth 1 -name "video*.mp4" -printf '.' | wc -m)
 			num_old=$(find . -maxdepth 1 -name "zoom*.mp4" -printf '.' | wc -m)
 			num_total=$(($num_new + $num_old))
-			if [[ num_total == 0 ]]; then
+			if [[ $num_total == 0 ]]; then
 				# still possible to be missing audio entirely
 				echo "(psychs interview ${folder} is missing a properly formatted interview video file)"
 				cd .. # leave interview folder before continuing
 				continue
 			fi
-			if [[ num_total -gt 1 ]]; then
+			if [[ $num_total -gt 1 ]]; then
 				# this can happen if a Zoom session remains open but recording is stoppped and restarted
 				# doesn't fit with current naming conventions, so this is against the SOP, should be dealt with manually if it happens by accident
 				echo "(psychs interview ${folder} contains multiple interview video files, skipping for now)"

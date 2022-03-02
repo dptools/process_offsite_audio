@@ -59,13 +59,13 @@ for p in *; do
 
 				# want exactly one audio file on the top level of Zoom folder here, as no one should be modifying the output returned by Zoom
 				num_mono=$(find . -maxdepth 1 -name "audio*.m4a" -printf '.' | wc -m)
-				if [[ num_mono == 0 ]]; then
+				if [[ $num_mono == 0 ]]; then
 					# still possible to be missing audio entirely
 					echo "(open offsite interview ${folder} is missing a properly formatted interview audio file)"
 					cd .. # leave interview folder before continuing
 					continue
 				fi
-				if [[ num_mono -gt 1 ]]; then
+				if [[ $num_mono -gt 1 ]]; then
 					# this can happen if a Zoom session remains open but recording is stoppped and restarted
 					# doesn't fit with current naming conventions, so this is against the SOP, should be dealt with manually if it happens by accident
 					echo "(open offsite interview ${folder} contains multiple mono interview audio files, skipping for now)"
@@ -149,13 +149,13 @@ for p in *; do
 
 				# want exactly one audio file on the top level of Zoom folder here, as no one should be modifying the output returned by Zoom
 				num_mono=$(find . -maxdepth 1 -name "audio*.m4a" -printf '.' | wc -m)
-				if [[ num_mono == 0 ]]; then
+				if [[ $num_mono == 0 ]]; then
 					# still possible to be missing audio entirely
 					echo "(psychs offsite interview ${folder} is missing a properly formatted interview audio file)"
 					cd .. # leave interview folder before continuing
 					continue
 				fi
-				if [[ num_mono -gt 1 ]]; then
+				if [[ $num_mono -gt 1 ]]; then
 					# this can happen if a Zoom session remains open but recording is stoppped and restarted
 					# doesn't fit with current naming conventions, so this is against the SOP, should be dealt with manually if it happens by accident
 					echo "(psychs offsite interview ${folder} contains multiple mono interview audio files, skipping for now)"

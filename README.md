@@ -3,6 +3,8 @@ Code for data organization and quality control of clinical interview audio, curr
 
 This repository is a prerelease of Baker Lab code, made publicly viewable for the purposes of testing on collaborator machines. Contact mennis@g.harvard.edu with any unanswered questions.
 
+A basic video QC side to the pipeline has now been added and initial testing has completed. However, details remain to be finalized - at that time documentation will be updated.
+
 ### Setup
 The code requires ffmpeg and python3 to be installed, as well as use of standard bash commands. For the email alerting to work, the sendmail command must be configured. The python package dependencies can be found in the setup/audio_process.yml file, with the exception of soundfile and librosa. If Anaconda3 is installed this file can be used directly to generate a usable python environment. 
 
