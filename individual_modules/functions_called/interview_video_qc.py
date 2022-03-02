@@ -174,7 +174,7 @@ def interview_video_qc(interview_type, data_root, study, ptID):
 	# single existing DPDash file is expected - do concatenation and then delete old version (since naming convention will not overwrite)
 	if len(output_paths) == 1:
 		old_df = pd.read_csv(output_paths[0])
-		join_csv=pd.concat([old_df, new_csv])
+		join_csv=pd.concat([old_df, new_df])
 		join_csv.reset_index(drop=True, inplace=True)
 		# drop any duplicates in case audio got decrypted a second time - shouldn't happen via pipeline
 		join_csv.drop_duplicates(subset=["patient", "day", "timeofday"],inplace=True)
@@ -187,7 +187,7 @@ def interview_video_qc(interview_type, data_root, study, ptID):
 		print("Warning - multiple DPDash CSVs exist for patient " + ptID + ". Saving current CSV separately for now")
 	# with 0 or more than 1, just save this as is
 	output_path_cur = study + "-" + ptID + "-interviewVideoQC_" + interview_type + "-day" + str(study_days[0]) + "to" + str(study_days[-1]) + '.csv'
-	new_csv.to_csv(output_path_cur,index=False)
+	new_df.to_csv(output_path_cur,index=False)
 
 if __name__ == '__main__':
     # Map command line arguments to function arguments.
