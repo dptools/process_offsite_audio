@@ -98,7 +98,8 @@ for p in *; do
 					for hr in $(seq 0 $hours); do
 						# if a minute doesn't exist in the hour ffmpeg will fail that command, but no effect on the greater pipeline so it is easiest to let it just proceed this way
 						# this is assuming a video will not hit 10+ hours, which seems reasonable
-						ffmpeg -ss 0"$hr":00:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute00.jpg &> /dev/null
+						# offset first frame by 1 second to avoid capturing possible empty screen at very beginning of recording
+						ffmpeg -ss 0"$hr":00:01 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute00.jpg &> /dev/null
 						ffmpeg -ss 0"$hr":05:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute05.jpg &> /dev/null
 						ffmpeg -ss 0"$hr":10:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute10.jpg &> /dev/null
 						ffmpeg -ss 0"$hr":15:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute15.jpg &> /dev/null

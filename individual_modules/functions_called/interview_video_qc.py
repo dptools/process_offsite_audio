@@ -56,7 +56,12 @@ def interview_video_qc(interview_type, data_root, study, ptID):
 	min_faces_in_frame = []
 	max_faces_in_frame = []
 	mean_faces_in_frame = []
+	min_face_confidence = []
+	max_face_confidence = []
 	mean_face_confidence = []
+	min_face_area = []
+	max_face_area = []
+	mean_face_area = []
 	for folder in cur_folders_unprocessed:
 		os.chdir(folder)
 		os.mkdir("PyFeatOutputs")
@@ -64,6 +69,7 @@ def interview_video_qc(interview_type, data_root, study, ptID):
 		frames_count = 0
 		face_nums_list = []
 		face_conf_list = []
+		face_area_list = []
 		for file in os.listdir("."):
 			if not file.endswith(".jpg"):
 				# only process images
@@ -91,12 +97,19 @@ def interview_video_qc(interview_type, data_root, study, ptID):
 			frames_count = frames_count + 1
 			face_nums_list.append(image_core_faces.shape[0])
 			face_conf_list.extend(image_core_faces["FaceScore"].tolist())
+			cur_faces_area = [float(x) * y for x,y in zip(image_core_faces["FaceRectHeight"].tolist(),image_core_faces["FaceRectWidth"].tolist())]
+			face_area_list.extend(cur_faces_area)
 		# add to overall list for this interivew
 		num_frames.append(frames_count)
 		min_faces_in_frame.append(np.min(face_nums_list))
 		max_faces_in_frame.append(np.max(face_nums_list))
 		mean_faces_in_frame.append(np.mean(face_nums_list))
+		min_face_confidence.append(np.min(face_conf_list))
+		max_face_confidence.append(np.max(face_conf_list))
 		mean_face_confidence.append(np.mean(face_conf_list))
+		min_face_area.append(np.min(face_area_list))
+		max_face_area.append(np.max(face_area_list))
+		mean_face_area.append(np.mean(face_area_list))
 		# back out of folder before continuing loop
 		os.chdir("..") 
 
@@ -107,12 +120,19 @@ def interview_video_qc(interview_type, data_root, study, ptID):
 	new_df["minimum_faces_detected_in_frame"] = min_faces_in_frame
 	new_df["maximum_faces_detected_in_frame"] = max_faces_in_frame
 	new_df["mean_faces_detected_in_frame"] = mean_faces_in_frame
+	new_df["minimum_face_confidence_score"] = min_face_confidence
+	new_df["maximum_face_confidence_score"] = max_face_confidence
 	new_df["mean_face_confidence_score"] = mean_face_confidence
+	new_df["minimum_face_area"] = min_face_area
+	new_df["maximum_face_area"] = max_face_area
+	new_df["mean_face_area"] = mean_face_area
 
 	# now need to add metadata columns to the csv using the raw filename parameter
 	# first specify column headers for final DPDash CSV
 	headers=["reftime","day","timeofday","weekday","study","patient","interview_number",
-			 "number_extracted_frames","minimum_faces_detected_in_frame","maximum_faces_detected_in_frame","mean_faces_detected_in_frame", "mean_face_confidence_score"]
+			 "number_extracted_frames","minimum_faces_detected_in_frame","maximum_faces_detected_in_frame","mean_faces_detected_in_frame", 
+			 "minimum_face_confidence_score","maximum_face_confidence_score","mean_face_confidence_score",
+			 "minimum_face_area","maximum_face_area","mean_face_area"]
 	# initialize lists to fill in df
 	# reftime column will leave blank so can just make it np.nan at the end
 	study_days = []

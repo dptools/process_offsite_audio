@@ -30,6 +30,8 @@ if [ $pipeline = "Y" ]; then
 	echo "Additionally, any transcript files newly returned from this site's manual redaction review process will be listed at the end of this email. If any of the final redacted transcripts appear to require manual review, a warning will be appended below." >> "$repo_root"/transcript_lab_email_body.txt
 	echo "" >> "$repo_root"/transcript_lab_email_body.txt
 	echo "-- TranscribeMe SFTP pull details --" >> "$repo_root"/transcript_lab_email_body.txt
+
+	trans_updates=0 # variable will track if there are any updates across this study - will flip to 1 if get any, and regardless will export this at the end
 fi
 
 # now start going through patients for the download - do open and psychs separately
@@ -86,6 +88,9 @@ for p in *; do # loop over all patients in the specified study folder on PHOENIX
 
 		# now add new info about this patient to email alert body (if this is part of pipeline and there was pending audio)
 		if [[ $pipeline = "Y" && -d pending_audio && ! -z "$(ls -A pending_audio)" ]]; then
+			# if reach this point there is something to put in the email!
+			trans_updates=1
+
 			# pending_audio folder will contain all necessary info
 			cd pending_audio
 
@@ -130,6 +135,9 @@ for p in *; do # loop over all patients in the specified study folder on PHOENIX
 		python "$func_root"/interview_transcribeme_sftp_pull.py "psychs" "$data_root" "$study" "$p" "$transcribeme_username" "$transcribeme_password" "$transcription_language" "$pipeline" "$repo_root"/transcript_lab_email_body.txt
 		
 		if [[ $pipeline = "Y" && -d pending_audio && ! -z "$(ls -A pending_audio)" ]]; then
+			# if reach this point there is something to put in the email!
+			trans_updates=1
+
 			# pending_audio folder will contain all necessary info
 			cd pending_audio
 
@@ -167,3 +175,8 @@ for p in *; do # loop over all patients in the specified study folder on PHOENIX
 	# back out of pt folder when done
 	cd "$data_root"/PROTECTED/"$study"/processed
 done
+
+if [ $pipeline = "Y" ]; then
+	# so we only send the email if there is something worthwhile in it
+	export trans_updates
+fi

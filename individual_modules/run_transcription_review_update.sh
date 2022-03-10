@@ -22,6 +22,8 @@ if [[ $pipeline = "Y" ]]; then
 	# add header info to email body about newly reviewed transcripts
 	echo "" >> "$repo_root"/transcript_lab_email_body.txt # blank line for spacing first
 	echo "-- List of all study transcripts newly returned by site review --" >> "$repo_root"/transcript_lab_email_body.txt
+
+	review_updates=0 # variable will track if there are any updates across this study - will flip to 1 if get any, and regardless will export this at the end
 fi
 
 # move to study's raw folder to loop over patients
@@ -49,6 +51,9 @@ for p in *; do
 			cp "$file" "$data_root"/PROTECTED/"$study"/processed/"$p"/interviews/"$int_type"/transcripts/"$file"
 			# add this file to the email list as well when relevant
 			if [[ $pipeline = "Y" ]]; then
+				# if reach this point there is something to put in the email!
+				review_updates=1
+
 				echo "$file" >> "$repo_root"/transcript_lab_email_body.txt
 			fi
 		fi
@@ -57,3 +62,8 @@ for p in *; do
 	# back out of pt folder when done
 	cd "$data_root"/PROTECTED/"$study"/raw
 done
+
+if [ $pipeline = "Y" ]; then
+	# so we only send the email if there is something worthwhile in it
+	export review_updates
+fi

@@ -250,25 +250,23 @@ if [ $auto_send_on = "Y" ] || [ $auto_send_on = "y" ]; then
 	bash "$repo_root"/individual_modules/run_email_writer.sh "$data_root" "$study"
 	echo ""
 
-	# now actually send the email notifying lab members about audio files successfully pushed, with info about any errors or excluded files. 
-	echo "Emailing status update to lab"
-	mail -s "[${study} Interview Pipeline Updates] New Audio Uploaded to TranscribeMe" "$lab_email_list" < "$repo_root"/audio_lab_email_body.txt
-	#rm "$repo_root"/audio_lab_email_body.txt # this will be created by email alert script above, cleared out here after email is sent
-	# for now don't delete the email, as it isn't sending on dev server. instead save it to logs folder
-	mv "$repo_root"/audio_lab_email_body.txt "$repo_root"/logs/"$study"/audio_lab_email_body_"$log_timestamp".txt
-	echo ""
-
-	# finally, send an email to TranscribeMe so they know new audio has been uploaded and how much - but of course only if there was some new audio uploaded successfully
+	# finally, deal with email alerts. if no audio was successfully uploaded, there will be no transcribeme email file. only send emails if there is an update to report on
+	# TODO - make sure that site emails will still send though if it is just that all the audios were rejected for example
 	if [[ -e "$repo_root"/audio_transcribeme_email_body.txt ]]; then 
-		echo "Sending email alert to TranscribeMe"
+		echo "Sending email alerts"
+		# actually send the email notifying lab members about audio files successfully pushed, with info about any errors or excluded files. 
+		mail -s "[${study} Interview Pipeline Updates] New Audio Processed" "$lab_email_list" < "$repo_root"/audio_lab_email_body.txt
+
+		# also have the email compiled for TranscribeMe
 		# use -r as part of the email command for this one so TranscribeMe will see reply address as mennis@g.harvard.edu
-		mail -s "[Baker Lab] New Audio to Transcribe" -r "$transcribeme_email_reply_to" "$transcribeme_email_list" < "$repo_root"/audio_transcribeme_email_body.txt
-		#rm "$repo_root"/audio_transcribeme_email_body.txt # this will also be created by email alert script above, cleared out here after email sent
-		# for now don't delete the email, as it isn't sending on dev server. instead save it to logs folder
+		mail -s "[${study}] New Audio to Transcribe" -r "$transcribeme_email_reply_to" "$transcribeme_email_list" < "$repo_root"/audio_transcribeme_email_body.txt
+		# move the email to logs folder for reference
 		mv "$repo_root"/audio_transcribeme_email_body.txt "$repo_root"/logs/"$study"/audio_transcribeme_email_body_"$log_timestamp".txt
 	else # if email file doesn't exist in pipeline means no new audio pushed
-		echo "No new audios uploaded, so no alert to send to TranscribeMe"
+		echo "No new audios uploaded, so no emails to send"
 	fi	
+	# move the site email to logs folder for reference regardless
+	mv "$repo_root"/audio_lab_email_body.txt "$repo_root"/logs/"$study"/audio_lab_email_body_"$log_timestamp".txt
 	echo ""
 
 	# add current time for runtime tracking purposes
