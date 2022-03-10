@@ -100,7 +100,9 @@ Each major step is initiated by the pipeline using a script in the individual_mo
 
 <details>
 	<summary>Click here for an overview of data flow and the use of different modules through the pipeline</summary>
+
 ![architecture diagram](./images/InterviewU24Diagram.png) 
+
 </details>
 
 Additional details on each step are provided below. 
@@ -246,17 +248,23 @@ These are the primary mode of communication for the pipeline. For each site a se
 
 <details>
 	<summary>Click here for an example of an audio update email</summary>
+
 ![audio email](./images/AudioEmail.png) 
+
 </details>
 
 <details>
 	<summary>Click here for an example of a transcript update email from a new upload to TranscribeMe</summary>
+
 ![transcribeme email](./images/TranscriptEmail1.png) 
+
 </details>
 
 <details>
 	<summary>Click here for an example of a transcript update email from a transcript newly returned from manual site redaction review</summary>
+
 ![review email](./images/TranscriptEmail2.png) 
+
 </details>
 
 The emails continue to be refined and their exact content may change.
@@ -266,22 +274,30 @@ These are the primary outputs pushed to the data lake (besides the redacted tran
 
 <details>
 	<summary>Click here for an example snippet of the Pronet file accounting page on DPDash, now including rows that indicate availability of audio, transcript, and video QC outputs for each subject ID</summary>
+
 ![dpdash](./images/PronetFiles.png) 
+
 </details>
 
 <details>
 	<summary>Click here for an example of an audio QC CSV</summary>
+
 ![audio qc](./images/AudioQC.png) 
+
 </details>
 
 <details>
 	<summary>Click here for an example snippet of a transcript QC CSV, chosen because it detected a typo in the speaker identification in one of the transcripts (one line was attributed to S21). Note many additional transcript QC features were omitted from this image for legibility</summary>
+
 ![transcript qc](./images/TranscriptQC.png) 
+
 </details>
 
 <details>
 	<summary>Click here for an example snippet of a video QC CSV. In this example there are no faces detected at the start of the video, but 2 faces as expected at the 5 minute mark (it is a short interview). Note some additional video QC features were omitted from this image</summary>
+
 ![video qc](./images/VideoQC.png) 
+
 </details>
 
 For more information on the specific features extracted as part of each of the above QC modules, see the associated "Processing Details" section above.
@@ -294,6 +310,7 @@ This code has been running autonomously on the Pronet development server since e
 
 <details>
 	<summary>Details on site mock interview status as of 3/9/2022:</summary>
+
 Sites that have successfully had some data processed - 
 * PronetLA, PronetYA, and PronetNN have had an interview make it all the way through the pipeline.
 	* In the case of PronetYA 3 interviews have gone through, all other sites with any processing have done a single interview.
@@ -367,6 +384,7 @@ The next steps described here focus on what is necessary to finalize the data fl
 	* Switch check for required encoding to UTF-8 instead of ASCII
 	* Update transcript QC code so features are correct in every language (requires some more information from TranscribeMe in part)
 	* Should also make sure that Zoom file naming conventions are not substantially different in different countries!
+* Perhaps add video duration, resolution, and fps to the video QC to supplement the image-based/face-related features
 
 </details>
 
@@ -423,8 +441,10 @@ For the existing protocols, it is an ongoing issue to ensure that sites are awar
 
 </details>
 
+Finally, there are a few logistics to handle specific to Pronet and Prescient. For Pronet, we just need to take the last steps for setup of the production server. This involves confirming that the latest version of the code with the new video QC features is installed, verifying that this code passed the Yale IT security review, and performing an actual test run on prod.
+
 <details>
-	<summary>Finally, there are a few logistics to handle specific to Pronet and Prescient. For Pronet, we just need to take the last steps for setup of the production server. This involves confirming that the latest version of the code with the new video QC features is installed, verifying that this code passed the Yale IT security review, and performing an actual test run on prod. For Prescient, there are many more steps, as we still need to get the development server installation working first before proceeding to production setup. The major blockers we are actively trying to address for this are:</summary>
+	<summary>For Prescient, there are many more steps, as we still need to get the development server installation working first before proceeding to production setup. The major blockers we are actively trying to address for this are:</summary>
 
 * Completing code security review, as we require approval to install the code even on the dev server
 * Figure out how the code will integrate with MediaFlux instead of Box
