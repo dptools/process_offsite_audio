@@ -11,6 +11,8 @@ import glob
 import cv2
 from feat import Detector
 
+# suppress future warning here?
+
 # run video QC on the newly extracted frames, also handling the file name map for videos here
 def interview_video_qc(interview_type, data_root, study, ptID):
 	# if can't find valid metadata info for the patient, can't move forward here

@@ -138,7 +138,7 @@ echo ""
 
 # send email notifying lab members about transcripts successfully pulled/processed, and those we are still waiting on. 
 # only send if there is something relevant for this study though - check environment variables set by relevant modules
-if [[ $trans_updates==1 || $review_updates==1 ]]; then
+if [[ "$trans_updates" == 1 || "$review_updates" == 1 ]]; then
 	echo "Emailing status update to lab"
 	mail -s "[${study} Interview Pipeline Updates] New Transcripts Received" "$lab_email_list" < "$repo_root"/transcript_lab_email_body.txt
 else
