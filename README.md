@@ -309,15 +309,17 @@ Test data collection has begun across sites, awaiting real data collection. The 
 This code has been running autonomously on the Pronet development server since early February 2022. Only a minority of sites have correctly added properly formatted interviews to Box and registered the corresponding subject ID in REDCap, but the code has worked well in those cases.
 
 <details>
-	<summary>Details on site mock interview status as of 3/9/2022:</summary>
+	<summary>Details on site mock interview status as of 3/17/2022:</summary>
 
 Sites that have successfully had some data processed - 
 * PronetLA, PronetYA, and PronetNN have had an interview make it all the way through the pipeline.
-	* In the case of PronetYA 3 interviews have gone through, all other sites with any processing have done a single interview.
+	* In the case of PronetYA, three interviews have gone through the pipeline.
+	* PronetLA had one transcript go all the way through as our first test transcript, and now has a second test audio file uploaded as part of the main testing phase - this second mock interview is awaiting transcription by TranscribeMe.
+	* All other sites with any processing have done a single interview.
 * PronetCA, PronetSF, PronetPI, PronetOR, PronetSI, and PronetGA have had transcripts returned by TranscribeMe, but have not yet correctly completed the manual redaction review process.
 	* PronetOR has put the reviewed transcript in the wrong spot on Box, the others don't seem to have done any review at all.
 
-As mentioned there are other sites that have tried to put interviews in Box but there were issues that prevented them from being processed. Multiple interviews are unable to be pulled by Lochness - Kevin's email summary can be referred to for more information on these cases. There have also been cases of interviews pulled by Lochness but with naming issues that prevented the audio code from recognizing them. PronetNC is the only such active case I am aware of.
+As mentioned there are other sites that have tried to put interviews in Box but there were issues that prevented them from being processed. Multiple interviews are unable to be pulled by Lochness - Kevin's email summary can be referred to for more information on these cases. There have also been cases of interviews pulled by Lochness but with naming issues that prevented the audio code from recognizing them (the files within the Zoom folder should not be renamed by sites!). PronetPA and PronetNC are the two sites that actively have this latter problem.
 
 All sites should have a test interview complete processing, in order to ensure that everyone understands the data collection procedures and has functioning equipment. There are also a few things in particular that really should still be tested - 
 * There has not yet been a non-English test audio uploaded.
@@ -330,7 +332,7 @@ All sites should have a test interview complete processing, in order to ensure t
 An initial install has been done on the Pronet production server, but details and testing there remain to be ironed out. 
 
 ##### Prescient <a name="prescient"></a>
-We have not yet done any testing of this code on Prescient, but are in the process of finding a time for a meeting with all relevant parties to get things going. The majority of the code should directly translate from Pronet to Prescient. Potential issues to address are noted under Next Steps below. 
+We have not yet done any testing of this code on Prescient, but are in the process of coordinating among all relevant parties. The majority of the code should directly translate from Pronet to Prescient, now that Prescient has agreed to use our general file management scheme. Potential issues to address are noted under Next Steps below. 
 
 ### Next Steps <a name="todo"></a>
 The next steps described here focus on what is necessary to finalize the data flow and quality control workflow for production data collection across sites. Once dataflow and quality control are successfully running, we will then come up with a plan for writing more intensive feature extraction code for the interview datatypes. The feature extraction code will be kept in a separate repository so that it can easily be installed on a separate production machine.
@@ -403,6 +405,8 @@ For the existing protocols, it is an ongoing issue to ensure that sites are awar
 * TranscribeMe has sometimes been inconsistent with the exact characters that they use for dashes and other things important to represent in the verbatim style transcriptions. We will need to contact them about this and keep an eye out
 * Also still waiting on TranscribeMe to answer about the verbatim transcription conventions in other languages. Need to confirm what will be different (at the very least I would expect markings like "inaudible" to be different)
 
+For most of these issues, recent reminder emails have been sent as of 3/17/22, awaiting responses.  
+
 </details>
 
 <details>
@@ -423,7 +427,7 @@ For the existing protocols, it is an ongoing issue to ensure that sites are awar
 * Finish actually setting up DPDash
 	* Make sure audio, transcript, and video CSVs are being imported
 	* Decide which features we want to display from each
-	* Create config files on the UI and ensure colormap bounds make sense for each feature shown
+	* Create config files on the UI and ensure colormap bounds make sense for each feature shown - draft config is failing to load the data on DPDash at the moment, awaiting more info from DPACC
 * Set protocol for communication with sites
 	* What happens when sites have mistakes with file naming/organization conventions?
 	* What happens when sites are missing data or don't complete a necessary manual review?
@@ -446,9 +450,13 @@ Finally, there are a few logistics to handle specific to Pronet and Prescient. F
 <details>
 	<summary>For Prescient, there are many more steps, as we still need to get the development server installation working first before proceeding to production setup. The major blockers we are actively trying to address for this are:</summary>
 
-* Completing code security review, as we require approval to install the code even on the dev server
+* Completing code security review, as we may require approval to install the code even on the dev server
 * Figure out how the code will integrate with MediaFlux instead of Box
+	* Prescient team is currently communicating with MediaFlux about how this will work, but we should be okay to use same general architecture as we do for Pronet
+	* For the actual push operation back to MediaFlux, should be able to use SFTP
 * Get a TranscribeMe SFTP account
 * Compile a table of the languages that will be used at the different sites 
+
+We are awaiting next meeting with Prescient group to determine details of next steps.
 
 </details>

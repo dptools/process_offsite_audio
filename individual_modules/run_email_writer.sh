@@ -168,8 +168,8 @@ for p in *; do
 		elif [ $err_code = "2" ]; then
 			echo "[rejected because audio has low volume]" >> "$repo_root"/audio_lab_email_body.txt
 		else
-			# again, handling case here where no error code was prepended. can happen if there is no audio QC DPDash CSV available for the patient, and possibly for other reasons.
-			echo "[rejected for unknown reason - ensure there is a valid consent date for this patient in the study metadata]" >> "$repo_root"/audio_lab_email_body.txt
+			# again, handling case here where no error code was prepended. can happen if there is no audio QC DPDash CSV available for the patient (however that would cause rename to fail), and possibly for other reasons.
+			echo "[rejected for unknown reason - please check on the audio file and associated folder permissions]" >> "$repo_root"/audio_lab_email_body.txt
 		fi
 		# finally do the move/rename
 		mv "$file" ../rejected_audio/"$orig_name"
@@ -200,8 +200,8 @@ for p in *; do
 		elif [ $err_code = "2" ]; then
 			echo "[rejected because audio has low volume]" >> "$repo_root"/audio_lab_email_body.txt
 		else
-			# again, handling case here where no error code was prepended. can happen if there is no audio QC DPDash CSV available for the patient, and possibly for other reasons.
-			echo "[rejected for unknown reason - ensure there is a valid consent date for this patient in the study metadata and check on file permissions]" >> "$repo_root"/audio_lab_email_body.txt
+			# again, handling case here where no error code was prepended. can happen if there is no audio QC DPDash CSV available for the patient (however that would cause rename to fail), and possibly for other reasons.
+			echo "[rejected for unknown reason - please check on the audio file and associated folder permissions]" >> "$repo_root"/audio_lab_email_body.txt
 		fi
 		# finally do the move/rename
 		mv "$file" ../rejected_audio/"$orig_name"
