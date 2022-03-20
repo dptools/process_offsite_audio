@@ -81,7 +81,8 @@ echo "Current time: ${now}"
 echo ""
 
 # run transcript pull script, also puts together bulk of email update
-bash "$repo_root"/individual_modules/run_transcription_pull.sh "$data_root" "$study" "$transcribeme_username" "$transcribeme_password" "$transcription_language"
+# use source to maintain environment variable on transcript update boolean
+source "$repo_root"/individual_modules/run_transcription_pull.sh "$data_root" "$study" "$transcribeme_username" "$transcribeme_password" "$transcription_language"
 echo ""
 echo "Transcript pull complete"
 echo ""
@@ -93,7 +94,8 @@ echo ""
 
 # put copies of any newly reviewed transcripts (returned via Lochness) from raw to appropriate processed folder location here
 # info on newly reviewed transcripts also appended to email
-bash "$repo_root"/individual_modules/run_transcription_review_update.sh "$data_root" "$study" 
+# use source to maintain environment variable on transcript update boolean
+source "$repo_root"/individual_modules/run_transcription_review_update.sh "$data_root" "$study" 
 echo ""
 echo "Transcript review updates complete"
 echo ""
