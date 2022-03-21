@@ -25,6 +25,6 @@ done
 
 # at the end of the processing, make sure that all processed interview outputs are in the pronet group, so they can be appropriately synced back to datalake
 # this is also a temporary workaround for dev server, prod plan TODO
-sudo chgrp -R pronet /opt/software/Pronet_data_sync/PHOENIX/*/*/processed/*/interviews
+sudo chgrp -R pronet /opt/software/Pronet_data_sync/PHOENIX/*/*/processed/*
 # similarly make sure for the box transfer folder!
 sudo chgrp -R pronet /opt/software/Pronet_data_sync/PHOENIX/PROTECTED/box_transfer
