@@ -309,12 +309,12 @@ Test data collection has begun across sites, awaiting real data collection. The 
 This code has been running autonomously on the Pronet development server since early February 2022. Only a minority of sites have correctly added properly formatted interviews to Box and registered the corresponding subject ID in REDCap, but the code has worked well in those cases.
 
 <details>
-	<summary>Details on site mock interview status as of 3/17/2022:</summary>
+	<summary>Details on site mock interview status as of 3/22/2022:</summary>
 
 Sites that have successfully had some data processed - 
 * PronetLA, PronetYA, and PronetNN have had an interview make it all the way through the pipeline.
 	* In the case of PronetYA, three interviews have gone through the pipeline.
-	* PronetLA had one transcript go all the way through as our first test transcript, and now has a second test audio file uploaded as part of the main testing phase - this second mock interview is awaiting transcription by TranscribeMe.
+	* PronetLA had one transcript go all the way through as our first test transcript, and now has a second test audio file uploaded as part of the main testing phase - this second mock interview has been transcribed and is awaiting manual site redaction review.
 	* All other sites with any processing have done a single interview.
 * PronetCA, PronetSF, PronetPI, PronetOR, PronetSI, and PronetGA have had transcripts returned by TranscribeMe, but have not yet correctly completed the manual redaction review process.
 	* PronetOR has put the reviewed transcript in the wrong spot on Box, the others don't seem to have done any review at all.
@@ -370,11 +370,21 @@ The next steps described here focus on what is necessary to finalize the data fl
 	* Need to be careful of PII in these emails? It should be okay to include the dates as long as we are careful about who receives the emails. But keep in mind display names are in the speaker specific Zoom files, that could be much more sensitive (this also applies to the Lochness email alerts!)
 	* Will want to consider how this email alert (and others from this pipeline) will integrate with what Lochness is already doing on both the pull and push sides. 
 
+For reference, Lochness will alert to a naming problem in Box/MediaFlux based on the following criteria:
+* Verify the Subject ID digits ('XX00000' in the folder name) falls into AMP-SCZ ID digits
+* 'YYYY-MM-DD HH.MM.SS folder name' – check if the Zoom folder name matches how Zoom creates folder by default
+* '.mp4' files have to be under the Zoom directory
+* '.m4a' files could be under either the Zoom directory, or below 'Audio Record'
+
 </details>
 
 <details>
 	<summary>Finally, there are a few features that remain to be added:</summary>
 
+* Some smaller clean-up TODO first for the DPDash CSVs to improve display
+	* Change "length(minutes)" variable name to "length_minutes" in the audio QC CSV
+	* Start rounding all float outputs in the DPDash CSVs
+	* When make these code changes need to ensure they will be fixed separately in the existing QC CSVs first
 * Implement the transcript manual review as a random selection of 10% of transcripts per site instead of sending all transcripts for additional review
 	* This phase will occur once a given site has had 5 transcripts reviewed - so need to keep the current code as well, have an appropriate toggle
 	* Can use the "completed" folder under box_transfers to track how many transcripts have already been pushed for review to the sites
@@ -405,7 +415,7 @@ For the existing protocols, it is an ongoing issue to ensure that sites are awar
 * TranscribeMe has sometimes been inconsistent with the exact characters that they use for dashes and other things important to represent in the verbatim style transcriptions. We will need to contact them about this and keep an eye out
 * Also still waiting on TranscribeMe to answer about the verbatim transcription conventions in other languages. Need to confirm what will be different (at the very least I would expect markings like "inaudible" to be different)
 
-For most of these issues, recent reminder emails have been sent as of 3/17/22, awaiting responses.  
+For most of these issues, recent reminder emails have been sent as of 3/22/22, awaiting responses.  
 
 </details>
 
@@ -425,9 +435,10 @@ For most of these issues, recent reminder emails have been sent as of 3/17/22, a
 	* Who will handle it when changes need to be made on the server? Could involve changes to code, changes to files in processed folders, or changes to files in raw folders
 	* Who will be checking the QC outputs on DPDash?
 * Finish actually setting up DPDash
-	* Make sure audio, transcript, and video CSVs are being imported
+	* Make sure audio, transcript, and video CSVs are being imported (for DPDash dev server paths are at /data/predict/kcho/flow_test/Pronet/PHOENIX/GENERAL/\*/processed/\*/interviews/\*/\*QC\*.csv)
 	* Decide which features we want to display from each
-	* Create config files on the UI and ensure colormap bounds make sense for each feature shown - draft config is failing to load the data on DPDash at the moment, awaiting more info from DPACC
+	* Create config files on the UI and ensure colormap bounds make sense for each feature shown
+	* First config for looking at core audio, video, and transcript QC features together has been drafted - can be reviewed once the CSV import is set up by DPACC, then we can iterate on configs (also making more detailed ones for each individual modality?)
 * Set protocol for communication with sites
 	* What happens when sites have mistakes with file naming/organization conventions?
 	* What happens when sites are missing data or don't complete a necessary manual review?
