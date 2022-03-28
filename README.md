@@ -107,6 +107,8 @@ Each major step is initiated by the pipeline using a script in the individual_mo
 
 Additional details on each step are provided below. 
 
+For the U24 study, we expect two different types of interviews (open and psychs), which are both handled by the full pipeline and will both be included in the same email alerts, but are processed independently by each module with outputs saved separately. Each participant will be given 2 open interviews and 9 psychs interviews. The open interviews will be about 20 minutes, while the psychs interviews will be about 30 minutes. 
+
 ##### Common Issues <a name="issues"></a>
 Most times that an interview is not processed when expected there is an issue with violating naming conventions, either because the data was incorrectly placed so Lochness could not pull it, or the files within the Zoom folder were renamed so that this audio code could not recognize it. It has also been common during the testing phase for subject IDs to be missing metadata - if there is a new subject ID it needs to be entered in REDCap before the code can process.
 
@@ -309,7 +311,7 @@ Test data collection has begun across sites, awaiting real data collection. The 
 This code has been running autonomously on the Pronet development server since early February 2022. Only a minority of sites have correctly added properly formatted interviews to Box and registered the corresponding subject ID in REDCap, but the code has worked well in those cases.
 
 <details>
-	<summary>Details on site mock interview status as of 3/22/2022:</summary>
+	<summary>Details on site mock interview status as of 3/27/2022:</summary>
 
 Sites that have successfully had some data processed - 
 * PronetLA, PronetYA, and PronetNN have had an interview make it all the way through the pipeline.
@@ -318,6 +320,8 @@ Sites that have successfully had some data processed -
 	* All other sites with any processing have done a single interview.
 * PronetCA, PronetSF, PronetPI, PronetOR, PronetSI, and PronetGA have had transcripts returned by TranscribeMe, but have not yet correctly completed the manual redaction review process.
 	* PronetOR has put the reviewed transcript in the wrong spot on Box, the others don't seem to have done any review at all.
+	* Note PronetLA has their second transcript awaiting the manual review right now.
+* PronetMT and PronetWU have had audio preprocessed and are currently awaiting transcription by TranscribeMe.
 
 As mentioned there are other sites that have tried to put interviews in Box but there were issues that prevented them from being processed. Multiple interviews are unable to be pulled by Lochness - Kevin's email summary can be referred to for more information on these cases. There have also been cases of interviews pulled by Lochness but with naming issues that prevented the audio code from recognizing them (the files within the Zoom folder should not be renamed by sites!). PronetPA and PronetNC are the two sites that actively have this latter problem.
 
@@ -329,10 +333,13 @@ All sites should have a test interview complete processing, in order to ensure t
 	* The one concern about “psychs” is it can also sometimes involve upload of a single file from an external audio recording device instead of a Zoom interview. The code is written to address this but requires closer testing.
 </details>
 
-An initial install has been done on the Pronet production server, but details and testing there remain to be ironed out. 
+An initial install has been done on the Pronet production server, but details and testing there remain to be ironed out. A few things to keep track of:
+* ffmpeg may still need to be installed, but other dependencies should be there
+* How to access the conda installation that was already done from my user account?
+* Is the code itself pulled onto production server yet or should my account be doing that?
 
 ##### Prescient <a name="prescient"></a>
-We have not yet done any testing of this code on Prescient, but are in the process of coordinating among all relevant parties. The majority of the code should directly translate from Pronet to Prescient, now that Prescient has agreed to use our general file management scheme. Potential issues to address are noted under Next Steps below. 
+We have not yet done any testing of this code on Prescient, but are in the process of coordinating among all relevant parties. The majority of the code should directly translate from Pronet to Prescient, now that Prescient has agreed to use our general file management scheme. Potential issues to address are noted under Next Steps below. We are currently focusing on figuring out how to upload transcripts for review back to Mediaflux, and on creating an SFTP account with TranscribeMe for Prescient (analogous to the one already set up for Pronet). 
 
 ### Next Steps <a name="todo"></a>
 The next steps described here focus on what is necessary to finalize the data flow and quality control workflow for production data collection across sites. Once dataflow and quality control are successfully running, we will then come up with a plan for writing more intensive feature extraction code for the interview datatypes. The feature extraction code will be kept in a separate repository so that it can easily be installed on a separate production machine.
@@ -370,7 +377,7 @@ The next steps described here focus on what is necessary to finalize the data fl
 	* Need to be careful of PII in these emails? It should be okay to include the dates as long as we are careful about who receives the emails. But keep in mind display names are in the speaker specific Zoom files, that could be much more sensitive (this also applies to the Lochness email alerts!)
 	* Will want to consider how this email alert (and others from this pipeline) will integrate with what Lochness is already doing on both the pull and push sides. 
 
-For reference, Lochness will alert to a naming problem in Box/MediaFlux based on the following criteria:
+For reference, Lochness will alert to a naming problem in Box/Mediaflux based on the following criteria:
 * Verify the Subject ID digits ('XX00000' in the folder name) falls into AMP-SCZ ID digits
 * 'YYYY-MM-DD HH.MM.SS folder name' – check if the Zoom folder name matches how Zoom creates folder by default
 * '.mp4' files have to be under the Zoom directory
@@ -381,22 +388,35 @@ For reference, Lochness will alert to a naming problem in Box/MediaFlux based on
 <details>
 	<summary>Finally, there are a few features that remain to be added:</summary>
 
-* Some smaller clean-up TODO first for the DPDash CSVs to improve display
+* Getting the QC CSVs to display in DPDash remains an ongoing project, but may need to make the following changes (confirming these are necessary first):
+	* Site ID in the CSV name needs to be the 2 digit site ID, not matching the site folder name
+	* CSV needs to have 1 row for every day even if there is missing data, and it needs to start at day 1 regardless of what the filename says the availability is
+* Some smaller clean-up TODO first for the DPDash CSVs to improve visualization
 	* Change "length(minutes)" variable name to "length_minutes" in the audio QC CSV
 	* Start rounding all float outputs in the DPDash CSVs
 	* When make these code changes need to ensure they will be fixed separately in the existing QC CSVs first
+	* Should also switch the frame extraction from the video to be every 4 minutes at this time
 * Implement the transcript manual review as a random selection of 10% of transcripts per site instead of sending all transcripts for additional review
 	* This phase will occur once a given site has had 5 transcripts reviewed - so need to keep the current code as well, have an appropriate toggle
 	* Can use the "completed" folder under box_transfers to track how many transcripts have already been pushed for review to the sites
 	* For the actual random selection, should be fine to just use a random number generator to get a 10% chance independently for each file
 	* Once it is implemented, also need to make sure that the status emails and other file accounting pieces of the pipeline are updated to appropriately reflect
-* Add preprocessing for Teams and WebEx interviews to accommodate the couple of Prescient sites that cannot use Zoom
-	* Waiting on examples of interviews from these softwares first
 * Improve how code processes non-English transcripts
 	* Switch check for required encoding to UTF-8 instead of ASCII
 	* Update transcript QC code so features are correct in every language (requires some more information from TranscribeMe in part)
 	* Should also make sure that Zoom file naming conventions are not substantially different in different countries!
+	* In general could improve how code handles random unexpected characters when they are inserted by TranscribeMe?
+* Add preprocessing for Teams and WebEx interviews to accommodate the couple of Prescient sites that cannot use Zoom
+	* Waiting on examples of interviews from these softwares first
+* Handle local video feature extraction where needed
+	* Jena is not allowed to have video uploaded to the aggregation server, although they can have the audio uploaded
+	* Awaiting contact from Jena point person about how to set up some code to handle the video portion (and related file organization) locally
 * Perhaps add video duration, resolution, and fps to the video QC to supplement the image-based/face-related features
+	* Will definitely be switching frame extraction to occur every 4 minutes to better accomodate expected interview length
+* Make a DPDash summary of QC features CSV as part of the pipeline slightly down the road? 
+	* Would be nice to see an overview of the QC stats to have a better grounding in what an individual value means
+	* This could play into the summary email that I am supposed to be making anyway too
+	* Need to be more familiar with how DPDash works first though - Where would the CSV even be saved? Would it be one per site or one overall or potentially both? What columns matter? 
 
 </details>
 
@@ -408,14 +428,13 @@ For the existing protocols, it is an ongoing issue to ensure that sites are awar
 <details>
 	<summary>There are also some details that need to be verified on our end still in order to make some final decisions about the code:</summary>
 
-* How long are the interview videos generally expected to be? We may want to adjust how frequently frames are extracted from the videos for the QC
-* How will we identify from the speaker specific audio file names which audio belongs to the participant? Interviewers could keep a consistent display name or sites could provide a list of all interviewer display names used perhaps. Regardless, this will be another issue for file accounting code to check once a method is decided on
-* The transcript timestamps are currently only second level resolution, which may present issues. TranscribeMe could also provide millisecond level, which may not be accurate down to the millisecond but is at least reliable on the hundred millisecond level - and that could make a big difference for interview periods with shorter sentences
-* How do we want to identify which TranscribeMe speaker ID is the participant? Should we have some convention like always having the interviewer say some particular word at the start, or can we tackle the problem with purely automated methods? Or perhaps the transcriber could intentionally use a particular ID for who they think the participant is?
-* TranscribeMe has sometimes been inconsistent with the exact characters that they use for dashes and other things important to represent in the verbatim style transcriptions. We will need to contact them about this and keep an eye out
+* Need to confirm TranscribeMe is switching to millisecond resolution on the transcript timestamps
+	* More generally, we should be on same page about all expectations and the protocol for when mistakes happen, before moving into production
 * Also still waiting on TranscribeMe to answer about the verbatim transcription conventions in other languages. Need to confirm what will be different (at the very least I would expect markings like "inaudible" to be different)
-
-For most of these issues, recent reminder emails have been sent as of 3/22/22, awaiting responses.  
+	* Even for English, TranscribeMe has sometimes been inconsistent with the exact characters that they use for dashes and other things important to represent in the verbatim style transcriptions - recently contacted them (as of 3/27/2022) but waiting to hear back
+	* Consider writing more detailed documentation about TranscribeMe when wrapping up this project?
+* How will we identify from the speaker specific audio file names which audio belongs to the participant? Interviewers could keep a consistent display name or sites could provide a list of all interviewer display names used perhaps. Regardless, this will be another issue for file accounting code to check once a method is decided on
+* How do we want to identify which TranscribeMe speaker ID is the participant? Should we have some convention like always having the interviewer say some particular word at the start, or can we tackle the problem with purely automated methods? Or perhaps the transcriber could intentionally use a particular ID for who they think the participant is?
 
 </details>
 
@@ -462,12 +481,13 @@ Finally, there are a few logistics to handle specific to Pronet and Prescient. F
 	<summary>For Prescient, there are many more steps, as we still need to get the development server installation working first before proceeding to production setup. The major blockers we are actively trying to address for this are:</summary>
 
 * Completing code security review, as we may require approval to install the code even on the dev server
-* Figure out how the code will integrate with MediaFlux instead of Box
-	* Prescient team is currently communicating with MediaFlux about how this will work, but we should be okay to use same general architecture as we do for Pronet
-	* For the actual push operation back to MediaFlux, should be able to use SFTP
+	* We seem to now have initial approval to at least test on dev, but should confirm this (and make sure I have an account with the necessary permissions on that server)
+* Figure out how the code will integrate with Mediaflux instead of Box
+	* Prescient team is currently communicating with Mediaflux about how this will work, but we should be okay to use same general architecture as we do for Pronet
+	* For the actual push operation back to Mediaflux, should be able to use SFTP
 * Get a TranscribeMe SFTP account
 * Compile a table of the languages that will be used at the different sites 
 
-We are awaiting next meeting with Prescient group to determine details of next steps.
+We are awaiting next meeting with Prescient group to determine details of next steps, but expected focus will be on implementing push to Mediaflux and creating necessary TranscribeMe account.
 
 </details>
