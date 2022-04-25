@@ -10,6 +10,7 @@ sudo rm /opt/software/Pronet_data_sync/PHOENIX/PROTECTED/PronetLA/raw/LA00090/in
 sudo rm /opt/software/Pronet_data_sync/PHOENIX/PROTECTED/PronetNN/raw/NN00004/interviews/transcripts/PronetNN_NN00004_interviewAudioTranscript_open_day44592_session001.txt 
 sudo rm /opt/software/Pronet_data_sync/PHOENIX/PROTECTED/PronetWU/raw/WU00079/interviews/transcripts/PronetWU_WU00079_interviewAudioTranscript_open_day44593_session001.txt 
 sudo rm /opt/software/Pronet_data_sync/PHOENIX/PROTECTED/PronetYA/raw/YA00015/interviews/transcripts/PronetYA_YA00015_interviewAudioTranscript_open_day44432_session001.txt
+sudo rm /opt/software/Pronet_data_sync/PHOENIX/PROTECTED/PronetLA/raw/LA49125/interviews/transcripts/PronetLA_LA49125_interviewAudioTranscript_open_day12114_session003.txt
 
 # activate python environment
 . /home/mme36/anaconda3/etc/profile.d/conda.sh
