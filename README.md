@@ -5,7 +5,7 @@ The audio side of the pipeline converts/renames any new mono interview audio fil
 
 The transcript side of the pipeline analogously handles pulling returned transcripts back to the server, integrating with the existing dataflow for sites to review redaction quality and share anonymized data with the larger study. It also includes email updates and computation of quality control metrics on the returned transcripts, for monitoring of the entire data collection process. 
 
-The video portion of the pipeline identifies unprocessed video files in valid Zoom interview folders and extracts one frame from every 5 minutes of each video. These frames are then run through a lightweight face detection model from PyFeat, to provide some video quality control at low computational cost. The same script also gets metadata information about the interview (e.g. converting to study day number) in order to fill out a DPDash-formatted QC CSV analogous to those created for audio and transcripts. 
+The video portion of the pipeline identifies unprocessed video files in valid Zoom interview folders and extracts one frame from every 4 minutes of each video. These frames are then run through a lightweight face detection model from PyFeat, to provide some video quality control at low computational cost. The same script also gets metadata information about the interview (e.g. converting to study day number) in order to fill out a DPDash-formatted QC CSV analogous to those created for audio and transcripts. 
 
 ### Table of Contents
 1. [Setup](#setup)
@@ -212,7 +212,7 @@ We receive full verbatim transcriptions from TranscribeMe, with sentence level t
 ### Video Processing Details <a name="video"></a>
 The major steps of the video side of the pipeline are:
 1. Identify new video files in raw by checking against existing extracted frames
-2. Extract 1 frame from every 5 minutes of any new raw video file, saving images in an interview-specific subfolder on the processed side of PROTECTED
+2. Extract 1 frame from every 4 minutes of any new raw video file, saving images in an interview-specific subfolder on the processed side of PROTECTED
 3. Run PyFeat's basic face detection model, saving a corresponding CSV for each image
 4. Use PyFeat outputs from across each interview along with study/interview metadata information to update DPDash-formatted video QC CSV on the processed side of GENERAL
 
@@ -220,7 +220,7 @@ The major steps of the video side of the pipeline are:
 	<summary>The primary output of this side of the pipeline is the DPDash CSV, although the extracted images and their corresponding PyFeat outputs could also be useful. The details of these outputs are as follows:</summary>
 
 Because the DPDash CSV is saved on the processed side of GENERAL, it is pushed to the data lake. It is of course intended to be imported into DPDash for further monitoring. As per convention there is one CSV generated per subject ID and interview type, containing one row per interview. Besides the DPDash metadata columns, the QC columns include - 
-* Number of frames extracted (will be the floor of interview minutes divided by 5)
+* Number of frames extracted (will be the floor of interview minutes divided by 4)
 * Minimum number of faces detected in an extracted frame
 * Maximum number of faces detected in an extracted frame
 * Average number of faces detected across extracted frames
@@ -290,6 +290,8 @@ The emails continue to be refined and their exact content may change.
 ##### DPDash CSVs <a name="dpdash"></a>
 These are the primary outputs pushed to the data lake (besides the redacted transcripts), and also will be used for data quality monitoring once appropriate DPDash configurations are created. Audio, transcript, and video QC DPDash-formatted CSVs are generated for each subject ID and interview type with existing data. The DPACC team has also added tracking of these files into their data accounting script. 
 
+Note the QC features have since been updated to round any floats for better display on DPDash, and some of the column names have been adjusted to ensure formatting is consistent. Filenames were also updated to meet new DPDash naming conventions (e.g. the site code needs to be just the two digits in the CSV filename). 
+
 <details>
 	<summary>Click here for an example snippet of the Pronet file accounting page on DPDash, now including rows that indicate availability of audio, transcript, and video QC outputs for each subject ID</summary>
 
@@ -327,36 +329,48 @@ Test data collection has begun across sites, awaiting real data collection. The 
 This code has been running autonomously on the Pronet development server since early February 2022. Only a minority of sites have correctly added properly formatted interviews to Box and registered the corresponding subject ID in REDCap, but the code has worked well in those cases.
 
 <details>
-	<summary>Details on site mock interview status as of 3/31/2022:</summary>
+	<summary>Details on site mock interview status as of 4/25/2022:</summary>
 
 Sites that have successfully had some data processed - 
-* PronetLA, PronetYA, and PronetNN have had an interview make it all the way through the pipeline.
+* PronetLA, PronetYA, PronetNN, and PronetWU have had an interview make it all the way through the pipeline.
 	* In the case of PronetYA, three interviews have gone through the pipeline.
-	* PronetLA had one transcript go all the way through as our first test transcript, and now has a second test audio file uploaded as part of the main testing phase - this second mock interview has been transcribed and is awaiting manual site redaction review.
+	* In the case of PronetLA, two interviews have gone through the pipeline.
 	* All other sites with any processing have done a single interview.
-* PronetCA, PronetSF, PronetPI, PronetOR, PronetSI, PronetGA, PronetMT, and PronetWU have had transcripts returned by TranscribeMe, but have not yet correctly completed the manual redaction review process.
-	* PronetOR has put the reviewed transcript in the wrong spot on Box, the others don't seem to have done any review at all.
-	* Note PronetLA has their second transcript awaiting the manual review right now.
+* PronetCA, PronetSF, PronetPI, PronetOR, PronetSI, PronetGA, PronetMT, and PronetMA have had transcripts returned by TranscribeMe, but have not yet correctly completed the manual redaction review process.
+	* PronetOR, PronetSF, PronetCA, and PronetMT have put the reviewed transcript in the wrong spot on Box.
+	* The others don't seem to have attempted to transfer an approved transcript at all.
+* PronetPA and PronetTE are currently awaiting transcriptions to be returned by TranscribeMe.
 
-As mentioned there are other sites that have tried to put interviews in Box but there were issues that prevented them from being processed. Multiple interviews are unable to be pulled by Lochness - Kevin's email summary can be referred to for more information on these cases. There have also been cases of interviews pulled by Lochness but with naming issues that prevented the audio code from recognizing them (the files within the Zoom folder should not be renamed by sites!). PronetPA and PronetNC are the two sites that actively have this latter problem.
+As mentioned there are other sites that have tried to put interviews in Box but there were issues that prevented them from being processed -
+* Multiple interviews are unable to be pulled by Lochness to begin with, so they are not available to the code. 
+	* PronetIR, PronetKC, and PronetPV all fall into this category due to lack of a correct subject ID registered to REDCap.
+* There have also been cases of interviews pulled by Lochness but with naming issues that prevented this code from recognizing them (the files within the Zoom folder should not be renamed by sites!). 
+	* PronetHA incorrectly renamed the audio file only, so the video part of the interview has been QCed but the audio has not yet been processed.
+	* PronetNC incorrectly renamed all files, so it has not been processed at all.
 
 All sites should have a test interview complete processing, in order to ensure that everyone understands the data collection procedures and has functioning equipment. There are also a few things in particular that really should still be tested - 
 * There has not yet been a non-English test audio fully processed.
-	* PronetMT, which is a primarily French site (although may use some English) has uploaded a test audio, but has not completed the redaction review portion so that the transcript can finish processing. This is the only non-English site to upload a test at all.
+	* PronetMT, which is a primarily French site (although may use some English) has uploaded a test audio, but has not completed the redaction review portion so that the transcript can finish processing. PronetMA, which is a Spanish site, is now also in the same boat. These are the only non-English sites that have processing in progress.
+	* PronetMU (German), PronetPV (Italian), PronetSL (Korean), and PronetSH (Mandarin) are the other non-English Pronet sites. 
 	* Testing is especially needed for languages with a very different character set than English.
 * No sites have uploaded a test interview under the “psychs” category.
 	* These are processed independently from “open” interviews, although the steps are basically the same.
 	* The one concern about “psychs” is it can also sometimes involve upload of a single file from an external audio recording device instead of a Zoom interview. The code is written to address this but requires closer testing.
+* All sites have uploaded mock interviews that are notably shorter than what we will expect during real data collection. We should test at least one longer interview to ensure there are no compute issues and to get a better sense for expected runtimes and storage requirements.
+* Further, to test the "for review" random assignments (and emails) once those are implemented, we will need some sites to upload multiple extra tests.
+	* As we verify with TranscribeMe that they are doing all the things we are paying for, we will also want to do additional tests to ensure that when we move to real data TranscribeMe will be following all our instructions regularly. 
+* Note that even sites that have been creating subject ID correctly in REDCap have not necessarily been providing a valid mock consent date. It is important in production that sites enter correct consent dates for each subject into REDCap ASAP. 
 
 </details>
 
-An initial install has been done on the Pronet production server, but details and testing there remain to be ironed out. A few things to keep track of:
-* ffmpeg may still need to be installed, but other dependencies should be there
-* How to access the conda installation that was already done from my user account?
-* Is the code itself pulled onto production server yet or should my account be doing that?
+Dependencies have been installed on the Pronet production server, but downloading this code and testing there remain to be ironed out. We first need to determine what account should be installing and running the AV pipeline from the production server (after verifying that it has passed the production security review). Then we can discuss remaining required steps. Need to make some decision about how much testing will occur on development server still versus moving to production, and also distinguishing between testing new mock interviews on prod versus actually moving to real data.
+
+As far as real data collection timeline, some sites may be able to begin soon, but others remain months away - need to figure out more about this as summer approaches. There are some deadlines being imposed by NIMH, but it is also not clear how quickly this pipeline needs to launch after data collection starts. There will always be some gap between upload and outputs being available anyway, because of the time it takes to manually transcribe.
 
 ##### Prescient <a name="prescient"></a>
-We have not yet done any testing of this code on Prescient, but are in the process of coordinating among all relevant parties. The majority of the code should directly translate from Pronet to Prescient, now that Prescient has agreed to use our general file management scheme. Potential issues to address are noted under Next Steps below. We are currently focusing on figuring out how to upload transcripts for review back to Mediaflux, and on creating an SFTP account with TranscribeMe for Prescient (analogous to the one already set up for Pronet). 
+We have not yet done any testing of this code on Prescient, but are in the process of coordinating among all relevant parties. The majority of the code should directly translate from Pronet to Prescient, now that Prescient has agreed to use our general file management scheme. Potential issues to address are noted under Next Steps below. We are currently focusing on figuring out how to upload transcripts for review back to Mediaflux, and on creating an SFTP account with TranscribeMe for Prescient (analogous to the one already set up for Pronet).
+
+Note that original mock interviews done by some Prescient sites did not follow the expected SOP, as they were originally using a different plan than Pronet. So sites will need to redo any mock interviews before testing can begin on dev server anyway.  
 
 ### Next Steps <a name="todo"></a>
 The next steps described here focus on what is necessary to finalize the data flow and quality control workflow for production data collection across sites. Once dataflow and quality control are successfully running, we will then come up with a plan for writing more intensive feature extraction code for the interview datatypes. The feature extraction code will be kept in a separate repository so that it can easily be installed on a separate production machine.
@@ -371,7 +385,11 @@ The next steps described here focus on what is necessary to finalize the data fl
 	* Count of different speakers (by Zoom display name)
 	* Number of files per speaker (can be split if participant exits and then reenters the Zoom room)
 * For the psychs interview type, should make a note of whether interviews are standalone WAV files or full Zoom interviews, so that we know whether other files (video, speaker specific audio) should be expected
-* Make sure any naming conventions we do enforce are consistent between the video and audio pipelines
+* Add some additional checks to help the sites with transfering the "approved" transcripts correctly?
+	* Should not pull a transcript back to processed unless it matches one that already exists in prescreening step (can then get rid of extra hard coded checks on study day in the dev server implementation)
+	* Confirm with Kevin whether I will need to check for things besides txt files, or if I just need to check on txt file naming. 
+* Make the code more robust to revisiting rejected audio or audio that failed to upload to TranscribeMe?
+	* This as well as "approved" transcript formatting checks could also be integrated better into email alert system, discussed below
 
 </details>
 
@@ -392,35 +410,33 @@ The next steps described here focus on what is necessary to finalize the data fl
 	* The script that runs the pipeline across sites that is currently on a cron can then be updated to concatenate all of these tables from all of the sites
 	* That will then be emailed to those that are supervising the U24 at a higher level (how to format the table using just basic mailx command?)
 	* Need to be careful of PII in these emails? It should be okay to include the dates as long as we are careful about who receives the emails. But keep in mind display names are in the speaker specific Zoom files, that could be much more sensitive (this also applies to the Lochness email alerts!)
-	* Will want to consider how this email alert (and others from this pipeline) will integrate with what Lochness is already doing on both the pull and push sides. 
+	* Will want to consider how this email alert (and others from this pipeline) will integrate with what Lochness is already doing on both the pull and push sides 
+* Add an email that notifies sites specifically when there are new transcripts to be reviewed
+	* This will go to sites while everything else will just go to central monitoring person(s). Still need the site emails to properly launch this
+	* A question to consider when implementing is whether the “for review” emails should go when there are outstanding files, or only when there are updates (as it is now). And should that then also be the case for TranscribeMe emails (which send the entire time one is pending)?
+	* Will set this up when I implement the random review portion, see below for more info
 
-For reference, Lochness will alert to a naming problem in Box/Mediaflux based on the following criteria:
+For reference, Lochness will alert to a naming problem in raw Box/Mediaflux files based on the following criteria:
 * Verify the Subject ID digits ('XX00000' in the folder name) falls into AMP-SCZ ID digits
 * 'YYYY-MM-DD HH.MM.SS folder name' – check if the Zoom folder name matches how Zoom creates folder by default
 * '.mp4' files have to be under the Zoom directory
 * '.m4a' files could be under either the Zoom directory, or below 'Audio Record'
+
+Similarly, for transcripts in the "approved" folder, it will ensure they are .txt files found under a subject ID subfolder.
 
 </details>
 
 <details>
 	<summary>Finally, there are a few features that remain to be added:</summary>
 
-* Getting the QC CSVs to display in DPDash remains an ongoing project, but need to make the following changes to the code:
-	* Site ID in the CSV name needs to be the 2 digit site ID, not matching the site folder name (confirmed it is safe to always take the last 2 characters of the site folder name)
-	* It turns out site ID name is the only necessary code change, as padding rows is only necessary when having one config containing multiple different assessment CSVs. Will make configs on the DPDash site separate for each modality going forward
-	* Will proceed with the DPDash code changes once the consent date situation on the dev server is sorted out (see below), then I can contact DPACC to finalize the DPDash import procedure for these CSVs. 
-* Some smaller clean-up TODO first for the DPDash CSVs to improve visualization
-	* Change "length(minutes)" variable name to "length_minutes" in the audio QC CSV
-	* Start rounding all float outputs in the DPDash CSVs
-	* When make these code changes need to ensure they will be fixed separately in the existing QC CSVs first
-	* Should also switch the frame extraction from the video to be every 4 minutes at this time
 * Implement the transcript manual review as a random selection of 10% of transcripts per site instead of sending all transcripts for additional review
 	* This phase will occur once a given site has had 5 transcripts reviewed - so need to keep the current code as well, have an appropriate toggle
 	* Can use the "completed" folder under box_transfers to track how many transcripts have already been pushed for review to the sites
 	* For the actual random selection, should be fine to just use a random number generator to get a 10% chance independently for each file
+	* May also want to add a check for 0 redactions to always be sent for site review, just in case something goes wrong with the foreign language encodings while I'm away. I doubt we will ever encounter 0 redactions in a correctly transcribed real interview. Note this could also be part of email alert to sites!
 	* Once it is implemented, also need to make sure that the status emails and other file accounting pieces of the pipeline are updated to appropriately reflect
 * Improve how code processes non-English transcripts
-	* Switch check for required encoding to UTF-8 instead of ASCII
+	* Switch check for required encoding to UTF-8 instead of ASCII (should also probably note what the encoding is in a file accounting output?)
 	* Update transcript QC code so features are correct in every language (requires some more information from TranscribeMe in part)
 	* Should also make sure that Zoom file naming conventions are not substantially different in different countries!
 	* In general could improve how code handles random unexpected characters when they are inserted by TranscribeMe?
@@ -431,8 +447,7 @@ For reference, Lochness will alert to a naming problem in Box/Mediaflux based on
 	* Jena is not allowed to have video uploaded to the aggregation server, although they can have the audio uploaded
 	* Awaiting contact from Jena point person about how to set up some code to handle the video portion (and related file organization) locally
 	* For now Jena has been provided with a high level plan and security information, which it seems will be sufficient to move forward with
-* Perhaps add video duration, resolution, and fps to the video QC to supplement the image-based/face-related features
-	* Will definitely be switching frame extraction to occur every 4 minutes to better accomodate expected interview length
+* Perhaps add video duration, resolution, and fps to the video QC to supplement the image-based/face-related features?
 * Make a DPDash summary of QC features CSV as part of the pipeline slightly down the road? 
 	* Would be nice to see an overview of the QC stats to have a better grounding in what an individual value means
 	* This could play into the summary email that I am supposed to be making anyway too
@@ -449,10 +464,12 @@ For the existing protocols, it is an ongoing issue to ensure that sites are awar
 	<summary>There are also some details that need to be verified on our end still in order to make some final decisions about the code:</summary>
 
 * Most urgently, we need to determine what is the final decision about use of consent dates in the code
-	* There was some talk of adding a small bit of noise to each consent date (but keep same for a single patient obviously) to help with deidentification - this would be fine, as would the expected method of just using real consent dates.
-	* However there was also some talk of not using consent dates at all (and currently the filler date for an empty consent is 1/1/1990), which would require a redefinition of "study day" and possibly rewriting of parts of this code (if we can't just fill in a more reasonable fake consent for all patients like 1/1/2022). 
-	* It has now been confirmed that there is no privacy/security reason not to have correct consent dates in the study metadata pulled by Lochness, so in the long run this should be fine. But it still needs to be confirmed with Lochness and DPDash devs how this is working technically, and to get it back to working on the dev server. Realistic fake consent dates used to be found on the dev server for many of the mock subject IDs, but they were subsequently removed, seemingly because of DPDash. 
+	* If data will be able to be pulled in production without a valid consent date, I should confirm what the dummy consent date is and then stop this code from doing any processing for any subject that has such a consent. However there is also a chance Lochness won't pull without a valid consent date, in which case I can just leave as is
+	* Note default on dev server is now 10/01/2021, allowing this to be used for testing purposes but will not worry about if the date changes and study alignment no longer makes sense for the mock interviews
+	* Should still probably add some tracking of consent date into file accounting so issue can be easily noticed if for some reason a subject's consent date does change part way through
+* Need to review redaction guidelines with TranscribeMe and ensure they are not being over the top aggressive with redaction (but also careful not to miss anything that is obvious PII)
 * Need to confirm TranscribeMe is switching to millisecond resolution on the transcript timestamps
+	* Note that this also requires them to actually give us sentence level timestamps! Make sure they are not cheaping out on the definition of a sentence
 	* More generally, we should be on same page about all expectations and the protocol for when mistakes happen, before moving into production
 * Also still waiting on TranscribeMe to answer about the verbatim transcription conventions in other languages. Need to confirm what will be different (at the very least I would expect markings like "inaudible" to be different)
 	* Even for English, TranscribeMe has sometimes been inconsistent with the exact characters that they use for dashes and other things important to represent in the verbatim style transcriptions - although they have confirmed they are working on refining their processes to minimize these issues in the future. 
@@ -460,7 +477,7 @@ For the existing protocols, it is an ongoing issue to ensure that sites are awar
 * How will we identify from the speaker specific audio file names which audio belongs to the participant? Interviewers could keep a consistent display name or sites could provide a list of all interviewer display names used perhaps. Regardless, this will be another issue for file accounting code to check once a method is decided on
 * How do we want to identify which TranscribeMe speaker ID is the participant? Should we have some convention like always having the interviewer say some particular word at the start, or can we tackle the problem with purely automated methods? Or perhaps the transcriber could intentionally use a particular ID for who they think the participant is?
 
-We will be meeting with TranscribeMe on 4/4 to confirm our data flow procedures with them and ensure Prescient is set up to work analogously to Pronet. At this time can ask the questions we still have for TranscribeMe. 
+TranscribeMe has been notified about the various issues above related to them, but addressing it remains ongoing.
 
 </details>
 
@@ -480,10 +497,10 @@ We will be meeting with TranscribeMe on 4/4 to confirm our data flow procedures 
 	* Who will handle it when changes need to be made on the server? Could involve changes to code, changes to files in processed folders, or changes to files in raw folders
 	* Who will be checking the QC outputs on DPDash?
 * Finish actually setting up DPDash
-	* Make sure audio, transcript, and video CSVs are being imported (for DPDash dev server paths are at /data/predict/kcho/flow_test/Pronet/PHOENIX/GENERAL/\*/processed/\*/interviews/\*/\*QC\*.csv)
+	* Make sure audio, transcript, and video CSVs are being imported (for DPDash dev server paths are at /data/predict/kcho/flow_test/Pronet/PHOENIX/GENERAL/\*/processed/\*/interviews/\*/\*QC\*.csv) - this should be in progress, awaiting additional info from Tashrif
 	* Decide which features we want to display from each
 	* Create config files on the UI and ensure colormap bounds make sense for each feature shown
-	* First config for looking at core audio, video, and transcript QC features together has been drafted, but need to split it out into more detailed configs for each modality individually instead. Can then also further refine boundaries, color scheme, etc. 
+	* First config for looking at core audio, video, and transcript QC features together has been drafted, but need to split it out into more detailed configs for each modality individually instead. Can then also further refine boundaries, color scheme, etc. Note these need to be done for both open and psychs interviews separately due to our folder structure
 * Set protocol for communication with sites
 	* What happens when sites have mistakes with file naming/organization conventions?
 	* What happens when sites are missing data or don't complete a necessary manual review?
@@ -503,7 +520,7 @@ Should ensure everyone is aware Michaela will be away for the summer (late May t
 
 </details>
 
-Finally, there are a few logistics to handle specific to Pronet and Prescient. For Pronet, we just need to take the last steps for setup of the production server. This involves confirming that the latest version of the code with the new video QC features is installed, verifying that this code passed the Yale IT security review, and performing an actual test run on prod.
+Finally, there are a few logistics to handle specific to Pronet and Prescient. For Pronet, we just need to take the last steps for setup of the production server. This involves confirming that the latest version of the code with the new video QC features is installed, verifying that this code passed the Yale IT security review, and performing an actual test run on prod. Should be cognizant of available compute resources on the production server while testing, as dev server could easily run out of RAM, and production interviews will be a bit longer than the mock interviews.
 
 <details>
 	<summary>For Prescient, there are many more steps, as we still need to get the development server installation working first before proceeding to production setup. The major blockers we are actively trying to address for this are:</summary>
@@ -517,7 +534,7 @@ Finally, there are a few logistics to handle specific to Pronet and Prescient. F
 	* [Next step is to review the Mediaflux SFTP documentation, follow-up with any remaining questions](https://wiki-rcs.unimelb.edu.au/pages/viewpage.action?pageId=328435)
 	* Will add implementation plan here once determined
 * Get a TranscribeMe SFTP account appropriately set up
-	* Conversation about this has been started, a lot will likely be settled by the group meeting with TranscribeMe on 4/4
+	* TranscribeMe has sent Kate information on how to do this, awaiting word from her on the account details
 * Compile a table of the languages that will be used at the different sites 
 
 Our current primary focus is establishing the necessary connection with TranscribeMe. The next focus will be on interfacing with Mediaflux. 
@@ -525,3 +542,7 @@ Our current primary focus is establishing the necessary connection with Transcri
 It also happens that most of the sites with special cases to handle are part of the Prescient network, and accommodating these cases is part of the code TODOs noted above. However, we will be prioritizing getting the standardized code working on Prescient first. 
 
 </details>
+
+When finalizing documentation for this repository, may want to rename it to ensure it better reflects the purpose of this code - running data aggregation/organization and quality control operations for interviews for the multisite AMP-SCZ study, and appropriately communicating the results of these operations. 
+
+At that time should also make sure example screenshots, setup instructions, etc. are fully up to date

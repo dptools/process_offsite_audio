@@ -54,7 +54,11 @@ def transcript_pull(interview_type, data_root, study, ptID, username, password, 
 			# nothing to do here, most likely need to just keep waiting on this transcript
 			# in future could look into detecting types of connection errors, perhaps not always assuming a miss means not transcribed yet
 			# even the current email alerts should make other issues easy to catch over time though, so not a big priority
-			pass 
+			try:
+				# seems this sometimes creates an empty file at the prescreening path, so just remove that for clarity
+				os.remove(local_path)
+			except:
+				pass 
 
 	# log some very basic info about success of script
 	print("(" + str(len(successful_transcripts)) + " total transcripts pulled)")
