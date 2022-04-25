@@ -84,11 +84,11 @@ def interview_mono_qc(interview_type, data_root, study, ptID):
 		lengths.append(round(mins,2))
 
 		# get other audio props
-		chan1 = data.flatten()
-		vol = np.sqrt(np.mean(np.square(chan1)))
+		data = data.flatten()
+		vol = np.sqrt(np.mean(np.square(data)))
 		gains.append(vol) # vol will be rounded when convert to db later
-		stds.append(round(np.nanstd(chan1),3))
-		spec_flat = librosa.feature.spectral_flatness(y=chan1)
+		stds.append(round(np.nanstd(data),3))
+		spec_flat = librosa.feature.spectral_flatness(y=data)
 		mean_flats.append(round(np.mean(spec_flat),4))
 		
 		# finally add the lookup of other stats based on the renamed file
@@ -96,7 +96,8 @@ def interview_mono_qc(interview_type, data_root, study, ptID):
 		study_day = int(filename.split("day")[1].split("_")[0])
 		int_num = int(filename.split("session")[1].split(".")[0])
 		folder_paths = os.listdir(os.path.join(data_root, "PROTECTED", study, "raw", ptID, "interviews", interview_type))
-		folder_names = [x.split("/")[-1] for x in folder_paths]
+		raw_folder_names = [x.split("/")[-1] for x in folder_paths]
+		folder_names = [x for x in raw_folder_names if (os.path.isdir(os.path.join(data_root, "PROTECTED", study, "raw", ptID, "interviews", interview_type, x)) and len(x.split(" ")) > 1 and len(x.split(" ")[0]) == 10 and len(x.split(" ")[1]) == 8) or (x.endswith(".WAV") and len(x) == 18)] # keep only files that seem to meet the convention
 		if interview_type == "psychs":
 			# make the onsites named the same as offsites for sorting purposess
 			folder_names = [x[0:4] + "-" + x[4:6] + "-" + x[6:8] + " " + x[8:10] + "." + x[10:12] + "." + x[12:14] if x.endswith(".WAV") else x for x in folder_names]

@@ -41,25 +41,25 @@ def sliding_audio_qc(filename,savepath,window_size=0.05,window_increment=0.05):
 		pass
 
 	# now proceed with analysis of just the one channel
-	chan1 = data.flatten()
+	data = data.flatten()
 			
 	# convert minute scale input to be sample rate
 	window_size_bins = int(window_size * 60.0 * fs)
 	window_increment_bins = int(window_increment * 60.0 * fs)
 
 	# compute features
-	chan1_rms_rolling = [np.sqrt(np.nanmean(np.square(chan1[i:i+window_size_bins]))) for i in range(0,len(chan1),window_increment_bins)]
-	chan1_flatness_rolling = [round(np.nanmean(librosa.feature.spectral_flatness(y=chan1[i:i+window_size_bins])),5) for i in range(0,len(chan1),window_increment_bins)]
-	minutes_bins = range(len(chan1_rms_rolling))
+	data_rms_rolling = [np.sqrt(np.nanmean(np.square(data[i:i+window_size_bins]))) for i in range(0,len(data),window_increment_bins)]
+	data_flatness_rolling = [round(np.nanmean(librosa.feature.spectral_flatness(y=data[i:i+window_size_bins])),5) for i in range(0,len(data),window_increment_bins)]
+	minutes_bins = range(len(data_rms_rolling))
 	minutes = [round(x*window_increment,3) for x in minutes_bins]
 	end_minutes = [round(x + window_size,3) for x in minutes]
 
 	# convert RMS to decibels
 	ref_rms=float(2*(10**(-5)))
-	c1_db = [round(20 * np.log10(x/ref_rms),2) for x in chan1_rms_rolling] 
+	c1_db = [round(20 * np.log10(x/ref_rms),2) for x in data_rms_rolling] 
 
 	# construct and save CSV
-	values = [minutes,end_minutes,c1_db,chan1_flatness_rolling]
+	values = [minutes,end_minutes,c1_db,data_flatness_rolling]
 	new_csv = pd.DataFrame()
 	for i in range(len(headers)):
 		h = headers[i]
