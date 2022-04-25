@@ -99,18 +99,22 @@ for p in *; do
 						# if a minute doesn't exist in the hour ffmpeg will fail that command, but no effect on the greater pipeline so it is easiest to let it just proceed this way
 						# this is assuming a video will not hit 10+ hours, which seems reasonable
 						# offset first frame by 1 second to avoid capturing possible empty screen at very beginning of recording
+						# takes frame every 4 minutes now
 						ffmpeg -ss 0"$hr":00:01 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute00.jpg &> /dev/null
-						ffmpeg -ss 0"$hr":05:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute05.jpg &> /dev/null
-						ffmpeg -ss 0"$hr":10:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute10.jpg &> /dev/null
-						ffmpeg -ss 0"$hr":15:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute15.jpg &> /dev/null
+						ffmpeg -ss 0"$hr":04:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute04.jpg &> /dev/null
+						ffmpeg -ss 0"$hr":08:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute08.jpg &> /dev/null
+						ffmpeg -ss 0"$hr":12:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute12.jpg &> /dev/null
+						ffmpeg -ss 0"$hr":16:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute16.jpg &> /dev/null
 						ffmpeg -ss 0"$hr":20:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute20.jpg &> /dev/null
-						ffmpeg -ss 0"$hr":25:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute25.jpg &> /dev/null
-						ffmpeg -ss 0"$hr":30:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute30.jpg &> /dev/null
-						ffmpeg -ss 0"$hr":35:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute35.jpg &> /dev/null
+						ffmpeg -ss 0"$hr":24:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute24.jpg &> /dev/null
+						ffmpeg -ss 0"$hr":28:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute28.jpg &> /dev/null
+						ffmpeg -ss 0"$hr":32:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute32.jpg &> /dev/null
+						ffmpeg -ss 0"$hr":36:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute36.jpg &> /dev/null
 						ffmpeg -ss 0"$hr":40:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute40.jpg &> /dev/null
-						ffmpeg -ss 0"$hr":45:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute45.jpg &> /dev/null
-						ffmpeg -ss 0"$hr":50:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute50.jpg &> /dev/null
-						ffmpeg -ss 0"$hr":55:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute55.jpg &> /dev/null
+						ffmpeg -ss 0"$hr":44:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute44.jpg &> /dev/null
+						ffmpeg -ss 0"$hr":48:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute48.jpg &> /dev/null
+						ffmpeg -ss 0"$hr":52:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute52.jpg &> /dev/null
+						ffmpeg -ss 0"$hr":56:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute56.jpg &> /dev/null
 					done
 				fi
 			done
@@ -179,18 +183,23 @@ for p in *; do
 					for hr in $(seq 0 $hours); do
 						# if a minute doesn't exist in the hour ffmpeg will fail that command, but no effect on the greater pipeline so it is easiest to let it just proceed this way
 						# this is assuming a video will not hit 10+ hours, which seems reasonable
-						ffmpeg -ss 0"$hr":00:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute00.jpg &> /dev/null
-						ffmpeg -ss 0"$hr":05:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute05.jpg &> /dev/null
-						ffmpeg -ss 0"$hr":10:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute10.jpg &> /dev/null
-						ffmpeg -ss 0"$hr":15:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute15.jpg &> /dev/null
+						# offset first frame by 1 second to avoid capturing possible empty screen at very beginning of recording
+						# takes frame every 4 minutes now
+						ffmpeg -ss 0"$hr":00:01 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute00.jpg &> /dev/null
+						ffmpeg -ss 0"$hr":04:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute04.jpg &> /dev/null
+						ffmpeg -ss 0"$hr":08:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute08.jpg &> /dev/null
+						ffmpeg -ss 0"$hr":12:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute12.jpg &> /dev/null
+						ffmpeg -ss 0"$hr":16:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute16.jpg &> /dev/null
 						ffmpeg -ss 0"$hr":20:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute20.jpg &> /dev/null
-						ffmpeg -ss 0"$hr":25:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute25.jpg &> /dev/null
-						ffmpeg -ss 0"$hr":30:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute30.jpg &> /dev/null
-						ffmpeg -ss 0"$hr":35:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute35.jpg &> /dev/null
+						ffmpeg -ss 0"$hr":24:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute24.jpg &> /dev/null
+						ffmpeg -ss 0"$hr":28:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute28.jpg &> /dev/null
+						ffmpeg -ss 0"$hr":32:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute32.jpg &> /dev/null
+						ffmpeg -ss 0"$hr":36:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute36.jpg &> /dev/null
 						ffmpeg -ss 0"$hr":40:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute40.jpg &> /dev/null
-						ffmpeg -ss 0"$hr":45:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute45.jpg &> /dev/null
-						ffmpeg -ss 0"$hr":50:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute50.jpg &> /dev/null
-						ffmpeg -ss 0"$hr":55:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute55.jpg &> /dev/null
+						ffmpeg -ss 0"$hr":44:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute44.jpg &> /dev/null
+						ffmpeg -ss 0"$hr":48:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute48.jpg &> /dev/null
+						ffmpeg -ss 0"$hr":52:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute52.jpg &> /dev/null
+						ffmpeg -ss 0"$hr":56:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute56.jpg &> /dev/null
 					done
 				fi
 			done

@@ -46,7 +46,8 @@ def audio_length_check(data_root, study, length_limit):
 			print("Problem with GENERAL processed audio folder for " + ptID + " " + interview_type + ", continuing")
 			continue
 
-		dpdash_name_format = study + "-" + ptID + "-interviewMonoAudioQC_" + interview_type + "-day*to*.csv"
+		# for this project the DPDash CSV name only uses last two digits of the study ID
+		dpdash_name_format = study[-2:] + "-" + ptID + "-interviewMonoAudioQC_" + interview_type + "-day*to*.csv"
 		try:
 			dpdash_name = glob.glob(dpdash_name_format)[0] # DPDash script deletes any older days in this subfolder, so should only get 1 match each time
 			dpdash_qc = pd.read_csv(dpdash_name) 
@@ -61,7 +62,7 @@ def audio_length_check(data_root, study, length_limit):
 			# should always be exactly one matching entry, as only allowing one file into DPDash per day (first submitted)
 			cur_row = dpdash_qc[(dpdash_qc["day"]==day_num) & (dpdash_qc["interview_number"]==int_num)] 
 			# then get total time of that particular recording (in minutes)
-			cur_count = float(cur_row["length(minutes)"].tolist()[0])
+			cur_count = float(cur_row["length_minutes"].tolist()[0])
 		except:
 			# again should never reach the error as should always be a day in the DPDash CSV for a day found here, but just to be safe!
 			print(filen + " is missing a record in the DPDash CSV for " + ptID + " " + interview_type + ", continuing")

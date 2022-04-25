@@ -21,7 +21,7 @@ import glob
 def interview_mono_qc(interview_type, data_root, study, ptID):
 	# specify column headers that will be used for every CSV
 	# make it DPDash formatted, but will leave reftime columns blank. others will look up
-	headers=["reftime","day","timeofday","weekday","study","patient","interview_number","length(minutes)","overall_db","amplitude_stdev","mean_flatness"]
+	headers=["reftime","day","timeofday","weekday","study","patient","interview_number","length_minutes","overall_db","amplitude_stdev","mean_flatness"]
 	# initialize lists to fill in df
 	study_days = []
 	times = []
@@ -80,15 +80,16 @@ def interview_mono_qc(interview_type, data_root, study, ptID):
 		# append length info
 		sec = float(ns)/fs
 		mins = sec/float(60)
-		lengths.append(mins)
+		# use round so values are reasonably viewable on DPDash
+		lengths.append(round(mins,2))
 
 		# get other audio props
 		chan1 = data.flatten()
 		vol = np.sqrt(np.mean(np.square(chan1)))
-		gains.append(vol)
-		stds.append(np.nanstd(chan1))
+		gains.append(vol) # vol will be rounded when convert to db later
+		stds.append(round(np.nanstd(chan1),3))
 		spec_flat = librosa.feature.spectral_flatness(y=chan1)
-		mean_flats.append(np.mean(spec_flat))
+		mean_flats.append(round(np.mean(spec_flat),4))
 		
 		# finally add the lookup of other stats based on the renamed file
 		# format should be [study]_[ptID]_offsiteInterview_audio_day[4digit#]_session[3digit#].wav
@@ -113,7 +114,8 @@ def interview_mono_qc(interview_type, data_root, study, ptID):
 		
 	# convert RMS to decibels
 	ref_rms=float(2*(10**(-5)))
-	db = [20 * np.log10(x/ref_rms) for x in gains] 
+	# use round so values are reasonably viewable on DPDash
+	db = [round(20 * np.log10(x/ref_rms),2) for x in gains] 
 
 	# get pt and study lists, and also an empty list for reftime column
 	studies = [study for x in range(len(db))]
@@ -132,7 +134,8 @@ def interview_mono_qc(interview_type, data_root, study, ptID):
 	os.chdir(os.path.join(data_root, "GENERAL", study, "processed", ptID, "interviews", interview_type))
 
 	# now save CSV
-	output_path_format = study+"-"+ptID+"-interviewMonoAudioQC_" + interview_type + "-day*.csv"
+	# Tashrif decided to change the convention for U24 DPDash, so study name in the DPDash CSV name needs to always just be last 2 digits of the site ID here
+	output_path_format = study[-2:]+"-"+ptID+"-interviewMonoAudioQC_" + interview_type + "-day*.csv"
 	output_paths = glob.glob(output_path_format)
 	# single existing DPDash file is expected - do concatenation and then delete old version (since naming convention will not overwrite)
 	if len(output_paths) == 1:
@@ -142,14 +145,16 @@ def interview_mono_qc(interview_type, data_root, study, ptID):
 		# drop any duplicates in case audio got decrypted a second time - shouldn't happen via pipeline
 		join_csv.drop_duplicates(subset=["patient", "day", "timeofday"],inplace=True)
 		join_csv.sort_values(by=["day","timeofday"],inplace=True) # make sure concatenated CSV is still sorted primarily by day number and secondarily by time
-		output_path_cur = study + "-" + ptID + "-interviewMonoAudioQC_" + interview_type + "-day" + str(join_csv["day"].tolist()[0]) + "to" + str(join_csv["day"].tolist()[-1]) + '.csv'
+		# study name in the DPDash CSV name needs to always just be last 2 digits of the site ID here
+		output_path_cur = study[-2:] + "-" + ptID + "-interviewMonoAudioQC_" + interview_type + "-day" + str(join_csv["day"].tolist()[0]) + "to" + str(join_csv["day"].tolist()[-1]) + '.csv'
 		join_csv.to_csv(output_path_cur,index=False)
 		return # function is now done if we are in the single existing dp dash case
 	# print warning if more than 1 for this patient
 	if len(output_paths) > 1:
 		print("Warning - multiple DPDash CSVs exist for patient " + ptID + ". Saving current CSV separately for now")
 	# with 0 or more than 1, just save this as is
-	output_path_cur = study + "-" + ptID + "-interviewMonoAudioQC_" + interview_type + "-day" + str(study_days[0]) + "to" + str(study_days[-1]) + '.csv'
+	# study name in the DPDash CSV name needs to always just be last 2 digits of the site ID here
+	output_path_cur = study[-2:] + "-" + ptID + "-interviewMonoAudioQC_" + interview_type + "-day" + str(study_days[0]) + "to" + str(study_days[-1]) + '.csv'
 	new_csv.to_csv(output_path_cur,index=False)
 	return
 

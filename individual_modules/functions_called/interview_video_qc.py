@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 
+# prevent pyfeat from logging an unneccessary warning every time
+import warnings
+warnings.filterwarnings("ignore", category=FutureWarning)
+
 import os
 import sys
 import datetime
@@ -10,8 +14,6 @@ import glob
 # new imports for video
 import cv2
 from feat import Detector
-
-# suppress future warning here?
 
 # run video QC on the newly extracted frames, also handling the file name map for videos here
 def interview_video_qc(interview_type, data_root, study, ptID):
@@ -101,17 +103,27 @@ def interview_video_qc(interview_type, data_root, study, ptID):
 			face_conf_list.extend(image_core_faces["FaceScore"].tolist())
 			cur_faces_area = [float(x) * y for x,y in zip(image_core_faces["FaceRectHeight"].tolist(),image_core_faces["FaceRectWidth"].tolist())]
 			face_area_list.extend(cur_faces_area)
-		# add to overall list for this interivew
+		# add to overall list for this interview
 		num_frames.append(frames_count)
 		min_faces_in_frame.append(np.min(face_nums_list))
 		max_faces_in_frame.append(np.max(face_nums_list))
-		mean_faces_in_frame.append(np.mean(face_nums_list))
-		min_face_confidence.append(np.min(face_conf_list))
-		max_face_confidence.append(np.max(face_conf_list))
-		mean_face_confidence.append(np.mean(face_conf_list))
-		min_face_area.append(np.min(face_area_list))
-		max_face_area.append(np.max(face_area_list))
-		mean_face_area.append(np.mean(face_area_list))
+		# use round so values are reasonably viewable on DPDash
+		mean_faces_in_frame.append(round(np.mean(face_nums_list),2))
+		if len(face_conf_list) == 0:
+			# handle case where no faces were detected at all
+			min_face_confidence.append(np.nan)
+			max_face_confidence.append(np.nan)
+			mean_face_confidence.append(np.nan)
+			min_face_area.append(np.nan)
+			max_face_area.append(np.nan)
+			mean_face_area.append(np.nan)
+		else:
+			min_face_confidence.append(round(np.min(face_conf_list),3))
+			max_face_confidence.append(round(np.max(face_conf_list),3))
+			mean_face_confidence.append(round(np.mean(face_conf_list),3))
+			min_face_area.append(round(np.min(face_area_list),1))
+			max_face_area.append(round(np.max(face_area_list),1))
+			mean_face_area.append(round(np.mean(face_area_list),1))
 		# back out of folder before continuing loop
 		os.chdir("..") 
 
@@ -191,7 +203,8 @@ def interview_video_qc(interview_type, data_root, study, ptID):
 	# now prepare to save new CSV for this patient (or update existing CSV if there is one)
 	os.chdir(os.path.join(data_root, "GENERAL", study, "processed", ptID, "interviews", interview_type))
 	# find if there are existing CSVs for this particular subject/type videos
-	output_path_format = study+"-"+ptID+"-interviewVideoQC_" + interview_type + "-day*.csv"
+	# Tashrif decided to change the convention for U24 DPDash, so study name in the DPDash CSV name needs to always just be last 2 digits of the site ID here
+	output_path_format = study[-2:]+"-"+ptID+"-interviewVideoQC_" + interview_type + "-day*.csv"
 	output_paths = glob.glob(output_path_format)
 	# single existing DPDash file is expected - do concatenation and then delete old version (since naming convention will not overwrite)
 	if len(output_paths) == 1:
@@ -201,14 +214,16 @@ def interview_video_qc(interview_type, data_root, study, ptID):
 		# drop any duplicates in case audio got decrypted a second time - shouldn't happen via pipeline
 		join_csv.drop_duplicates(subset=["patient", "day", "timeofday"],inplace=True)
 		join_csv.sort_values(by=["day","timeofday"],inplace=True) # make sure concatenated CSV is still sorted primarily by day number and secondarily by time
-		output_path_cur = study + "-" + ptID + "-interviewVideoQC_" + interview_type + "-day" + str(join_csv["day"].tolist()[0]) + "to" + str(join_csv["day"].tolist()[-1]) + '.csv'
+		# study name in the DPDash CSV name needs to always just be last 2 digits of the site ID here
+		output_path_cur = study[-2:] + "-" + ptID + "-interviewVideoQC_" + interview_type + "-day" + str(join_csv["day"].tolist()[0]) + "to" + str(join_csv["day"].tolist()[-1]) + '.csv'
 		join_csv.to_csv(output_path_cur,index=False)
 		return # function is now done if we are in the single existing dp dash case
 	# print warning if more than 1 for this patient
 	if len(output_paths) > 1:
 		print("Warning - multiple DPDash CSVs exist for patient " + ptID + ". Saving current CSV separately for now")
 	# with 0 or more than 1, just save this as is
-	output_path_cur = study + "-" + ptID + "-interviewVideoQC_" + interview_type + "-day" + str(study_days[0]) + "to" + str(study_days[-1]) + '.csv'
+	# study name in the DPDash CSV name needs to always just be last 2 digits of the site ID here
+	output_path_cur = study[-2:] + "-" + ptID + "-interviewVideoQC_" + interview_type + "-day" + str(study_days[0]) + "to" + str(study_days[-1]) + '.csv'
 	new_df.to_csv(output_path_cur,index=False)
 
 if __name__ == '__main__':

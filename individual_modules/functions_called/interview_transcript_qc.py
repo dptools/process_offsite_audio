@@ -19,7 +19,7 @@ def interview_transcript_qc(interview_type, data_root, study, ptID):
 			 "num_sentences_S2","num_words_S2","min_words_in_sen_S2","max_words_in_sen_S2", # generally should have S1 and S2 as main interviewer and patient
 			 "num_sentences_S3","num_words_S3","min_words_in_sen_S3","max_words_in_sen_S3", # expect at most 3 relevant subject IDs usually
 			 "num_inaudible","num_questionable","num_crosstalk","num_redacted","num_commas","num_dashes", # transcription accuracy related measures
-			 "final_timestamp","min_timestamp_space","max_timestamp_space","min_timestamp_space_per_word","max_timestamp_space_per_word"] # timestamp accuracy related measures
+			 "final_timestamp_minutes","min_timestamp_space","max_timestamp_space","min_timestamp_space_per_word","max_timestamp_space_per_word"] # timestamp accuracy related measures
 
 	# initialize lists to fill in df
 	# metadata ones
@@ -167,7 +167,7 @@ def interview_transcript_qc(interview_type, data_root, study, ptID):
 			cur_minutes = [float(int(x.split(":")[0]))*60.0 + float(int(x.split(":")[1])) + float(x.split(":")[2])/60.0 for x in cur_times]
 		except:
 			cur_minutes = [float(int(x.split(":")[0])) + float(x.split(":")[1])/60.0 for x in cur_times] # format sometimes will not include an hours time, so need to catch that
-		fintimes.append(cur_minutes[-1])
+		fintimes.append(round(cur_minutes[-1],2))
 
 		cur_seconds = [m * 60.0 for m in cur_minutes] # convert the minutes to a number of seconds!
 
@@ -182,6 +182,7 @@ def interview_transcript_qc(interview_type, data_root, study, ptID):
 			maxspacesweighted.append(np.nan)
 			minspacesweightedabs.append(np.nan)
 		else:
+			# use round so values are reasonably viewable on DPDash
 			minspaces.append(round(np.nanmin(differences_list),3))
 			maxspaces.append(round(np.nanmax(differences_list),3))
 			weighted_list = [j/float(i) for i, j in zip(words_per[: -1], differences_list)]
@@ -210,7 +211,8 @@ def interview_transcript_qc(interview_type, data_root, study, ptID):
 
 	# now prepare to save new CSV for this patient
 	os.chdir(os.path.join(data_root, "GENERAL", study, "processed", ptID, "interviews", interview_type))
-	output_path_format = study+"-"+ptID+"-interviewRedactedTranscriptQC_" + interview_type + "-day*.csv"
+	# Tashrif decided to change the convention for U24 DPDash, so study name in the DPDash CSV name needs to always just be last 2 digits of the site ID here
+	output_path_format = study[-2:]+"-"+ptID+"-interviewRedactedTranscriptQC_" + interview_type + "-day*.csv"
 	output_paths = glob.glob(output_path_format)
 	# delete any old DPDash transcript CSVs
 	cur_day_string = str(study_days[0]) + "to" + str(study_days[-1]) + '.csv' # check to see if the new one is actually new though
@@ -219,7 +221,8 @@ def interview_transcript_qc(interview_type, data_root, study, ptID):
 			return # do nothing if we already have!
 		os.remove(old_dp)
 	# save the current one finally
-	output_path_cur = study + "-" + ptID + "-interviewRedactedTranscriptQC_" + interview_type + "-day" + str(study_days[0]) + "to" + str(study_days[-1]) + '.csv'
+	# study name in the DPDash CSV name needs to always just be last 2 digits of the site ID here
+	output_path_cur = study[-2:] + "-" + ptID + "-interviewRedactedTranscriptQC_" + interview_type + "-day" + str(study_days[0]) + "to" + str(study_days[-1]) + '.csv'
 	new_csv.to_csv(output_path_cur,index=False)
 	return
 			

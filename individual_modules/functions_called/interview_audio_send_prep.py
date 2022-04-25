@@ -11,7 +11,8 @@ def move_audio_to_send(interview_type, data_root, study, ptID, length_cutoff, db
 	# navigate to folder of interest, load initial CSVs
 	try:
 		os.chdir(os.path.join(data_root, "GENERAL", study, "processed", ptID, "interviews", interview_type))
-		dpdash_name_format = study + "-" + ptID + "-interviewMonoAudioQC_" + interview_type + "-day*.csv"
+		# for this project the DPDash CSV name only uses last two digits of the study ID
+		dpdash_name_format = study[-2:] + "-" + ptID + "-interviewMonoAudioQC_" + interview_type + "-day*.csv"
 		dpdash_name = glob.glob(dpdash_name_format)[0] # DPDash script deletes any older days in this subfolder, so should only get 1 match each time
 		dpdash_qc = pd.read_csv(dpdash_name)
 		os.chdir(os.path.join(data_root, "PROTECTED", study, "processed", ptID, "interviews", interview_type))
@@ -40,7 +41,7 @@ def move_audio_to_send(interview_type, data_root, study, ptID, length_cutoff, db
 			continue # move onto next file
 
 		# now decide if file meets criteria or not. will only be one row in the df, grab the length and volume from that
-		cur_length = float(cur_df["length(minutes)"].tolist()[0]) * 60.0 # convert from minutes to seconds to compare to the seconds cutoff input
+		cur_length = float(cur_df["length_minutes"].tolist()[0]) * 60.0 # convert from minutes to seconds to compare to the seconds cutoff input
 		cur_db = float(cur_df["overall_db"].tolist()[0])
 		if cur_length < float(length_cutoff):
 			# use error code 1 to denote the file is too short - volume not even considered

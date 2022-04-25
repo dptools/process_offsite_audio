@@ -49,7 +49,8 @@ def get_email_summary_stats(data_root, study, lab_email_path, transcribeme_email
 		filen = filep.split("/")[-1]
 		ptID = filen.split("_")[1]
 		os.chdir(os.path.join(data_root, "GENERAL", study, "processed", ptID, "interviews", interview_type))
-		dpdash_name_format = study + "-" + ptID + "-interviewMonoAudioQC_" + interview_type + "-day*.csv"
+		# for this project the DPDash CSV name only uses last two digits of the study ID
+		dpdash_name_format = study[-2:] + "-" + ptID + "-interviewMonoAudioQC_" + interview_type + "-day*.csv"
 		dpdash_name = glob.glob(dpdash_name_format)[0] # DPDash script deletes any older days in this subfolder, so should only get 1 match each time
 		dpdash_qc = pd.read_csv(dpdash_name) 
 		# technically reloading this CSV for each file instead of for each patient, but should be a fast operation because CSV is small
@@ -61,7 +62,7 @@ def get_email_summary_stats(data_root, study, lab_email_path, transcribeme_email
 		# should always be exactly one matching entry, as only allowing one file into DPDash per day (first submitted)
 		cur_row = dpdash_qc[(dpdash_qc["day"]==day_num) & (dpdash_qc["interview_number"]==int_num)] 
 		# then get total time of that particular recording (in minutes)
-		cur_count = float(cur_row["length(minutes)"].tolist()[0])
+		cur_count = float(cur_row["length_minutes"].tolist()[0])
 
 		# update total count across the entire study
 		num_minutes = num_minutes + cur_count
@@ -73,7 +74,8 @@ def get_email_summary_stats(data_root, study, lab_email_path, transcribeme_email
 		filen = filep.split("/")[-1]
 		ptID = filen.split("_")[1]
 		os.chdir(os.path.join(data_root, "GENERAL", study, "processed", ptID, "interviews", interview_type))
-		dpdash_name_format = study + "-" + ptID + "-interviewMonoAudioQC_" + interview_type + "-day*.csv"
+		# for this project the DPDash CSV name only uses last two digits of the study ID
+		dpdash_name_format = study[-2:] + "-" + ptID + "-interviewMonoAudioQC_" + interview_type + "-day*.csv"
 		dpdash_name = glob.glob(dpdash_name_format)[0] # DPDash script deletes any older days in this subfolder, so should only get 1 match each time
 		dpdash_qc = pd.read_csv(dpdash_name) 
 		# technically reloading this CSV for each file instead of for each patient, but should be a fast operation because CSV is small
@@ -85,7 +87,7 @@ def get_email_summary_stats(data_root, study, lab_email_path, transcribeme_email
 		# should always be exactly one matching entry, as only allowing one file into DPDash per day (first submitted)
 		cur_row = dpdash_qc[(dpdash_qc["day"]==day_num) & (dpdash_qc["interview_number"]==int_num)] 
 		# then get total time of that particular recording (in minutes)
-		cur_count = float(cur_row["length(minutes)"].tolist()[0])
+		cur_count = float(cur_row["length_minutes"].tolist()[0])
 
 		# update total count across the entire study
 		num_minutes_unsent = num_minutes_unsent + cur_count
@@ -93,11 +95,12 @@ def get_email_summary_stats(data_root, study, lab_email_path, transcribeme_email
 	# and get total length of bad files
 	num_minutes_bad = 0.0
 	for filep in temp_paths_list:
-		## find dpdash path from file path
+		# find dpdash path from file path
 		filen = filep.split("/")[-1]
 		ptID = filen.split("_")[1]
 		os.chdir(os.path.join(data_root, "GENERAL", study, "processed", ptID, "interviews", interview_type))
-		dpdash_name_format = study + "-" + ptID + "-interviewMonoAudioQC_" + interview_type + "-day*.csv"
+		# for this project the DPDash CSV name only uses last two digits of the study ID
+		dpdash_name_format = study[-2:] + "-" + ptID + "-interviewMonoAudioQC_" + interview_type + "-day*.csv"
 		dpdash_name = glob.glob(dpdash_name_format)[0] # DPDash script deletes any older days in this subfolder, so should only get 1 match each time
 		dpdash_qc = pd.read_csv(dpdash_name) 
 		# technically reloading this CSV for each file instead of for each patient, but should be a fast operation because CSV is small
@@ -109,7 +112,7 @@ def get_email_summary_stats(data_root, study, lab_email_path, transcribeme_email
 		# should always be exactly one matching entry, as only allowing one file into DPDash per day (first submitted)
 		cur_row = dpdash_qc[(dpdash_qc["day"]==day_num) & (dpdash_qc["interview_number"]==int_num)] 
 		# then get total time of that particular recording (in minutes)
-		cur_count = float(cur_row["length(minutes)"].tolist()[0])
+		cur_count = float(cur_row["length_minutes"].tolist()[0])
 
 		# update total count across the entire study
 		num_minutes_bad = num_minutes_bad + cur_count
