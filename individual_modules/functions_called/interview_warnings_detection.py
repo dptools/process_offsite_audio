@@ -276,7 +276,7 @@ def interview_warnings_check(interview_type, data_root, study, ptID, warning_lab
 				fw.write(ptID + " (" + interview_type + ")")
 		else:
 			with open(summary_lab_email_path, 'a') as fa:
-				fa.write(", " + ptID)
+				fa.write(", " + ptID + " (" + interview_type + ")")
 
 	# finally save the merged CSV if there is anything new to report - since it contains everything to date can just overwrite
 	if not all_new_df.empty:

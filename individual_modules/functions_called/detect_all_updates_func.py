@@ -21,7 +21,7 @@ def all_updates_email(output_root):
 	# load all the data frames to reference to start
 	summary_stat_df = pd.read_csv(os.path.join(output_root,"all-QC-summary-stats.csv"))
 	# don't actually need the accounting df, that part will be attached to email but not needed in the body construction
-	warning_df.read_csv(os.path.join(output_root,"all-processed-warnings.csv"))
+	warning_df = read_csv(os.path.join(output_root,"all-processed-warnings.csv"))
 	sop_df = pd.read_csv(os.path.join(output_root,"all-SOP-warnings.csv"))
 
 	# get email body paths ready
