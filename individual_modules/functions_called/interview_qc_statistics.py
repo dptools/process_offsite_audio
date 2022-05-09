@@ -120,7 +120,7 @@ def interview_qc_statistics(interview_type, data_root, study, summary_lab_email_
 		trans_summary_df[cur_col + "_group_mean"] = [site_type_trans_mean[ci]]
 		trans_summary_df[cur_col + "_group_stdev"] = [site_type_trans_stdev[ci]]
 		trans_summary_df[cur_col + "_group_min"] = [site_type_trans_min[ci]]
-		trans_summary_df[cur_col + "_group_max"] = [site_type_audio_max[ci]]
+		trans_summary_df[cur_col + "_group_max"] = [site_type_trans_max[ci]]
 
 	# finally, merge all three to get a single row with everything that is available
 	all_summary_df = audio_summary_df.merge(video_summary_df, on=["summary_group", "computed_date"], how='outer').merge(trans_summary_df, on=["summary_group", "computed_date"], how='outer')
