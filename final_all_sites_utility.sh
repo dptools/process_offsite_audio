@@ -42,7 +42,9 @@ cd "$repo_root"/logs/TOTAL/"$cur_date" # change directories first so the file pa
 # for some stupid reason it seems impossible to both have an email body and have email attachments with this version of mailx (apparently if using -A it is an outdated version?)
 # tried many things so now just doing a workaround until the emails are nicer anyway (currently CSVs may be too dense)
 echo "" >> all_pipeline_update_email.txt
+echo "" >> all_pipeline_update_email.txt
 echo "Note described attachments are being sent in a separate email (these and warning CSVs to all be attached, should be 4 updated records coming in a separate email)" >> all_pipeline_update_email.txt
+echo "" >> all_warning_update_email.txt
 echo "" >> all_warning_update_email.txt
 echo "Note described attachments are being sent in a separate email (these and processed stat/accounting CSVs to all be attached, should be 4 updated records coming in a separate email)" >> all_warning_update_email.txt
 # actually send the email bodies now first

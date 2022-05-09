@@ -64,8 +64,7 @@ def all_updates_email(output_root):
 		# if no update just write that
 		with open(final_summary_path, 'a') as fa:
 			fa.write("No QC updates across any sites for psychs interviews, so no QC stats to highlight.")
-			fa.write("\n")
-			fa.write("\n")
+			# this is last section for this email so no need to add extra padding anymore
 	else:
 		# if have an update get the info first and then write everything
 		psychs_sites_list = list(set(summary_stat_df_psychs_recent["siteID"].tolist()))
@@ -83,8 +82,6 @@ def all_updates_email(output_root):
 			for cur_stat in psychs_qc_text_list:
 				fa.write("\n")
 				fa.write(cur_stat)
-			fa.write("\n")
-			fa.write("\n")
 
 	# finally check for warnings table recent updates
 	warning_df = warning_df[warning_df["warning_date"]==today_str]
