@@ -49,4 +49,4 @@ echo "Note described attachments are being sent in a separate email (these and p
 mail -s "[${server_version}] Interview Pipeline Daily Stats Email"  "$summary_email_list" < all_pipeline_update_email.txt
 mail -s "[${server_version}] Interview Pipeline Daily Warnings Email" "$summary_email_list" < all_warning_update_email.txt
 # inputting the txt file here even though it won't show up in the email body, just to prevent command from stalling looking for a cc
-mail -s "[${server_version}] Interview Pipeline Latest Attachments" -A all-QC-summary-stats.csv -A all-processed-accounting.csv -A all-processed-warnings.csv -A all-SOP-warnings.csv "$summary_email_list" < all_pipeline_update_email
+mail -s "[${server_version}] Interview Pipeline Latest Attachments" -A all-QC-summary-stats.csv -A all-processed-accounting.csv -A all-processed-warnings.csv -A all-SOP-warnings.csv "$summary_email_list" < all_pipeline_update_email.txt
