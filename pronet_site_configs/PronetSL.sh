@@ -28,15 +28,15 @@ export auto_send_limit_bool
 # settings for automatic email, again only relevant if auto transcription is on
 # first addresses for the more thorough updates on most recent files
 lab_email_list="mennis2@partners.org"
-# then addresses to send the TranscribeMe notification to
-transcribeme_email_list="mennis2@partners.org"
-# finally should also supply an email address that any answers will go to if TranscribeMe staff reply to the email alert
-transcribeme_email_reply_to="Michaela Ennis <mennis@g.harvard.edu>"
+# then addresses to send the site review notification to
+site_email_list="mennis2@partners.org"
+# finally should also supply current server label (mainly for dev versus prod)
+server_version="dev"
 # for U24 now have language marker setting to add to the files that are uploaded to TranscribeMe, to alert them of what language the audio will be in
 transcription_language="KOREAN"
 export lab_email_list
-export transcribeme_email_list
-export transcribeme_email_reply_to
+export site_email_list
+export server_version
 export transcription_language
 
 # finally setup the secure passwords

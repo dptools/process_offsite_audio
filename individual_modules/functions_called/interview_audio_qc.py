@@ -38,13 +38,13 @@ def interview_mono_qc(interview_type, data_root, study, ptID):
 	try:
 		os.chdir(os.path.join(data_root,"PROTECTED", study, "processed", ptID, "interviews", interview_type, "temp_audio"))
 	except:
-		# should generally not reach this error if calling from main pipeline bash script
+		# should generally not reach this warning if calling from main pipeline bash script
 		print("Haven't converted any new audio files yet for input patient " + ptID + " " + interview_type + ", or problem with input arguments") 
 		return
 
 	cur_files = os.listdir(".")
 	if len(cur_files) == 0:
-		# should generally not reach this error if calling from main pipeline bash script
+		# should generally not reach this warning if calling from main pipeline bash script
 		print("Haven't converted any new audio files yet for input patient " + ptID + " " + interview_type)
 		return
 
@@ -57,14 +57,14 @@ def interview_mono_qc(interview_type, data_root, study, ptID):
 		try:
 			data, fs = sf.read(filename)
 		except:
-			# ignore bad audio - will want to log this for pipeline
+			# ignore bad audio - will want to log this for module, but within pipeline it should have been caught by sliding QC earlier
 			print("(" + filename + " is a corrupted audio file)")
 			continue 
 
 		# get length info
 		ns = data.shape[0]
 		if ns == 0:
-			# ignore empty audio - will want to log this for pipeline
+			# ignore empty audio - will want to log this for module, but within pipeline it should have been caught by sliding QC earlier
 			print("(" + filename + " audio is empty)")
 			continue
 		
@@ -135,7 +135,7 @@ def interview_mono_qc(interview_type, data_root, study, ptID):
 	os.chdir(os.path.join(data_root, "GENERAL", study, "processed", ptID, "interviews", interview_type))
 
 	# now save CSV
-	# Tashrif decided to change the convention for U24 DPDash, so study name in the DPDash CSV name needs to always just be avlqc identifier here
+	# convention for U24 DPDash is different, so study name in the DPDash CSV name needs to always just be avlqc identifier here
 	output_path_format = "avlqc"+"-"+ptID+"-interviewMonoAudioQC_" + interview_type + "-day*.csv"
 	output_paths = glob.glob(output_path_format)
 	# single existing DPDash file is expected - do concatenation and then delete old version (since naming convention will not overwrite)
@@ -157,8 +157,16 @@ def interview_mono_qc(interview_type, data_root, study, ptID):
 	# study name in the DPDash CSV name needs to always just be avlqc identifier here
 	output_path_cur = "avlqc" + "-" + ptID + "-interviewMonoAudioQC_" + interview_type + "-day" + str(study_days[0]) + "to" + str(study_days[-1]) + '.csv'
 	new_csv.to_csv(output_path_cur,index=False)
-	return
+	
+	# if reach the end, exit with code indicating there was no problem
+	sys.exit(0)
 
 if __name__ == '__main__':
-    # Map command line arguments to function arguments.
-    interview_mono_qc(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])
+	# Map command line arguments to function arguments.
+	try:
+		interview_mono_qc(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])
+	except Exception as e:
+		# if audio QC fails, exit with error code for bash caller to pick up
+		print("Audio QC script crashed with the following error!")
+		print(e)
+		sys.exit(1)

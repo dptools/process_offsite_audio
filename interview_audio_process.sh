@@ -58,6 +58,10 @@ fi
 if [[ ! -d ${repo_root}/logs/${study} ]]; then
 	mkdir "$repo_root"/logs/"$study"
 fi
+# also have a separate subfolder setup for possible emails to be more easily located
+if [[ ! -d ${repo_root}/logs/${study}/emails_sent ]]; then
+	mkdir "$repo_root"/logs/"$study"/emails_sent
+fi
 # save with unique timestamp (unix seconds)
 log_timestamp=`date +%s`
 # test using console and log file simultaneously
@@ -87,7 +91,7 @@ if [ $auto_send_on = "Y" ] || [ $auto_send_on = "y" ]; then
 	fi
 else
 	echo "Audio will not be automatically sent to TranscribeMe"
-	echo "all decrypted files will be left in the audio_to_send subfolder of offsite_interview/processed for each patient"
+	echo "all decrypted files will be left in the audio_to_send subfolder under PROTECTED side processed for each patient"
 fi
 echo ""
 
@@ -100,7 +104,7 @@ for p in *; do
 
 	# now need to make sure processed folders are setup for this patient in both PROTECTED and GENERAL
 	# need patient folder under processed, and then also need interviews folder under patient (and psychs/open under interviews)
-	# TODO - confirm desired folder permissions situation here
+	# TODO - confirm desired folder permissions situation here, add appropriate checks if needed here and in the other top level bash script (or delete if that's fine!)
 	if [[ ! -d ${data_root}/PROTECTED/${study}/processed/${p} ]]; then
 		mkdir "$data_root"/PROTECTED/"$study"/processed/"$p"
 	fi
@@ -133,6 +137,7 @@ for p in *; do
 	# especially because when it is run with auto send off, a to_send folder will be left that someone may forget about, could inadvertently send a backlog later
 	# so solution for now is just to exit the script if there are preexisting to_send files for this study
 	# then let user know the outstanding files should be dealt with outside of the main pipeline
+	# TODO: write some instructions about this part in the README
 	if [ $auto_send_on = "Y" ] || [ $auto_send_on = "y" ]; then
 		if [[ -d "$data_root"/PROTECTED/"$study"/processed/"$p"/interviews/open/audio_to_send ]]; then 
 			# know to_send exists for this patient now, so need it to be empty to continue the script
@@ -232,10 +237,6 @@ echo ""
 if [ $auto_send_on = "Y" ] || [ $auto_send_on = "y" ]; then
 	echo "Sending files for transcription"
 
-	# initialize txt files for email bodies
-	echo "Audio Push Updates for ${study}:" > "$repo_root"/audio_lab_email_body.txt
-	echo "Hi," > "$repo_root"/audio_transcribeme_email_body.txt
-
 	# run push script
 	bash "$repo_root"/individual_modules/run_transcription_push.sh "$data_root" "$study" "$transcribeme_username" "$transcribeme_password" "$transcription_language" "$auto_send_limit_bool" "$auto_send_limit"
 	echo ""
@@ -251,22 +252,15 @@ if [ $auto_send_on = "Y" ] || [ $auto_send_on = "y" ]; then
 	echo ""
 
 	# finally, deal with email alerts. if no audio was successfully uploaded, there will be no transcribeme email file. only send emails if there is an update to report on
-	# TODO - make sure that site emails will still send though if it is just that all the audios were rejected for example
-	if [[ -e "$repo_root"/audio_transcribeme_email_body.txt ]]; then 
-		echo "Sending email alerts"
-		# actually send the email notifying lab members about audio files successfully pushed, with info about any errors or excluded files. 
-		mail -s "[${study} Interview Pipeline Updates] New Audio Processed" "$lab_email_list" < "$repo_root"/audio_lab_email_body.txt
-
-		# also have the email compiled for TranscribeMe
-		# use -r as part of the email command for this one so TranscribeMe will see reply address as mennis@g.harvard.edu
-		mail -s "[${study}] New Audio to Transcribe" -r "$transcribeme_email_reply_to" "$transcribeme_email_list" < "$repo_root"/audio_transcribeme_email_body.txt
-		# move the email to logs folder for reference
-		mv "$repo_root"/audio_transcribeme_email_body.txt "$repo_root"/logs/"$study"/audio_transcribeme_email_body_"$log_timestamp".txt
-	else # if email file doesn't exist in pipeline means no new audio pushed
-		echo "No new audios uploaded, so no emails to send"
+	if [[ -e "$repo_root"/audio_lab_email_body.txt ]]; then 
+		echo "Emailing status update to lab"
+		# send the email notifying lab members about audio files successfully pushed, with info about any errors or excluded files. 
+		mail -s "[${study} ${server_version} Interview Pipeline Updates] New Audio Processed" "$lab_email_list" < "$repo_root"/audio_lab_email_body.txt
+		# move the email to logs folder for reference if there was actual content
+		mv "$repo_root"/audio_lab_email_body.txt "$repo_root"/logs/"$study"/emails_sent/audio_lab_email_body_"$log_timestamp".txt
+	else 
+		echo "No new audio updates for this study, so no email to send"
 	fi	
-	# move the site email to logs folder for reference regardless
-	mv "$repo_root"/audio_lab_email_body.txt "$repo_root"/logs/"$study"/audio_lab_email_body_"$log_timestamp".txt
 	echo ""
 
 	# add current time for runtime tracking purposes
@@ -274,5 +268,15 @@ if [ $auto_send_on = "Y" ] || [ $auto_send_on = "y" ]; then
 	echo "Current time: ${now}"
 	echo ""
 fi
+
+# finally run the file accounting updates for this study
+echo "Compiling/updating file lists with processing date"
+bash "$repo_root"/individual_modules/run_final_audio_accounting.sh "$data_root" "$study"
+echo ""
+
+# add current time for runtime tracking purposes
+now=$(date +"%T")
+echo "Current time: ${now}"
+echo ""
 
 echo "Script completed!"

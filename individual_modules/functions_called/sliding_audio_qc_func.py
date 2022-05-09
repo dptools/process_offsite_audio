@@ -21,14 +21,14 @@ def sliding_audio_qc(filename,savepath,window_size=0.05,window_increment=0.05):
 		data, fs = sf.read(filename)
 	except:
 		print("(" + filename + " is a corrupted audio file)")
-		return 
+		sys.exit(1) # use sys.exit(1) to signal to pipeline the code has failed for this file
 
 	# get length info
 	ns = data.shape[0]
 	if ns == 0:
 		# ignore empty audio - will want to log this for pipeline
 		print("(" + filename + " audio is empty)")
-		return
+		sys.exit(1)
 
 	# and check that the audio is mono - this is currently just meant for basic QC of overall file, not speaker separation
 	try: # may not be a second shape number when file is mono
@@ -68,8 +68,13 @@ def sliding_audio_qc(filename,savepath,window_size=0.05,window_increment=0.05):
 	new_csv.to_csv(savepath,index=False)
 
 if __name__ == '__main__':
-    # Map command line arguments to function arguments.
-    try: # if extra arguments provided allow window settings to also be set via command line
-    	sliding_audio_qc(sys.argv[1], sys.argv[2], window_size=float(sys.argv[3]), window_increment=float(sys.argv[4]))
-    except:
-    	sliding_audio_qc(sys.argv[1], sys.argv[2])
+	# Map command line arguments to function arguments.
+
+	try: # if extra arguments provided allow window settings to also be set via command line
+		window_size=float(sys.argv[3])
+		window_increment=float(sys.argv[4])
+	except:
+		window_size=0.05
+		window_increment=0.05
+
+	sliding_audio_qc(sys.argv[1], sys.argv[2], window_size=window_size, window_increment=window_increment)

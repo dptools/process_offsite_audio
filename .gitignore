@@ -1,3 +1,12 @@
+**/.DS_Store
+**/._.DS_Store
+**/*.pyc
+**/__pycache__
+**/.passwords.sh
 .DS_Store
-*.pyc
 .passwords.sh
+logs/
+logs/*/*.txt
+logs/*/*/*.txt
+logs/*/*.csv
+logs/*/*/*.csv

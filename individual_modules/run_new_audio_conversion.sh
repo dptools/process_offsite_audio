@@ -16,6 +16,7 @@ if [[ -z "${repo_root}" ]]; then
 	func_root="$module_root"/functions_called
 else
 	func_root="$repo_root"/individual_modules/functions_called
+	pipeline="Y" # note when it is called from pipeline so email can be initialized - only want the file generated if there are new files for a patient in this site
 fi
 
 # move to study's raw folder to loop over patients
@@ -33,6 +34,13 @@ for p in *; do
 	fi
 	if [[ ! -d ../processed/"$p"/interviews/psychs/temp_audio ]]; then
 		mkdir ../processed/"$p"/interviews/psychs/temp_audio
+	fi
+	# also make folder for filename maps
+	if [[ ! -d ../processed/"$p"/interviews/open/audio_filename_maps ]]; then
+		mkdir ../processed/"$p"/interviews/open/audio_filename_maps
+	fi
+	if [[ ! -d ../processed/"$p"/interviews/psychs/audio_filename_maps ]]; then
+		mkdir ../processed/"$p"/interviews/psychs/audio_filename_maps
 	fi
 
 	# start looping through raw - interviews organized by folder
@@ -85,6 +93,13 @@ for p in *; do
 					# (look for prior output to know - sliding window QC)
 					if [[ ! -e ../../../../../processed/"$p"/interviews/open/temp_audio/"$date"+"$time".wav && ! -e ../../../../../processed/"$p"/interviews/open/sliding_window_audio_qc/"$date"+"$time".csv ]]; then
 						eval ffmpeg -i "$file" ../../../../../processed/"$p"/interviews/open/temp_audio/"$date"+"$time".wav &> /dev/null
+						# initialize txt files for email bodies too if this is a pipeline call, as we have found a new audio to process for the site
+						if [[ $pipeline = "Y" ]]; then
+							# it is okay to just redo this every time since it will restart the file, all the other updates come way downstream
+							echo "Audio Processing Updates for ${study}:" > "$repo_root"/audio_lab_email_body.txt
+						fi
+						# now also log to the filename map
+						echo "${data_root}/PROTECTED/${study}/raw/${p}/interviews/open/${folder}/${file}" > ../../../../../processed/"$p"/interviews/open/audio_filename_maps/"$date"+"$time".txt
 					fi
 				done
 
@@ -100,6 +115,13 @@ for p in *; do
 				# (look for prior output to know - sliding window QC)
 				if [[ ! -e ../../../../processed/"$p"/interviews/open/temp_audio/"$date"+"$time".wav && ! -e ../../../../processed/"$p"/interviews/open/sliding_window_audio_qc/"$date"+"$time".csv ]]; then
 					eval ffmpeg -i "$folder_formatted"/audio_only.m4a ../../../../processed/"$p"/interviews/open/temp_audio/"$date"+"$time".wav &> /dev/null
+					# initialize txt files for email bodies too if this is a pipeline call, as we have found a new audio to process for the site
+					if [[ $pipeline = "Y" ]]; then
+						# it is okay to just redo this every time since it will restart the file, all the other updates come way downstream
+						echo "Audio Processing Updates for ${study}:" > "$repo_root"/audio_lab_email_body.txt
+					fi
+					# now also log to the filename map
+					echo "${data_root}/PROTECTED/${study}/raw/${p}/interviews/open/${folder}/${file}" > ../../../../processed/"$p"/interviews/open/audio_filename_maps/"$date"+"$time".txt
 				fi
 			fi
 		done
@@ -135,6 +157,13 @@ for p in *; do
 				# no need to eval or use folder_formatted either, as no spaces should appear in onsite name
 				if [[ ! -e ../../../../processed/"$p"/interviews/psychs/temp_audio/"$name".wav && ! -e ../../../../processed/"$p"/interviews/psychs/sliding_window_audio_qc/"$name".csv ]]; then
 					cp "$folder" ../../../../processed/"$p"/interviews/psychs/temp_audio/"$name".wav
+					# initialize txt files for email bodies too if this is a pipeline call, as we have found a new audio to process for the site
+					if [[ $pipeline = "Y" ]]; then
+						# it is okay to just redo this every time since it will restart the file, all the other updates come way downstream
+						echo "Audio Processing Updates for ${study}:" > "$repo_root"/audio_lab_email_body.txt
+					fi
+					# now also log to the filename map
+					echo "${data_root}/PROTECTED/${study}/raw/${p}/interviews/psychs/${folder}" > ../../../../processed/"$p"/interviews/psychs/audio_filename_maps/"$date"+"$time".txt
 				fi
 
 				# done with file for now if it is a standalone onsite 
@@ -175,7 +204,14 @@ for p in *; do
 					# (look for prior output to know - sliding window QC)
 					if [[ ! -e ../../../../../processed/"$p"/interviews/psychs/temp_audio/"$date"+"$time".wav && ! -e ../../../../../processed/"$p"/interviews/psychs/sliding_window_audio_qc/"$date"+"$time".csv ]]; then
 						eval ffmpeg -i "$file" ../../../../../processed/"$p"/interviews/psychs/temp_audio/"$date"+"$time".wav &> /dev/null
+						# initialize txt files for email bodies too if this is a pipeline call, as we have found a new audio to process for the site
+						if [[ $pipeline = "Y" ]]; then
+							# it is okay to just redo this every time since it will restart the file, all the other updates come way downstream
+							echo "Audio Processing Updates for ${study}:" > "$repo_root"/audio_lab_email_body.txt
+						fi
 					fi
+					# now also log to the filename map
+					echo "${data_root}/PROTECTED/${study}/raw/${p}/interviews/psychs/${folder}/${file}" > ../../../../../processed/"$p"/interviews/psychs/audio_filename_maps/"$date"+"$time".txt
 				done
 
 				cd .. # leave interview folder at end of loop
@@ -190,6 +226,13 @@ for p in *; do
 				# (look for prior output to know - sliding window QC)
 				if [[ ! -e ../../../../processed/"$p"/interviews/psychs/temp_audio/"$date"+"$time".wav && ! -e ../../../../processed/"$p"/interviews/psychs/sliding_window_audio_qc/"$date"+"$time".csv ]]; then
 					eval ffmpeg -i "$folder_formatted"/audio_only.m4a ../../../../processed/"$p"/interviews/psychs/temp_audio/"$date"+"$time".wav &> /dev/null
+					# initialize txt files for email bodies too if this is a pipeline call, as we have found a new audio to process for the site
+					if [[ $pipeline = "Y" ]]; then
+						# it is okay to just redo this every time since it will restart the file, all the other updates come way downstream
+						echo "Audio Processing Updates for ${study}:" > "$repo_root"/audio_lab_email_body.txt
+					fi
+					# now also log to the filename map
+					echo "${data_root}/PROTECTED/${study}/raw/${p}/interviews/psychs/${folder}/${file}" > ../../../../processed/"$p"/interviews/psychs/audio_filename_maps/"$date"+"$time".txt
 				fi
 			fi
 		done

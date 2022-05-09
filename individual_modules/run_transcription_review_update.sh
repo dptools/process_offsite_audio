@@ -7,13 +7,7 @@ study="$2"
 echo "Beginning script to organize newly reviewed transcripts for study ${study}"
 
 # allow module to be called stand alone as well as from main pipeline
-if [[ -z "${repo_root}" ]]; then
-	# get path current script is being run from, in order to get path of repo for calling functions used
-	full_path=$(realpath $0)
-	module_root=$(dirname $full_path)
-	func_root="$module_root"/functions_called
-else
-	func_root="$repo_root"/individual_modules/functions_called
+if [[ ! -z "${repo_root}" ]]; then
 	pipeline="Y" # flag to see that this was called via pipeline, so can start to setup email
 fi
 
@@ -45,6 +39,15 @@ for p in *; do
 		# figure out if current file is open or psychs next, as this is needed for copy location
 		# always will be 4th value on underscore split because of transcript naming convention
 		int_type=$(echo "$file" | awk -F '_' '{print $4}') 
+
+		# will only copy over a transcript if it matches a name already in the prescreening folder, otherwise log a warning and skip for now
+		# this will detect issues with txt file naming (sites shouldn't change name at all)
+		# if there are issues with the approved folder structure (including wrong file extension, unnecessary subfolders, no patient ID subfolder) Lochness should warn about that
+		if [[ ! -e ${data_root}/PROTECTED/${study}/processed/${p}/interviews/${int_type}/transcripts/prescreening/${file} ]]; then
+			echo "Newly uploaded approved transcript does not match any expected transcript sent for review, skipping for now"
+			echo "Please revisit ${file}"
+			continue
+		fi
 
 		# now if the transcript hasn't already been copied, copy it to appropriate PROTECTED folder
 		if [[ ! -e ${data_root}/PROTECTED/${study}/processed/${p}/interviews/${int_type}/transcripts/${file} ]]; then

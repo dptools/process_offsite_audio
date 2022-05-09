@@ -59,6 +59,10 @@ fi
 if [[ ! -d ${repo_root}/logs/${study} ]]; then
 	mkdir "$repo_root"/logs/"$study"
 fi
+# also have a separate subfolder setup for possible emails to be more easily located
+if [[ ! -d ${repo_root}/logs/${study}/emails_sent ]]; then
+	mkdir "$repo_root"/logs/"$study"/emails_sent
+fi
 # save with unique timestamp (unix seconds)
 log_timestamp=`date +%s`
 # test using console and log file simultaneously
@@ -96,6 +100,8 @@ echo ""
 # info on newly reviewed transcripts also appended to email
 # use source to maintain environment variable on transcript update boolean
 source "$repo_root"/individual_modules/run_transcription_review_update.sh "$data_root" "$study" 
+# also run the code that checks for transcripts that were set aside for prescreening but not yet returned by the sites as part of this block
+bash "$repo_root"/individual_modules/run_transcription_review_alerts.sh "$data_root" "$study" 
 echo ""
 echo "Transcript review updates complete"
 echo ""
@@ -143,11 +149,32 @@ echo ""
 if [[ "$trans_updates" == 1 || "$review_updates" == 1 ]]; then
 	echo "Emailing status update to lab"
 	mail -s "[${study} Interview Pipeline Updates] New Transcripts Received" "$lab_email_list" < "$repo_root"/transcript_lab_email_body.txt
+	# move email to logs folder for reference if it has real content
+	mv "$repo_root"/transcript_lab_email_body.txt "$repo_root"/logs/"$study"/emails_sent/transcript_lab_email_body_"$log_timestamp".txt
 else
 	echo "No new transcript updates for this study, so no email to send"
+	rm "$repo_root"/transcript_lab_email_body.txt
 fi
-# move email to logs folder for reference regardless
-mv "$repo_root"/transcript_lab_email_body.txt "$repo_root"/logs/"$study"/transcript_lab_email_body_"$log_timestamp".txt
+echo ""
+
+# similarly will send the email about transcripts remaining to be reviewed
+if [[ -e ${repo_root}/site_review_email_body.txt ]]; then
+	echo "Emailing review prompt to site"
+	mail -s "[Action Required] ${server_version} Interview Pipeline Transcripts to Review" "$site_email_list" < "$repo_root"/site_review_email_body.txt
+	mv "$repo_root"/site_review_email_body.txt "$repo_root"/logs/"$study"/emails_sent/site_review_email_body_"$log_timestamp".txt
+else
+	echo "No transcriptions requiring review currently for this site"
+fi
+echo ""
+
+# add current time for runtime tracking purposes
+now=$(date +"%T")
+echo "Current time: ${now}"
+echo ""
+
+# finally run the file accounting updates for this study
+echo "Compiling/updating file lists with processing date"
+bash "$repo_root"/individual_modules/run_final_transcript_accounting.sh "$data_root" "$study" "$transcription_language"
 echo ""
 
 # add current time for runtime tracking purposes

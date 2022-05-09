@@ -14,10 +14,11 @@ def interview_transcript_qc(interview_type, data_root, study, ptID):
 
 	# specify column headers that will be used for every CSV
 	# make it DPDash formatted, but will leave reftime/weekday/timeofday columns blank
+	# Note the sentence-related features from internal lab feature have been renamed to "turn", as TranscribeMe is not providing sentence-level splitting here
 	headers=["reftime","day","timeofday","weekday","study","patient","interview_number","transcript_name","num_subjects", # metadata
-			 "num_sentences_S1","num_words_S1","min_words_in_sen_S1","max_words_in_sen_S1", # per subject speaking amount stats
-			 "num_sentences_S2","num_words_S2","min_words_in_sen_S2","max_words_in_sen_S2", # generally should have S1 and S2 as main interviewer and patient
-			 "num_sentences_S3","num_words_S3","min_words_in_sen_S3","max_words_in_sen_S3", # expect at most 3 relevant subject IDs usually
+			 "num_turns_S1","num_words_S1","min_words_in_turn_S1","max_words_in_turn_S1", # per subject speaking amount stats
+			 "num_turns_S2","num_words_S2","min_words_in_turn_S2","max_words_in_turn_S2", # generally should have S1 and S2 as main interviewer and patient
+			 "num_turns_S3","num_words_S3","min_words_in_turn_S3","max_words_in_turn_S3", # expect at most 3 relevant subject IDs usually
 			 "num_inaudible","num_questionable","num_crosstalk","num_redacted","num_commas","num_dashes", # transcription accuracy related measures
 			 "final_timestamp_minutes","min_timestamp_space","max_timestamp_space","min_timestamp_space_per_word","max_timestamp_space_per_word"] # timestamp accuracy related measures
 
@@ -104,10 +105,10 @@ def interview_transcript_qc(interview_type, data_root, study, ptID):
 		nsubjs.append(len(set(cur_trans["subject"].tolist())))
 		
 		# now get word stats per subject
-		cur_trans_S1 = cur_trans[cur_trans["subject"]=="S1"] # for S1 it must have at least 1 sentence, so no empty check		
-		cur_sentences_S1 = [x.lower() for x in cur_trans_S1["text"].tolist()] # case shouldn't matter
-		nsens_S1.append(len(cur_sentences_S1))
-		words_per_S1 = [len(x.split(" ")) for x in cur_sentences_S1]
+		cur_trans_S1 = cur_trans[cur_trans["subject"]=="S1"] # for S1 it must have at least 1 turn, so no empty check		
+		cur_turns_S1 = [x.lower() for x in cur_trans_S1["text"].tolist()] # case shouldn't matter
+		nsens_S1.append(len(cur_turns_S1))
+		words_per_S1 = [len(x.split(" ")) for x in cur_turns_S1]
 		nwords_S1.append(np.nansum(words_per_S1))
 		minwordsper_S1.append(np.nanmin(words_per_S1))
 		maxwordsper_S1.append(np.nanmax(words_per_S1))
@@ -119,9 +120,9 @@ def interview_transcript_qc(interview_type, data_root, study, ptID):
 			minwordsper_S2.append(0)
 			maxwordsper_S2.append(0)
 		else:		
-			cur_sentences_S2 = [x.lower() for x in cur_trans_S2["text"].tolist()] # case shouldn't matter
-			nsens_S2.append(len(cur_sentences_S2))
-			words_per_S2 = [len(x.split(" ")) for x in cur_sentences_S2]
+			cur_turns_S2 = [x.lower() for x in cur_trans_S2["text"].tolist()] # case shouldn't matter
+			nsens_S2.append(len(cur_turns_S2))
+			words_per_S2 = [len(x.split(" ")) for x in cur_turns_S2]
 			nwords_S2.append(np.nansum(words_per_S2))
 			minwordsper_S2.append(np.nanmin(words_per_S2))
 			maxwordsper_S2.append(np.nanmax(words_per_S2))
@@ -133,25 +134,25 @@ def interview_transcript_qc(interview_type, data_root, study, ptID):
 			minwordsper_S3.append(0)
 			maxwordsper_S3.append(0)
 		else:		
-			cur_sentences_S3 = [x.lower() for x in cur_trans_S3["text"].tolist()] # case shouldn't matter
-			nsens_S3.append(len(cur_sentences_S3))
-			words_per_S3 = [len(x.split(" ")) for x in cur_sentences_S3]
+			cur_turns_S3 = [x.lower() for x in cur_trans_S3["text"].tolist()] # case shouldn't matter
+			nsens_S3.append(len(cur_turns_S3))
+			words_per_S3 = [len(x.split(" ")) for x in cur_turns_S3]
 			nwords_S3.append(np.nansum(words_per_S3))
 			minwordsper_S3.append(np.nanmin(words_per_S3))
 			maxwordsper_S3.append(np.nanmax(words_per_S3))
 
 		# count number of [inaudible] occurences, number of [*?] occurences (where * is any guess at what was said), and number of REDACTED occurences
 		# also count numbers of single dashes and commas as quick check on disfluency/verbatim transcription quality
-		# start by getting all sentences regardless of subject
-		cur_sentences = [x.lower() for x in cur_trans["text"].tolist()] # case shouldn't matter
+		# start by getting all turns regardless of subject
+		cur_turns = [x.lower() for x in cur_trans["text"].tolist()] # case shouldn't matter
 		# also need to get words per here to use later
-		words_per = [len(x.split(" ")) for x in cur_sentences]
-		inaud_per = [x.count("[inaudible]") for x in cur_sentences]
-		quest_per = [x.count("?]") for x in cur_sentences] # assume bracket should never follow a ? unless the entire word is bracketed in
-		cross_per = [x.count("[crosstalk]") for x in cur_sentences]
-		redact_per = [x.count("redacted") for x in cur_sentences]
-		commas_per = [x.count(",") for x in cur_sentences]
-		dash_per = [x.count("-") for x in cur_sentences]
+		words_per = [len(x.split(" ")) for x in cur_turns]
+		inaud_per = [x.count("[inaudible]") for x in cur_turns]
+		quest_per = [x.count("?]") for x in cur_turns] # assume bracket should never follow a ? unless the entire word is bracketed in
+		cross_per = [x.count("[crosstalk]") for x in cur_turns]
+		redact_per = [x.count("redacted") for x in cur_turns]
+		commas_per = [x.count(",") for x in cur_turns]
+		dash_per = [x.count("-") for x in cur_turns]
 		ninaud.append(np.nansum(inaud_per))
 		nquest.append(np.nansum(quest_per))
 		ncross.append(np.nansum(cross_per))
@@ -160,7 +161,7 @@ def interview_transcript_qc(interview_type, data_root, study, ptID):
 		ndashes.append(np.nansum(dash_per))
 
 		# finally timestamp related stats, again regardless of subject 
-		# get last timestamp - note this will be for the time *before* the last sentence
+		# get last timestamp - note this will be for the time *before* the last turn
 		cur_times = cur_trans["timefromstart"].tolist()
 		# convert all timestamps to a float value indicating number of minutes
 		try:
@@ -171,11 +172,11 @@ def interview_transcript_qc(interview_type, data_root, study, ptID):
 
 		cur_seconds = [m * 60.0 for m in cur_minutes] # convert the minutes to a number of seconds!
 
-		# get min and max space between timestamps, and then as a function of number of words in the intermediate sentence
+		# get min and max space between timestamps, and then as a function of number of words in the intermediate turn
 		# these have units of seconds here
 		differences_list = [j - i for i, j in zip(cur_seconds[: -1], cur_seconds[1 :])]
 		if len(differences_list) == 0:
-			# current transcript is of minimal length (1 sentence), so no valid timestamp differences, append nan
+			# current transcript is of minimal length (1 turn), so no valid timestamp differences, append nan
 			minspaces.append(np.nan)
 			maxspaces.append(np.nan)
 			minspacesweighted.append(np.nan)
@@ -211,7 +212,7 @@ def interview_transcript_qc(interview_type, data_root, study, ptID):
 
 	# now prepare to save new CSV for this patient
 	os.chdir(os.path.join(data_root, "GENERAL", study, "processed", ptID, "interviews", interview_type))
-	# Tashrif decided to change the convention for U24 DPDash, so study name in the DPDash CSV name needs to always just be avlqc identifier here
+	# convention for U24 DPDash is different, so study name in the DPDash CSV name needs to always just be avlqc identifier here
 	output_path_format = "avlqc"+"-"+ptID+"-interviewRedactedTranscriptQC_" + interview_type + "-day*.csv"
 	output_paths = glob.glob(output_path_format)
 	# delete any old DPDash transcript CSVs

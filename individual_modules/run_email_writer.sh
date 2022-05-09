@@ -6,45 +6,39 @@ study="$2"
 
 echo "Beginning email writing script for study ${study}"
 
-# allow module to be called stand alone as well as from main pipeline
+# no sense in this particular module being called outside the pipeline
 if [[ -z "${repo_root}" ]]; then
-	# get path current script is being run from, in order to get path of repo for calling functions used
-	full_path=$(realpath $0)
-	module_root=$(dirname $full_path)
-	func_root="$module_root"/functions_called
+	echo "Cannot generate email alert outside of pipeline, exiting"
+	exit
 else
 	func_root="$repo_root"/individual_modules/functions_called
 fi
 
+# before running the script, confirm there are new audios to process info about!
+if [[ ! -e "$repo_root"/audio_lab_email_body.txt ]]; then
+	# exit with status okay, as this just means there were no new audios detected
+	exit 0
+fi
+
 # start with stats python script, run for this study
-python "$repo_root"/individual_modules/functions_called/interview_audio_email_write.py "$data_root" "$study" "$repo_root"/audio_lab_email_body.txt "$repo_root"/audio_transcribeme_email_body.txt
+python "$repo_root"/individual_modules/functions_called/interview_audio_email_write.py "$data_root" "$study" "$repo_root"/audio_lab_email_body.txt
 # this script will add to the existing email txt files (initialized by main pipeline) the lines containing calculated summary numbers
 # for the lab email, this includes the following 3 lines:
-# "${num_audios} total offsite interviews were newly processed for ${study}. Of those, ${num_selected} were identified to be suitable for transcription, and ${num_pushed} successfully uploaded to TranscribeMe"
+# "${num_audios} total open interviews were newly processed for ${study}. Of those, ${num_selected} were identified to be suitable for transcription, and ${num_pushed} successfully uploaded to TranscribeMe"
 # "The uploaded audios totalled ~${num_minutes} minutes, for an estimated transcription cost of ${est_cost}."
 # "For the ${num_rejected} rejected audios, ${num_secondary} were rejected because of file naming issues, ${num_short} were rejected due to short length, and ${num_quiet} were rejected due to low volume"
 # plus the following additional line if there were any audio files that failed at the point of sftp to TranscribeMe
 # "Because ${num_failed} audio files were intended to be sent, but were not successfully pushed, it will be important to investigate the files remaining in the to_send subfolders of this study - the pipeline will NOT automatically reattempt the upload."
-# for the TranscribeMe email, this is just the following line:
-# "We have uploaded some new audio for transcription - there should be ${num_pushed} new audio files totalling ~${num_minutes} minutes."
-# The TranscribeMe email makes no distinction between open and psychs, but the lab email will report the two separately
+# the lab email will do this twice, once for open and once for psychs
 
-# now finish the TranscribeMe email here with the rest of the generic text - but only if the txt file still exists, otherwise that indicates no new uploads and so we should not contact TranscribeMe (only give lab email updates)
-if [[ -e "$repo_root"/audio_transcribeme_email_body.txt ]]; then
-	echo "As usual, we want these transcripts to be full verbatim, with sentence level timestamps and redacted PII, done by the AI learning team as discussed." >> "$repo_root"/audio_transcribeme_email_body.txt
-	echo "We are expecting these outputs to be .txt files with consistent formatting for our use case." >> "$repo_root"/audio_transcribeme_email_body.txt
-	echo "Please let us know if you have any questions." >> "$repo_root"/audio_transcribeme_email_body.txt
-	echo "Thank you!" >> "$repo_root"/audio_transcribeme_email_body.txt
-fi
-
-# next will finish the lab alert email by looping over all patients to add more specific information
+# now will finish the lab alert email by looping over all patients to add more specific information
 # (in the process will also remove the prepended "new+" tags on the pending_audio files, as they are added to email)
 # right now going in patient order with the information, but in the future may want to be more strategic about ordering
 cd "$data_root"/PROTECTED/"$study"/processed
 # before looping, add higher level header info on the contents of this list
 echo "" >> "$repo_root"/audio_lab_email_body.txt # add blank line
 echo "Additional information on each new interview per patient is provided below. This includes a list of filenames for successfully pushed audio files (matching lab transcript naming convention) and a list of filenames for rejected audio files along with the general reason for each rejection." >> "$repo_root"/audio_lab_email_body.txt
-echo "If any files failed during the upload process, they will be listed under an additional header." >> "$repo_root"/audio_lab_email_body.txt
+echo "If any files failed during the upload process, they will be listed under an additional header. Please note that if these pending upload files exist, they could stall the pipeline for this site in the future, so it must be decided whether the upload should be reattempted with an independent run of the SFTP push module or if the files should be moved into rejected manually." >> "$repo_root"/audio_lab_email_body.txt
 for p in *; do
 	# first check that it is truly a patient, that has had some files successfully pushed to transcribeme (by this pipeline) at some point
 	if [[ ! -d $p/interviews/open/pending_audio && ! -d $p/interviews/psychs/pending_audio ]]; then

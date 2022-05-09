@@ -18,18 +18,19 @@ def interview_mono_rename(interview_type, data_root, study, ptID):
 	except:
 		# occasionally we encounter issues with the study metadata file, so adding a check here
 		print("No consent date information in the study metadata CSV for input patient " + ptID + ", or problem with input arguments")
-		return
+		# this prevents actually processing and so needs to be treated as an error by the pipeline
+		sys.exit(1)
 
 	try:
 		os.chdir(os.path.join(data_root,"PROTECTED", study, "processed", ptID, "interviews", interview_type, "temp_audio"))
 	except:
-		# should generally not reach this error if calling from main pipeline bash script
+		# should generally not reach this warning if calling from main pipeline bash script
 		print("Haven't converted any new audio files yet for input patient " + ptID + " " + interview_type + ", or problem with input arguments") 
 		return
 
 	cur_files = os.listdir(".")
 	if len(cur_files) == 0:
-		# should generally not reach this error if calling from main pipeline bash script
+		# should generally not reach this warning if calling from main pipeline bash script
 		print("Haven't converted any new audio files yet for input patient " + ptID + " " + interview_type)
 		return
 
@@ -59,6 +60,10 @@ def interview_mono_rename(interview_type, data_root, study, ptID):
 
 		new_name = study + "_" + ptID + "_interviewMonoAudio_" + interview_type + "_day" + format(day_num, '04d') + "_session" + format(session_num, '03d') + ".wav"
 		os.rename(filename, new_name)
+
+		cur_map_path = "../audio_filename_maps/" + filename[:-3] + "txt"
+		with open(cur_map_path, 'a') as f: # a for append mode, so doesn't erase the raw filepath on line 1
+			f.write(new_name)
 
 if __name__ == '__main__':
     # Map command line arguments to function arguments.

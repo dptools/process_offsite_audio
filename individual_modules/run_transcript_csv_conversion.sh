@@ -34,8 +34,6 @@ for p in *; do # loop over all patients in the specified study folder on PHOENIX
 
 	# setup tracking information
 	pt_has_new=false # only mention patients in log that had new transcripts to process, tracked with this Boolean
-	encountered_non_ascii=false # similarly add a print to log at end if ever encountered non-ASCII characters
-	# (latter just for main pipeline, as details of missed transcripts will only go in email alert in that case)
 
 	# all text files on top level should be approved redacted transcripts, loop through them
 	for file in *.txt; do	
@@ -47,28 +45,36 @@ for p in *; do # loop over all patients in the specified study folder on PHOENIX
 		
 		# begin conversion for this applicable file
 		# ensure transcript is in ASCII encoding (sometimes they returned UTF-8, usually just a few offending characters that need to be fixed)
+		# to be more flexible with the additional languages used here, we will forcibly confirm UTF-8 (want to make sure e.g. curly braces are normal)
+		# but will change ASCII check to a warning only rather than a hard stop
 		typecheck=$(file -n "$file" | grep ASCII | wc -l)
 		if [[ $typecheck == 0 ]]; then
-			encountered_non_ascii=true
+			# ASCII is subset of UTF8, so now need to check UTF8 since we know it isn't ASCII
+			iconv -f utf8 "$file" -t utf8 -o /dev/null
+			if [ $? = 0 ]; then # if exit code of above command is 0, the file is UTF8, otherwise not
+				# if it's not ASCII but is UTF8, just log the relevant lines in case one wants to manually edit that part later
+				echo "" # also add spacing around it because the grep output could end up being long
+				echo "Found transcript that is not ASCII encoded, moving forward with processing but see the following offending lines if manual adjustment of ${file} is desired:"
+				grep_out=$(grep -P '[^\x00-\x7f]' "$file")
+				echo "$grep_out"
+				echo ""
+			else
+				# if it isn't UTF8 we have a problem, completely skip it and warn in email too
+				echo "Found transcript that is not UTF8 encoded, this may cause issues with the automatic redaction! It will be completely skipped in GENERAL for now, please review manually"
 
-			# if it's not ASCII need to skip the file, setup error message
-			# for now will need to manually fix any offending txt files and then rerun the conversion (and later pipeline steps) for those
-			# hopefully in future will have a way to deal with it fully automatically
-			echo "" # also add spacing around it because the grep output could end up being long
-			echo "Found transcript that is not ASCII encoded, skipping for now. Please address the following portions of ${file}:"
-			grep_out=$(grep -P '[^\x00-\x7f]' "$file")
-			echo "$grep_out"
-			echo ""
-			if [[ ! -z "${repo_root}" ]]; then
-				# if this module was called via the main pipeline, should add this info to the end of the email alert file (after a blank line) as well
-				echo "" >> "$repo_root"/transcript_lab_email_body.txt
-				echo "Possible error during post processing of new redacted transcripts!" >> "$repo_root"/transcript_lab_email_body.txt
-				echo "${file} is not ASCII encoded, so is not currently able to be processed. Please remove offending characters and then rerun processing steps on this transcript. The following command can be executed to identify the problematic parts:" >> "$repo_root"/transcript_lab_email_body.txt
-				echo "​grep -P '[^\x00-\x7f]' ${data_root}/GENERAL/${study}/processed/${p}/interviews/open/transcripts/${file}" >> "$repo_root"/transcript_lab_email_body.txt
-				# not actually including the output here so that email won't ever accidentally include PII (although transcripts in GENERAL should be redacted already!)
-			fi
+				if [[ ! -z "${repo_root}" ]]; then
+					# if this module was called via the main pipeline, should add this info to the end of the email alert file (after a blank line) as well
+					echo "" >> "$repo_root"/transcript_lab_email_body.txt
+					echo "Error during post processing of newly redacted transcripts!" >> "$repo_root"/transcript_lab_email_body.txt
+					echo "${file} is not UTF-8 encoded, so is not currently able to be processed. Keeping this transcript out of GENERAL currently, please manually revisit" >> "$repo_root"/transcript_lab_email_body.txt
+				fi
 
-			continue 
+				# now remove the file from GENERAL
+				rm "$file" 
+
+				# and finally skip to the next transcript
+				continue 
+			fi			
 		fi
 
 		# substitute tabs with single space for easier parsing (returned by transcribeme see a mix!)
@@ -135,8 +141,6 @@ for p in *; do # loop over all patients in the specified study folder on PHOENIX
 
 	# setup tracking information
 	pt_has_new=false # only mention patients in log that had new transcripts to process, tracked with this Boolean
-	encountered_non_ascii=false # similarly add a print to log at end if ever encountered non-ASCII characters
-	# (latter just for main pipeline, as details of missed transcripts will only go in email alert in that case)
 
 	# all text files on top level should be approved redacted transcripts, loop through them
 	for file in *.txt; do	
@@ -148,29 +152,41 @@ for p in *; do # loop over all patients in the specified study folder on PHOENIX
 		
 		# begin conversion for this applicable file
 		# ensure transcript is in ASCII encoding (sometimes they returned UTF-8, usually just a few offending characters that need to be fixed)
+		# to be more flexible with the additional languages used here, we will forcibly confirm UTF-8 (want to make sure e.g. curly braces are normal)
+		# but will change ASCII check to a warning only rather than a hard stop
 		typecheck=$(file -n "$file" | grep ASCII | wc -l)
 		if [[ $typecheck == 0 ]]; then
-			encountered_non_ascii=true
+			# ASCII is subset of UTF8, so now need to check UTF8 since we know it isn't ASCII
+			iconv -f utf8 "$file" -t utf8 -o /dev/null
+			if [ $? = 0 ]; then # if exit code of above command is 0, the file is UTF8, otherwise not
+				# if it's not ASCII but is UTF8, just log the relevant lines in case one wants to manually edit that part later
+				echo "" # also add spacing around it because the grep output could end up being long
+				echo "Found transcript that is not ASCII encoded, moving forward with processing but see the following offending lines if manual adjustment of ${file} is desired:"
+				grep_out=$(grep -P '[^\x00-\x7f]' "$file")
+				echo "$grep_out"
+				echo ""
+			else
+				# if it isn't UTF8 we have a problem, completely skip it and warn in email too
+				echo "Found transcript that is not UTF8 encoded, this may cause issues with the automatic redaction! It will be completely skipped in GENERAL for now, please review manually"
 
-			# if it's not ASCII need to skip the file, setup error message
-			# for now will need to manually fix any offending txt files and then rerun the conversion (and later pipeline steps) for those
-			# hopefully in future will have a way to deal with it fully automatically
-			echo "" # also add spacing around it because the grep output could end up being long
-			echo "Found transcript that is not ASCII encoded, skipping for now. Please address the following portions of ${file}:"
-			grep_out=$(grep -P '[^\x00-\x7f]' "$file")
-			echo "$grep_out"
-			echo ""
-			if [[ ! -z "${repo_root}" ]]; then
-				# if this module was called via the main pipeline, should add this info to the end of the email alert file (after a blank line) as well
-				echo "" >> "$repo_root"/transcript_lab_email_body.txt
-				echo "Possible error during post processing of new redacted transcripts!" >> "$repo_root"/transcript_lab_email_body.txt
-				echo "${file} is not ASCII encoded, so is not currently able to be processed. Please remove offending characters and then rerun processing steps on this transcript. The following command can be executed to identify the problematic parts:" >> "$repo_root"/transcript_lab_email_body.txt
-				echo "​grep -P '[^\x00-\x7f]' ${data_root}/GENERAL/${study}/processed/${p}/interviews/psychs/transcripts/${file}" >> "$repo_root"/transcript_lab_email_body.txt
-				# not actually including the output here so that email won't ever accidentally include PII (although transcripts in GENERAL should be redacted already!)
-			fi
+				if [[ ! -z "${repo_root}" ]]; then
+					# if this module was called via the main pipeline, should add this info to the end of the email alert file (after a blank line) as well
+					echo "" >> "$repo_root"/transcript_lab_email_body.txt
+					echo "Error during post processing of newly redacted transcripts!" >> "$repo_root"/transcript_lab_email_body.txt
+					echo "${file} is not UTF-8 encoded, so is not currently able to be processed. Keeping this transcript out of GENERAL currently, please manually revisit" >> "$repo_root"/transcript_lab_email_body.txt
+				fi
 
-			continue 
+				# now remove the file from GENERAL
+				rm "$file" 
+
+				# and finally skip to the next transcript
+				continue 
+			fi			
 		fi
+
+		# substitute tabs with single space for easier parsing (returned by transcribeme see a mix!)
+		# this file will be kept only temporarily
+		sed 's/\t/ /g' "$file" > "$name"_noTABS.txt
 
 		# prep CSV with column headers
 		# (no reason to have DPDash formatting for a transcript CSV, so I choose these columns)
@@ -202,7 +218,10 @@ for p in *; do # loop over all patients in the specified study folder on PHOENIX
 			text=$(echo "$text" | tr -d '"') # remove extra characters at end of each sentence
 			text=$(echo "$text" | tr -d '\r') # remove extra characters at end of each sentence
 			echo "${study},${p},${name},${sub},${time},\"${text}\"" >> csv/"$name".csv # add the line to CSV
-		done < "$file"
+		done < "$name"_noTABS.txt
+
+		# remove the temporary file
+		rm "$name"_noTABS.txt
 	done
 
 	if [[ "$pt_has_new" = true ]]; then

@@ -28,7 +28,7 @@ fi
 if [ $auto_send_limit_bool = "Y" ] || [ $auto_send_limit_bool = "y" ]; then
 	python "$func_root"/interview_audio_length_check.py "$data_root" "$study" "$auto_send_limit"
 	if [ $? = 1 ]; then # function returns with error code if length exceeded
-		# if called from pipeline will need to update the email body to denote the length was exceeded
+		# if called from pipeline (and pipeline has identified new audio was processed) will need to update the email body to denote the length was exceeded
 		if [[ -e "$repo_root"/audio_lab_email_body.txt ]]; then 
 			echo "Note that no audio was uploaded to TranscribeMe because the total length exceeded the input limit of ${auto_send_limit} minutes" >> "$repo_root"/audio_lab_email_body.txt
 			echo "" >> "$repo_root"/audio_lab_email_body.txt

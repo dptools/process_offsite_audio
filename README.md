@@ -1,11 +1,13 @@
-# U24 Interview AV Data Aggregation and Quality Control
-Code for data organization and quality control of clinical interview audio and video recorded from Zoom, currently focused on minimum necessary steps for initial use by U24 sites. This repository is a prerelease of Baker Lab code, made publicly viewable for the purposes of testing on collaborator machines. Contact mennis@g.harvard.edu with any unanswered questions.
+# Interview AV Data Aggregation and Quality Control
+Code for data organization and quality control of clinical interview audio and video recorded from Zoom, currently focused on minimum necessary steps for initial use by sites of [the AMP SCZ project](https://www.ampscz.org/). This repository is a prerelease of Baker Lab code, made publicly viewable for the purposes of testing on collaborator machines. 
 
 The audio side of the pipeline converts/renames any new mono interview audio files and extracts QC measures from these files. It then handles automatic upload of acceptable audio to TranscribeMe, along with emailing documentation to the group. It does not currently process speaker-specific audio files.  
 
 The transcript side of the pipeline analogously handles pulling returned transcripts back to the server, integrating with the existing dataflow for sites to review redaction quality and share anonymized data with the larger study. It also includes email updates and computation of quality control metrics on the returned transcripts, for monitoring of the entire data collection process. 
 
 The video portion of the pipeline identifies unprocessed video files in valid Zoom interview folders and extracts one frame from every 4 minutes of each video. These frames are then run through a lightweight face detection model from PyFeat, to provide some video quality control at low computational cost. The same script also gets metadata information about the interview (e.g. converting to study day number) in order to fill out a DPDash-formatted QC CSV analogous to those created for audio and transcripts. 
+
+Please note that some of the most recently implemented features are not yet reflected in the main pipeline documentation below. However, the core architecture is described in detail here and should greatly assist anyone else in using/adapting this code. Contact mennis@g.harvard.edu with any unanswered questions.
 
 ### Table of Contents
 1. [Setup](#setup)
@@ -107,7 +109,7 @@ Each major step is initiated by the pipeline using a script in the individual_mo
 
 Additional details on each step are provided below. 
 
-For the U24 study, we expect two different types of interviews (open and psychs), which are both handled by the full pipeline and will both be included in the same email alerts, but are processed independently by each module with outputs saved separately. Each participant will be given 2 open interviews and 9 psychs interviews. The open interviews will be about 20 minutes, while the psychs interviews will be about 30 minutes. 
+For the AMP SCZ multi-site study, we expect two different types of interviews (open and psychs), which are both handled by the full pipeline and will both be included in the same email alerts, but are processed independently by each module with outputs saved separately. Each participant will be given 2 open interviews and 9 psychs interviews. The open interviews will be about 20 minutes, while the psychs interviews will be about 30 minutes. 
 
 ##### Common Issues <a name="issues"></a>
 Most times that an interview is not processed when expected there is an issue with violating naming conventions, either because the data was incorrectly placed so Lochness could not pull it, or the files within the Zoom folder were renamed so that this audio code could not recognize it. It has also been common during the testing phase for subject IDs to be missing metadata - if there is a new subject ID it needs to be entered in REDCap before the code can process.
@@ -329,17 +331,16 @@ Test data collection has begun across sites, awaiting real data collection. The 
 This code has been running autonomously on the Pronet development server since early February 2022. Only a minority of sites have correctly added properly formatted interviews to Box and registered the corresponding subject ID in REDCap, but the code has worked well in those cases.
 
 <details>
-	<summary>Details on site mock interview status as of 4/25/2022:</summary>
+	<summary>Details on site mock interview status as of 5/9/2022:</summary>
 
 Sites that have successfully had some data processed - 
 * PronetLA, PronetYA, PronetNN, and PronetWU have had an interview make it all the way through the pipeline.
 	* In the case of PronetYA, three interviews have gone through the pipeline.
 	* In the case of PronetLA, two interviews have gone through the pipeline.
 	* All other sites with any processing have done a single interview.
-* PronetCA, PronetSF, PronetPI, PronetOR, PronetSI, PronetGA, PronetMT, and PronetMA have had transcripts returned by TranscribeMe, but have not yet correctly completed the manual redaction review process.
+* PronetCA, PronetSF, PronetPI, PronetOR, PronetSI, PronetGA, PronetMT, PronetMA, PronetPA, and PronetTE have had transcripts returned by TranscribeMe, but have not yet correctly completed the manual redaction review process.
 	* PronetOR, PronetSF, PronetCA, and PronetMT have put the reviewed transcript in the wrong spot on Box.
 	* The others don't seem to have attempted to transfer an approved transcript at all.
-* PronetPA and PronetTE are currently awaiting transcriptions to be returned by TranscribeMe.
 
 As mentioned there are other sites that have tried to put interviews in Box but there were issues that prevented them from being processed -
 * Multiple interviews are unable to be pulled by Lochness to begin with, so they are not available to the code. 
@@ -357,13 +358,13 @@ All sites should have a test interview complete processing, in order to ensure t
 	* These are processed independently from “open” interviews, although the steps are basically the same.
 	* The one concern about “psychs” is it can also sometimes involve upload of a single file from an external audio recording device instead of a Zoom interview. The code is written to address this but requires closer testing.
 * All sites have uploaded mock interviews that are notably shorter than what we will expect during real data collection. We should test at least one longer interview to ensure there are no compute issues and to get a better sense for expected runtimes and storage requirements.
-* Further, to test the "for review" random assignments (and emails) once those are implemented, we will need some sites to upload multiple extra tests.
+* Further, to test the "for review" random assignments (and emails), we will need some sites to upload multiple extra tests.
 	* As we verify with TranscribeMe that they are doing all the things we are paying for, we will also want to do additional tests to ensure that when we move to real data TranscribeMe will be following all our instructions regularly. 
 * Note that even sites that have been creating subject ID correctly in REDCap have not necessarily been providing a valid mock consent date. It is important in production that sites enter correct consent dates for each subject into REDCap ASAP. 
 
 </details>
 
-Dependencies have been installed on the Pronet production server, but downloading this code and testing there remain to be ironed out. We first need to determine what account should be installing and running the AV pipeline from the production server (after verifying that it has passed the production security review). Then we can discuss remaining required steps. Need to make some decision about how much testing will occur on development server still versus moving to production, and also distinguishing between testing new mock interviews on prod versus actually moving to real data.
+Dependencies have been installed on the Pronet production server, but testing there remain to be ironed out. Note dev testing will continue in parallel to prod testing, to cover sites that haven't thoroughly done their testing yet.
 
 As far as real data collection timeline, some sites may be able to begin soon, but others remain months away - need to figure out more about this as summer approaches. There are some deadlines being imposed by NIMH, but it is also not clear how quickly this pipeline needs to launch after data collection starts. There will always be some gap between upload and outputs being available anyway, because of the time it takes to manually transcribe.
 
@@ -379,67 +380,37 @@ The next steps described here focus on what is necessary to finalize the data fl
 <details>
 	<summary>The file accounting portions of the code still need to be expanded upon:</summary>
 
-* Maintain a CSV mapping Zoom folder names to renamed audio file names under PROTECTED, so that deletion of WAV files is an option if storage becomes a problem
-	* Could something similar be done for the extracted images on the video side as well?
-* Add some basic tracking of the existence of speaker-specific audio files
-	* Count of different speakers (by Zoom display name)
-	* Number of files per speaker (can be split if participant exits and then reenters the Zoom room)
-* For the psychs interview type, should make a note of whether interviews are standalone WAV files or full Zoom interviews, so that we know whether other files (video, speaker specific audio) should be expected
-* Add some additional checks to help the sites with transfering the "approved" transcripts correctly?
-	* Should not pull a transcript back to processed unless it matches one that already exists in prescreening step (can then get rid of extra hard coded checks on study day in the dev server implementation)
-	* Confirm with Kevin whether I will need to check for things besides txt files, or if I just need to check on txt file naming. 
-* Make the code more robust to revisiting rejected audio or audio that failed to upload to TranscribeMe?
-	* This as well as "approved" transcript formatting checks could also be integrated better into email alert system, discussed below
+* Maintaining a CSV mapping Zoom folder names to renamed audio file names under PROTECTED, so that deletion of WAV files is an option if storage becomes a problem - how would that be handled if need does arise?
+* Write FAQ about various edge case scenarios, how code handles them - crashes, rejections, bad SFTP, etc. As mentioned documentation requires updates about recent code functionality regardless!
 
 </details>
 
 <details>
 	<summary>There are also multiple updates to make to the email alert system:</summary>
 
-* Make necessary tweaks to the existing audio and transcript emails
-	* Ensure audio email alert will still send in the case where new audio is processed but none is uploaded to TranscribeMe
-	* Detect when audio side code has crashed, preventing full email summary from being generated - that way this case can be handled separately with appropriate notifications sent
-	* Review "from" field of emails, particularly where trying to add a reply-to address
-* Implement a site-specific email for when file naming issues are detected on the raw side of PHOENIX
-	* The email alerts sent by Lochness focus on problems in the source folders, but there are also possible situations where an interview is able to be pulled by Lochness but then can't be processed by this code due to naming issues
-	* The logs already note when naming conventions are violated, so would just need to compile this into an email as well
-	* The email should probably add a note about consulting with IT to get the bad interview off the server side, because otherwise even once it is fixed by the site the notification will persist due to Lochness not removing files that were deleted on the source
-* Add a summary email that compiles complete status to date from across sites
-	* Compile a table of raw interviews to basic info about them for each participant and interview type
-	* Can include relevant file names, date the raw file was pulled to PHOENIX, date the transcript was returned from TranscribeMe, info on manual site review where needed, and any problems that occured with the interview
-	* The script that runs the pipeline across sites that is currently on a cron can then be updated to concatenate all of these tables from all of the sites
-	* That will then be emailed to those that are supervising the U24 at a higher level (how to format the table using just basic mailx command?)
+* Finish refining both the email alerts that go to sites, the per-site email alerts that go to a monitor, and the overall email alert that goes to some other monitor
+	* Still need addresses to send to, proper testing, potential formatting cleanup or even expand what we include?
 	* Need to be careful of PII in these emails? It should be okay to include the dates as long as we are careful about who receives the emails. But keep in mind display names are in the speaker specific Zoom files, that could be much more sensitive (this also applies to the Lochness email alerts!)
 	* Will want to consider how this email alert (and others from this pipeline) will integrate with what Lochness is already doing on both the pull and push sides 
-* Add an email that notifies sites specifically when there are new transcripts to be reviewed
-	* This will go to sites while everything else will just go to central monitoring person(s). Still need the site emails to properly launch this
-	* A question to consider when implementing is whether the “for review” emails should go when there are outstanding files, or only when there are updates (as it is now). And should that then also be the case for TranscribeMe emails (which send the entire time one is pending)?
-	* Will set this up when I implement the random review portion, see below for more info
 
 For reference, Lochness will alert to a naming problem in raw Box/Mediaflux files based on the following criteria:
 * Verify the Subject ID digits ('XX00000' in the folder name) falls into AMP-SCZ ID digits
+* Verify the Subject ID has a real consent date entered into the study metadata
 * 'YYYY-MM-DD HH.MM.SS folder name' – check if the Zoom folder name matches how Zoom creates folder by default
 * '.mp4' files have to be under the Zoom directory
 * '.m4a' files could be under either the Zoom directory, or below 'Audio Record'
 
-Similarly, for transcripts in the "approved" folder, it will ensure they are .txt files found under a subject ID subfolder.
+Similarly, for transcripts in the "approved" folder, it will ensure they are .txt files found directly under a subject ID subfolder.
 
 </details>
 
 <details>
 	<summary>Finally, there are a few features that remain to be added:</summary>
 
-* Implement the transcript manual review as a random selection of 10% of transcripts per site instead of sending all transcripts for additional review
-	* This phase will occur once a given site has had 5 transcripts reviewed - so need to keep the current code as well, have an appropriate toggle
-	* Can use the "completed" folder under box_transfers to track how many transcripts have already been pushed for review to the sites
-	* For the actual random selection, should be fine to just use a random number generator to get a 10% chance independently for each file
-	* May also want to add a check for 0 redactions to always be sent for site review, just in case something goes wrong with the foreign language encodings while I'm away. I doubt we will ever encounter 0 redactions in a correctly transcribed real interview. Note this could also be part of email alert to sites!
-	* Once it is implemented, also need to make sure that the status emails and other file accounting pieces of the pipeline are updated to appropriately reflect
 * Improve how code processes non-English transcripts
-	* Switch check for required encoding to UTF-8 instead of ASCII (should also probably note what the encoding is in a file accounting output?)
+	* Will require more test files!
 	* Update transcript QC code so features are correct in every language (requires some more information from TranscribeMe in part)
 	* Should also make sure that Zoom file naming conventions are not substantially different in different countries!
-	* In general could improve how code handles random unexpected characters when they are inserted by TranscribeMe?
 * Add preprocessing for Teams and WebEx interviews to accommodate the couple of Prescient sites that cannot use Zoom
 	* Waiting on examples of interviews from these softwares first
 	* Which sites are they? There has been some turnover in included sites, so it is possible some of these edge cases are no longer relevant or that new edge cases have been introduced
@@ -447,11 +418,8 @@ Similarly, for transcripts in the "approved" folder, it will ensure they are .tx
 	* Jena is not allowed to have video uploaded to the aggregation server, although they can have the audio uploaded
 	* Awaiting contact from Jena point person about how to set up some code to handle the video portion (and related file organization) locally
 	* For now Jena has been provided with a high level plan and security information, which it seems will be sufficient to move forward with
+	* Cologne may end up in the same situation as Jena, to be determined
 * Perhaps add video duration, resolution, and fps to the video QC to supplement the image-based/face-related features?
-* Make a DPDash summary of QC features CSV as part of the pipeline slightly down the road? 
-	* Would be nice to see an overview of the QC stats to have a better grounding in what an individual value means
-	* This could play into the summary email that I am supposed to be making anyway too
-	* Need to be more familiar with how DPDash works first though - Where would the CSV even be saved? Would it be one per site or one overall or potentially both? What columns matter? 
 
 </details>
 
@@ -463,14 +431,8 @@ For the existing protocols, it is an ongoing issue to ensure that sites are awar
 <details>
 	<summary>There are also some details that need to be verified on our end still in order to make some final decisions about the code:</summary>
 
-* Most urgently, we need to determine what is the final decision about use of consent dates in the code
-	* If data will be able to be pulled in production without a valid consent date, I should confirm what the dummy consent date is and then stop this code from doing any processing for any subject that has such a consent. However there is also a chance Lochness won't pull without a valid consent date, in which case I can just leave as is
-	* Note default on dev server is now 10/01/2021, allowing this to be used for testing purposes but will not worry about if the date changes and study alignment no longer makes sense for the mock interviews
-	* Should still probably add some tracking of consent date into file accounting so issue can be easily noticed if for some reason a subject's consent date does change part way through
 * Need to review redaction guidelines with TranscribeMe and ensure they are not being over the top aggressive with redaction (but also careful not to miss anything that is obvious PII)
-* Need to confirm TranscribeMe is switching to millisecond resolution on the transcript timestamps
-	* Note that this also requires them to actually give us sentence level timestamps! Make sure they are not cheaping out on the definition of a sentence
-	* More generally, we should be on same page about all expectations and the protocol for when mistakes happen, before moving into production
+* It turns out we are only receiving turn-level timestamps and they likely won't be of higher resolution (although it is less useful with turns anyway). So we should be more careful overall going forward to make sure eveyrone is on the same page about all expectations and the protocol for when mistakes happen, before moving into production
 * Also still waiting on TranscribeMe to answer about the verbatim transcription conventions in other languages. Need to confirm what will be different (at the very least I would expect markings like "inaudible" to be different)
 	* Even for English, TranscribeMe has sometimes been inconsistent with the exact characters that they use for dashes and other things important to represent in the verbatim style transcriptions - although they have confirmed they are working on refining their processes to minimize these issues in the future. 
 	* Consider writing more detailed documentation about TranscribeMe when wrapping up this project?
@@ -497,17 +459,14 @@ TranscribeMe has been notified about the various issues above related to them, b
 	* Who will handle it when changes need to be made on the server? Could involve changes to code, changes to files in processed folders, or changes to files in raw folders
 	* Who will be checking the QC outputs on DPDash?
 * Finish actually setting up DPDash
-	* Make sure audio, transcript, and video CSVs are being imported (for DPDash dev server paths are at /data/predict/kcho/flow_test/Pronet/PHOENIX/GENERAL/\*/processed/\*/interviews/\*/\*QC\*.csv) - this should be in progress, awaiting additional info from Tashrif
-	* Decide which features we want to display from each
-	* Create config files on the UI and ensure colormap bounds make sense for each feature shown
-	* First config for looking at core audio, video, and transcript QC features together has been drafted, but need to split it out into more detailed configs for each modality individually instead. Can then also further refine boundaries, color scheme, etc. Note these need to be done for both open and psychs interviews separately due to our folder structure
+	* Set up for dev for pronet, prod equivalent in progress
+	* Make sure audio, transcript, and video CSVs are being imported regularly (for DPDash dev server paths are at /data/predict/kcho/flow_test/Pronet/PHOENIX/GENERAL/\*/processed/\*/interviews/\*/\*QC\*.csv)
 * Set protocol for communication with sites
 	* What happens when sites have mistakes with file naming/organization conventions?
 	* What happens when sites are missing data or don't complete a necessary manual review?
 	* What happens when sites upload poor quality data?
 	* Who will be in charge of all of this?
-* Set protocol for communication with TranscribeMe (this can also be discussed at 4/4 meeting with TranscribeMe reps!)
-	* On both sides, who will be receiving any automated communication about SFTP uploads?
+* Set protocol for communication with TranscribeMe
 	* What happens when TranscribeMe does not upload a transcript we are expecting for an extended period?
 	* What happens when a transcript has enough issues that it needs to be redone?
 	* What happens when there is a minor issue in a transcript (outside of the already defined site redaction review)?
@@ -520,7 +479,7 @@ Should ensure everyone is aware Michaela will be away for the summer (late May t
 
 </details>
 
-Finally, there are a few logistics to handle specific to Pronet and Prescient. For Pronet, we just need to take the last steps for setup of the production server. This involves confirming that the latest version of the code with the new video QC features is installed, verifying that this code passed the Yale IT security review, and performing an actual test run on prod. Should be cognizant of available compute resources on the production server while testing, as dev server could easily run out of RAM, and production interviews will be a bit longer than the mock interviews.
+Finally, there are a few logistics to handle specific to Pronet and Prescient. For Pronet, we just need to take the last steps for setup of the production server - note we have passed security review. This involves performing an actual test run on prod. Should be cognizant of available compute resources on the production server while testing, as dev server could easily run out of RAM, and production interviews will be a bit longer than the mock interviews.
 
 <details>
 	<summary>For Prescient, there are many more steps, as we still need to get the development server installation working first before proceeding to production setup. The major blockers we are actively trying to address for this are:</summary>
@@ -532,17 +491,17 @@ Finally, there are a few logistics to handle specific to Pronet and Prescient. F
 	* For the actual push operation back to Mediaflux, should be able to use SFTP
 	* We will likely have to implement this piece for Prescient even though it was implemented by Yale IT for Pronet
 	* [Next step is to review the Mediaflux SFTP documentation, follow-up with any remaining questions](https://wiki-rcs.unimelb.edu.au/pages/viewpage.action?pageId=328435)
+	* I will definitely need the actual credentials to use the Mediaflux SFTP here
 	* Will add implementation plan here once determined
 * Get a TranscribeMe SFTP account appropriately set up
 	* TranscribeMe has sent Kate information on how to do this, awaiting word from her on the account details
 * Compile a table of the languages that will be used at the different sites 
 
-Our current primary focus is establishing the necessary connection with TranscribeMe. The next focus will be on interfacing with Mediaflux. 
-
 It also happens that most of the sites with special cases to handle are part of the Prescient network, and accommodating these cases is part of the code TODOs noted above. However, we will be prioritizing getting the standardized code working on Prescient first. 
 
 </details>
 
-When finalizing documentation for this repository, may want to rename it to ensure it better reflects the purpose of this code - running data aggregation/organization and quality control operations for interviews for the multisite AMP-SCZ study, and appropriately communicating the results of these operations. 
+When finalizing documentation for this repository, may want to rename it to ensure it better reflects the purpose of this code - running data aggregation/organization and quality control operations for interviews for the sites of the AMP SCZ study, and appropriately communicating the results of these operations. 
+Split out some of the AMP SCZ stuff into supplemental documentation so that other groups could also adapt this code to their own needs without any confusion arising from U24 details
 
-At that time should also make sure example screenshots, setup instructions, etc. are fully up to date
+At that time should also make sure example screenshots, setup instructions, etc. are fully up to date. Currently many of the latest code updates are not reflected in the above documentation (Only TODOs and basic site status are more up to date).

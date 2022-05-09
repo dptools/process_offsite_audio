@@ -65,17 +65,18 @@ fi
 # save with unique timestamp (unix seconds)
 log_timestamp=`date +%s`
 # test using console and log file simultaneously
-exec >  >(tee -ia "$repo_root"/logs/"$study"/video_process_logging_"$log_timestamp".txt)
-exec 2> >(tee -ia "$repo_root"/logs/"$study"/video_process_logging_"$log_timestamp".txt >&2)
+exec >  >(tee -ia "$repo_root"/logs/"$study"/summary_check_logging_"$log_timestamp".txt)
+exec 2> >(tee -ia "$repo_root"/logs/"$study"/summary_check_logging_"$log_timestamp".txt >&2)
 
 # let user know script is starting
 echo ""
-echo "Beginning script - interview video preprocessing for:"
+echo "Beginning script - interview final summary/accounting for:"
 echo "$study"
 echo "with data root:"
 echo "$data_root"
 
 # setup processed folder (if necessary for new studies/patients)
+# really this should never be needed as this should always run after the other pipeline steps, but keep in case (a few of the components here could work from only raw)
 for p in *; do
 	# check that it is truly a patient ID that has some interview data
 	if [[ ! -d ${data_root}/PROTECTED/${study}/raw/${p}/interviews ]]; then
@@ -116,7 +117,8 @@ now=$(date +"%T")
 echo "Current time: ${now}"
 echo ""
 
-bash "$repo_root"/individual_modules/run_new_video_extract.sh "$data_root" "$study"
+# locate things under raw that do not match SOP for raw warning list
+bash "$repo_root"/individual_modules/run_raw_folder_check.sh "$data_root" "$study"
 echo ""
 
 # add current time for runtime tracking purposes
@@ -124,39 +126,46 @@ now=$(date +"%T")
 echo "Current time: ${now}"
 echo ""
 
-# now run video QC
-bash "$repo_root"/individual_modules/run_video_qc.sh "$data_root" "$study"
+# identify any new warnings both from newly processed files (check basic accounting and QC CSVs) and from newly detected SOP issues in raw
+bash "$repo_root"/individual_modules/run_processed_accounting_check.sh "$data_root" "$study"
 echo ""
 
 # add current time for runtime tracking purposes
 now=$(date +"%T")
 echo "Current time: ${now}"
 echo ""
+
+# if a summary stats email was initialized, it means there is some update for DPDash stats, so proceed with computing some summaries
+if [[ -e "$repo_root"/summary_lab_email_body.txt ]]; then
+	bash "$repo_root"/individual_modules/run_qc_site_stats.sh "$data_root" "$study"
+	echo ""
+
+	# add current time for runtime tracking purposes
+	now=$(date +"%T")
+	echo "Current time: ${now}"
+	echo ""
+fi
 
 # finally send email if these was anything to email about
-if [[ -e "$repo_root"/video_lab_email_body.txt ]]; then
-	echo "Emailing status update to lab"
-	# first need to put together the rest of the email
-	echo "--- Interview videos newly processed ---" >> "$repo_root"/video_lab_email_body.txt
-	cat "$repo_root"/video_temp_process_list.txt >> "$repo_root"/video_lab_email_body.txt
-	rm "$repo_root"/video_temp_process_list.txt
-	# now send
-	mail -s "[${study} ${server_version} Interview Pipeline Updates] New Video Processed" "$lab_email_list" < "$repo_root"/video_lab_email_body.txt
+# doing warning email first if there were any
+if [[ -e "$repo_root"/warning_lab_email_body.txt ]]; then
+	echo "Emailing detected warnings to lab"
+	mail -s "[ACTION REQUIRED] Issues Detected by ${study} ${server_version} Interview Pipeline" "$lab_email_list" < "$repo_root"/warning_lab_email_body.txt
 	# move the email to logs folder for reference if there was actual content
-	mv "$repo_root"/video_lab_email_body.txt "$repo_root"/logs/"$study"/emails_sent/video_lab_email_body_"$log_timestamp".txt
+	mv "$repo_root"/warning_lab_email_body.txt "$repo_root"/logs/"$study"/emails_sent/warning_lab_email_body_"$log_timestamp".txt
 else
-	echo "No new video updates for this study, so no email to send"
+	echo "No new file accounting or major QC warnings for this study"
 fi
 echo ""
-
-# add current time for runtime tracking purposes
-now=$(date +"%T")
-echo "Current time: ${now}"
-echo ""
-
-# finally run the file accounting updates for this study
-echo "Compiling/updating file lists with processing date"
-bash "$repo_root"/individual_modules/run_final_video_accounting.sh "$data_root" "$study"
+# now also send summary email if anything new was successfully processed
+if [[ -e "$repo_root"/summary_lab_email_body.txt ]]; then
+	echo "Emailing status updates to lab"
+	mail -s "[${study} ${server_version} Interview Pipeline Updates] Latest QC Summary Stats" "$lab_email_list" < "$repo_root"/summary_lab_email_body.txt
+	# move the email to logs folder for reference if there was actual content
+	mv "$repo_root"/summary_lab_email_body.txt "$repo_root"/logs/"$study"/emails_sent/summary_lab_email_body_"$log_timestamp".txt
+else
+	echo "No new changes to processed file stats for this study"
+fi
 echo ""
 
 # add current time for runtime tracking purposes

@@ -6,7 +6,7 @@ import glob
 import pandas as pd
 import numpy as np
 
-def get_email_summary_stats(data_root, study, lab_email_path, transcribeme_email_path, interview_type, num_existing_pushed, num_existing_minutes):
+def get_email_summary_stats(data_root, study, lab_email_path, interview_type):
 	# get paths of interest for all patients in this study
 	os.chdir(os.path.join(data_root, "PROTECTED", study))
 	# first get paths to main folders for all patients that have them
@@ -170,21 +170,11 @@ def get_email_summary_stats(data_root, study, lab_email_path, transcribeme_email
 		if interview_type == "open":
 			f.write("\n")
 
-	# finally, add to the TranscribeMe email similarly, only for last interview type so we send them just the sums
-	# however, if nothing successfully sent to TrancribeMe, don't want to send any email to them, so delete the file instead in that case
-	if interview_type == "psychs":
-		if num_pushed + num_existing_pushed == 0:
-			os.remove(transcribeme_email_path)
-		else:
-			with open(transcribeme_email_path, 'a') as f: # a for append mode, so doesn't erase any info already included
-				# for this email, only one main line that includes the stats calculated in this script
-				transcribeme_summary = "We have uploaded new audio for transcription - there should be " + str(num_pushed + num_existing_pushed) + " new audio files totalling ~" + str(num_minutes + num_existing_minutes) + " minutes."
-				f.write(transcribeme_summary) 
-				f.write("\n")
-
 	return num_pushed, num_minutes
 
 if __name__ == '__main__':
 	# Map command line arguments to function arguments.
-	o_pushed_num, o_pushed_minutes = get_email_summary_stats(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], "open", 0, 0)
-	get_email_summary_stats(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], "psychs", o_pushed_num, o_pushed_minutes)
+	o_pushed_num, o_pushed_minutes = get_email_summary_stats(sys.argv[1], sys.argv[2], sys.argv[3], "open")
+	p_pushed_num, p_pushed_minutes = get_email_summary_stats(sys.argv[1], sys.argv[2], sys.argv[3], "psychs")
+	print("Total audio files successfully pushed to TranscribeMe for this site today = " + str(o_pushed_num + p_pushed_num))
+	print("Total minutes of audio successfully pushed for this site today = " + str(o_pushed_minutes + p_pushed_minutes))

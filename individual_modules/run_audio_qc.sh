@@ -41,17 +41,51 @@ for p in *; do
 	if [[ ! -d ../sliding_window_audio_qc ]]; then
 		mkdir ../sliding_window_audio_qc
 	fi
+	# make a folder for the current files for now too as a temporary holding - so easy to remove if a crash occurs for a particular patient!
+	mkdir ../sliding_window_audio_qc/temp
 	for file in *.wav; do
 		name=$(echo "$file" | awk -F '.wav' '{print $1}')
 		# outputs still go in PROTECTED for now as at this stage they still contain dates/times
-		python "$func_root"/sliding_audio_qc_func.py "$file" ../sliding_window_audio_qc/"$name".csv
+		python "$func_root"/sliding_audio_qc_func.py "$file" ../sliding_window_audio_qc/temp/"$name".csv
+
+		# check for error with any of the runs of the sliding audio function first, remove the corresponding temp audio file and log issue if so
+		if [ $? = 1 ]; then 
+			echo "Sliding audio QC failed for open ${file} - skipping for now, please revisit"
+
+			# if calling from pipeline make a note it crashed!
+			if [[ -e "$repo_root"/audio_lab_email_body.txt ]]; then 
+				echo "Note that the raw open audio file ${name} for subject ${p} crashed before QC was finished and has been skipped by processing for now" >> "$repo_root"/audio_lab_email_body.txt
+				echo "" >> "$repo_root"/audio_lab_email_body.txt
+			fi	
+
+			# finally remove the offending file so it isn't further processed
+			rm "$file"
+			rm ../audio_filename_maps/"$name".txt
+		fi
 	done
 
 	# now need to rename the files for the summary QC and TranscribeMe pipeline
 	python "$func_root"/interview_audio_rename.py "open" "$data_root" "$study" "$p"
 
-	if [ $? = 1 ]; then # if rename script exited with an error for this patient, won't be able to run summary/dpdash QC
-		echo "Renaming script failed for patient's open interviews, leaving files in temporary audio folder and moving on. Should be manually addressed"
+	# if rename script exited with an error for this patient, won't be able to run summary/dpdash QC
+	# handle this and make sure it is well alerted
+	if [ $? = 1 ]; then 
+		echo "Renaming script failed for subject ${p} open interviews today, so they skip being processed - please check manually"
+	
+		# if calling from pipeline make a note it crashed!
+		if [[ -e "$repo_root"/audio_lab_email_body.txt ]]; then 
+			echo "Note that renaming crashed for new open interviews from subject ${p}. They have been skipped for now, may require manual investigation." >> "$repo_root"/audio_lab_email_body.txt
+			echo "" >> "$repo_root"/audio_lab_email_body.txt
+		fi	
+
+		# remove all the temp files/newly added files then
+		for file in *.wav; do
+			name=$(echo "$file" | awk -F '.wav' '{print $1}')
+			rm ../audio_filename_maps/"$name".txt
+		done
+		rm *.wav
+		rm -rf ../sliding_window_audio_qc/temp
+
 		# back out of folder before continuing to next patient
 		cd "$data_root"/PROTECTED/"$study"/processed
 		continue
@@ -59,6 +93,37 @@ for p in *; do
 	
 	# finally run main audio QC script on this patient
 	python "$func_root"/interview_audio_qc.py "open" "$data_root" "$study" "$p"
+
+	# add similar handling for case where audio QC script failed
+	if [ $? = 1 ]; then 
+		echo "Overall audio QC failed for subject ${p} open interviews today, so they skip being processed - please check manually"
+	
+		# if calling from pipeline make a note it crashed!
+		if [[ -e "$repo_root"/audio_lab_email_body.txt ]]; then 
+			echo "Note that overall audio QC updates crashed for new open interviews from subject ${p}. They have been skipped for now, may require manual investigation." >> "$repo_root"/audio_lab_email_body.txt
+			echo "" >> "$repo_root"/audio_lab_email_body.txt
+		fi	
+
+		# remove all the temp files/newly added files then
+		for file in *.wav; do
+			name=$(echo "$file" | awk -F '.wav' '{print $1}')
+			rm ../audio_filename_maps/"$name".txt
+		done
+		rm *.wav
+		rm -rf ../sliding_window_audio_qc/temp
+
+		# back out of folder before continuing to next patient
+		cd "$data_root"/PROTECTED/"$study"/processed
+		continue
+	fi
+
+	# if reach here then actually the processing was fine, can move stuff out of the temp sliding qc folder into the real one
+	cd ../sliding_window_audio_qc/temp
+	for file in *.csv; do
+		mv "$file" ../"$file"
+	done
+	cd ..
+	rm -rf temp # clear temporary folder now
 
 	# back out of folder before continuing to next patient
 	cd "$data_root"/PROTECTED/"$study"/processed
@@ -86,17 +151,51 @@ for p in *; do
 	if [[ ! -d ../sliding_window_audio_qc ]]; then
 		mkdir ../sliding_window_audio_qc
 	fi
+	# make a folder for the current files for now too as a temporary holding - so easy to remove if a crash occurs for a particular patient!
+	mkdir ../sliding_window_audio_qc/temp
 	for file in *.wav; do
 		name=$(echo "$file" | awk -F '.wav' '{print $1}')
 		# outputs still go in PROTECTED for now as at this stage they still contain dates/times
-		python "$func_root"/sliding_audio_qc_func.py "$file" ../sliding_window_audio_qc/"$name".csv
+		python "$func_root"/sliding_audio_qc_func.py "$file" ../sliding_window_audio_qc/temp/"$name".csv
+
+		# check for error with any of the runs of the sliding audio function first, remove the corresponding temp audio file and log issue if so
+		if [ $? = 1 ]; then 
+			echo "Sliding audio QC failed for psychs ${file} - skipping for now, please revisit"
+
+			# if calling from pipeline make a note it crashed!
+			if [[ -e "$repo_root"/audio_lab_email_body.txt ]]; then 
+				echo "Note that the raw psychs audio file ${name} for subject ${p} crashed before QC was finished and has been skipped by processing for now" >> "$repo_root"/audio_lab_email_body.txt
+				echo "" >> "$repo_root"/audio_lab_email_body.txt
+			fi	
+
+			# finally remove the offending file so it isn't further processed
+			rm "$file"
+			rm ../audio_filename_maps/"$name".txt
+		fi
 	done
 
 	# now need to rename the files for the summary QC and TranscribeMe pipeline
 	python "$func_root"/interview_audio_rename.py "psychs" "$data_root" "$study" "$p"
 
-	if [ $? = 1 ]; then # if rename script exited with an error for this patient, won't be able to run summary/dpdash QC
-		echo "Renaming script failed for patient's psychs interviews, leaving files in temporary audio folder and moving on. Should be manually addressed"
+	# if rename script exited with an error for this patient, won't be able to run summary/dpdash QC
+	# handle this and make sure it is well alerted
+	if [ $? = 1 ]; then 
+		echo "Renaming script failed for subject ${p} psychs interviews today, so they skip being processed - please check manually"
+	
+		# if calling from pipeline make a note it crashed!
+		if [[ -e "$repo_root"/audio_lab_email_body.txt ]]; then 
+			echo "Note that renaming crashed for new psychs interviews from subject ${p}. They have been skipped for now, may require manual investigation." >> "$repo_root"/audio_lab_email_body.txt
+			echo "" >> "$repo_root"/audio_lab_email_body.txt
+		fi	
+
+		# remove all the temp files/newly added files then
+		for file in *.wav; do
+			name=$(echo "$file" | awk -F '.wav' '{print $1}')
+			rm ../audio_filename_maps/"$name".txt
+		done
+		rm *.wav
+		rm -rf ../sliding_window_audio_qc/temp
+
 		# back out of folder before continuing to next patient
 		cd "$data_root"/PROTECTED/"$study"/processed
 		continue
@@ -104,6 +203,37 @@ for p in *; do
 	
 	# finally run main audio QC script on this patient
 	python "$func_root"/interview_audio_qc.py "psychs" "$data_root" "$study" "$p"
+
+	# add similar handling for case where audio QC script failed
+	if [ $? = 1 ]; then 
+		echo "Overall audio QC failed for subject ${p} psychs interviews today, so they skip being processed - please check manually"
+	
+		# if calling from pipeline make a note it crashed!
+		if [[ -e "$repo_root"/audio_lab_email_body.txt ]]; then 
+			echo "Note that overall audio QC updates crashed for new psychs interviews from subject ${p}. They have been skipped for now, may require manual investigation." >> "$repo_root"/audio_lab_email_body.txt
+			echo "" >> "$repo_root"/audio_lab_email_body.txt
+		fi	
+
+		# remove all the temp files/newly added files then
+		for file in *.wav; do
+			name=$(echo "$file" | awk -F '.wav' '{print $1}')
+			rm ../audio_filename_maps/"$name".txt
+		done
+		rm *.wav
+		rm -rf ../sliding_window_audio_qc/temp
+
+		# back out of folder before continuing to next patient
+		cd "$data_root"/PROTECTED/"$study"/processed
+		continue
+	fi
+
+	# if reach here then actually the processing was fine, can move stuff out of the temp sliding qc folder into the real one
+	cd ../sliding_window_audio_qc/temp
+	for file in *.csv; do
+		mv "$file" ../"$file"
+	done
+	cd ..
+	rm -rf temp # clear temporary folder now
 
 	# back out of folder before continuing to next patient
 	cd "$data_root"/PROTECTED/"$study"/processed

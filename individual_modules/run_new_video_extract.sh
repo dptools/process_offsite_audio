@@ -16,6 +16,7 @@ if [[ -z "${repo_root}" ]]; then
 	func_root="$module_root"/functions_called
 else
 	func_root="$repo_root"/individual_modules/functions_called
+	pipeline="Y" # note when it is called from pipeline so email can be initialized - only want the file generated if there are new files for a patient in this site
 fi
 
 # move to study's raw folder to loop over patients
@@ -116,6 +117,15 @@ for p in *; do
 						ffmpeg -ss 0"$hr":52:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute52.jpg &> /dev/null
 						ffmpeg -ss 0"$hr":56:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute56.jpg &> /dev/null
 					done
+
+					# initialize txt files for email bodies too if this is a pipeline call, as we have found a new video to process for the site
+					if [[ $pipeline = "Y" ]]; then
+						# it is okay to just redo this every time since it will restart the file, all the other updates come way downstream
+						echo "Video Processing Updates for ${study}:" > "$repo_root"/video_lab_email_body.txt
+						echo "If any processing errors are encountered they will be included at the top of this message. All successfully processed interview videos are then listed." >> "$repo_root"/video_lab_email_body.txt
+						echo "" >> "$repo_root"/video_lab_email_body.txt
+						touch "$repo_root"/video_temp_process_list.txt # also make sure this file exists for putting together final email
+					fi
 				fi
 			done
 
@@ -201,6 +211,15 @@ for p in *; do
 						ffmpeg -ss 0"$hr":52:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute52.jpg &> /dev/null
 						ffmpeg -ss 0"$hr":56:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute56.jpg &> /dev/null
 					done
+
+					# initialize txt files for email bodies too if this is a pipeline call, as we have found a new video to process for the site
+					if [[ $pipeline = "Y" ]]; then
+						# it is okay to just redo this every time since it will restart the file, all the other updates come way downstream
+						echo "Video Processing Updates for ${study}:" > "$repo_root"/video_lab_email_body.txt
+						echo "If any processing errors are encountered they will be included at the top of this message. All successfully processed interview videos are then listed." >> "$repo_root"/video_lab_email_body.txt
+						echo "" >> "$repo_root"/video_lab_email_body.txt
+						touch "$repo_root"/video_temp_process_list.txt # also make sure this file exists for putting together final email
+					fi
 				fi
 			done
 
