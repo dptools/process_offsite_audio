@@ -69,10 +69,10 @@ def interview_warnings_check(interview_type, data_root, study, ptID, warning_lab
 	days_diff_shift = sorted_accounting_csv["days_diff"].tolist()[1:]
 	days_diff_shift.append(np.nan)
 	sorted_accounting_csv["days_diff_shift"] = days_diff_shift
-	cur_check = sorted_accounting_csv.dropna(subset="days_diff")
+	cur_check = sorted_accounting_csv.dropna(subset=["days_diff"])
 	cur_check = cur_check[cur_check["days_diff"] < 0]
 	bad_dates_df = all_new_df[(all_new_df["interview_date"].isin(cur_check["interview_date"].tolist())) & (all_new_df["interview_time"].isin(cur_check["interview_time"].tolist()))]
-	cur_check = sorted_accounting_csv.dropna(subset="days_diff_shift")
+	cur_check = sorted_accounting_csv.dropna(subset=["days_diff_shift"])
 	cur_check = cur_check[cur_check["days_diff_shift"] < 0]
 	bad_dates_df_2 = all_new_df[(all_new_df["interview_date"].isin(cur_check["interview_date"].tolist())) & (all_new_df["interview_time"].isin(cur_check["interview_time"].tolist()))]
 
@@ -83,10 +83,10 @@ def interview_warnings_check(interview_type, data_root, study, ptID, warning_lab
 		sess_diff_shift = sorted_accounting_csv["sess_diff"].tolist()[1:]
 		sess_diff_shift.append(np.nan)
 		sorted_accounting_csv["sess_diff_shift"] = sess_diff_shift
-		cur_check = sorted_accounting_csv.dropna(subset="sess_diff")
+		cur_check = sorted_accounting_csv.dropna(subset=["sess_diff"])
 		cur_check = cur_check[cur_check["sess_diff"] == 0]
 		bad_sess_nums_df = all_new_df[(all_new_df["interview_date"].isin(cur_check["interview_date"].tolist())) & (all_new_df["interview_time"].isin(cur_check["interview_time"].tolist()))]
-		cur_check = sorted_accounting_csv.dropna(subset="sess_diff_shift")
+		cur_check = sorted_accounting_csv.dropna(subset=["sess_diff_shift"])
 		cur_check = cur_check[cur_check["sess_diff_shift"] == 0]
 		bad_sess_nums_df_2 = all_new_df[(all_new_df["interview_date"].isin(cur_check["interview_date"].tolist())) & (all_new_df["interview_time"].isin(cur_check["interview_time"].tolist()))]
 	else:
