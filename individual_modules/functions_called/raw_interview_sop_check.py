@@ -11,7 +11,7 @@ import numpy as np
 def interview_raw_account(interview_type, data_root, study, ptID):
 	# start with looking up existing sop checks
 	try:
-		prev_account = pd.read_csv("../" + study + "_" + ptID + "_" + interview_type + "RawInterviewSOPAccountingTable.csv")
+		prev_account = pd.read_csv(os.path.join(data_root, "PROTECTED", study, "processed", ptID, "interviews", interview_type, study + "_" + ptID + "_" + interview_type + "RawInterviewSOPAccountingTable.csv"))
 		existing_list = prev_account["raw_name"].tolist()
 	except:
 		existing_list = []	
@@ -31,7 +31,7 @@ def interview_raw_account(interview_type, data_root, study, ptID):
 	today_str = datetime.date.today().strftime("%Y-%m-%d")
 
 	# there must already be this folder with subfolders in it for wrapping bash script to call the function
-	os.chdir(os.path.join(data_root,"PROTECTED", study, "raw", ptID, "interviews", interview_type))
+	os.chdir(os.path.join(data_root, "PROTECTED", study, "raw", ptID, "interviews", interview_type))
 	cur_folders = os.listdir(".")
 
 	# loop through raw folders available now
@@ -92,7 +92,7 @@ def interview_raw_account(interview_type, data_root, study, ptID):
 		return
 
 	# concat if one already exists, otherwise just save
-	output_path = "../" + study + "_" + ptID + "_" + interview_type + "RawInterviewSOPAccountingTable.csv"
+	output_path = os.path.join(data_root, "PROTECTED", study, "processed", ptID, "interviews", interview_type, study + "_" + ptID + "_" + interview_type + "RawInterviewSOPAccountingTable.csv")
 	if len(existing_list) > 0:
 		join_df = pd.concat([prev_account, new_df])
 		join_df.reset_index(drop=True, inplace=True)

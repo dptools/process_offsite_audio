@@ -237,7 +237,7 @@ def interview_transcript_account(interview_type, data_root, study, ptID, languag
 		new_df[header] = value
 
 	# saving
-	output_path = "../" + study + "_" + ptID + "_" + interview_type + "InterviewTranscriptProcessAccountingTable.csv"
+	output_path = study + "_" + ptID + "_" + interview_type + "InterviewTranscriptProcessAccountingTable.csv"
 	# concat the updated prior accounting with any newly found files where that is relevant
 	if len(transcribed_list) > 0 and not new_df.empty: # in this case have exiting df and new files
 		join_df = pd.concat([prev_account, new_df])
