@@ -69,9 +69,9 @@ def interview_warnings_check(interview_type, data_root, study, ptID, warning_lab
 	days_diff_shift = sorted_accounting_csv["days_diff"].tolist()[1:]
 	days_diff_shift.append(np.nan)
 	sorted_accounting_csv["days_diff_shift"] = days_diff_shift
-	cur_check = sorted_accounting_csv[(pd.notnull(sorted_accounting_csv["days_diff"])) & (sorted_accounting_csv["days_diff"] < 0)]
+	cur_check = sorted_accounting_csv[(~sorted_accounting_csv["days_diff"].isnull()) & (sorted_accounting_csv["days_diff"] < 0)]
 	bad_dates_df = all_new_df[(all_new_df["interview_date"].isin(cur_check["interview_date"].tolist())) & (all_new_df["interview_time"].isin(cur_check["interview_time"].tolist()))]
-	cur_check = sorted_accounting_csv[(pd.notnull(sorted_accounting_csv["days_diff_shift"])) & (sorted_accounting_csv["days_diff_shift"] < 0)]
+	cur_check = sorted_accounting_csv[(~sorted_accounting_csv["days_diff_shift"].isnull()) & (sorted_accounting_csv["days_diff_shift"] < 0)]
 	bad_dates_df_2 = all_new_df[(all_new_df["interview_date"].isin(cur_check["interview_date"].tolist())) & (all_new_df["interview_time"].isin(cur_check["interview_time"].tolist()))]
 
 	numbers_list = avl_accounting["interview_number"].tolist()
@@ -81,9 +81,9 @@ def interview_warnings_check(interview_type, data_root, study, ptID, warning_lab
 		sess_diff_shift = sorted_accounting_csv["sess_diff"].tolist()[1:]
 		sess_diff_shift.append(np.nan)
 		sorted_accounting_csv["sess_diff_shift"] = sess_diff_shift
-		cur_check = sorted_accounting_csv[(pd.notnull(sorted_accounting_csv["sess_diff"])) & (sorted_accounting_csv["sess_diff"] == 0)]
+		cur_check = sorted_accounting_csv[(~sorted_accounting_csv["sess_diff"].isnull()) & (sorted_accounting_csv["sess_diff"] == 0)]
 		bad_sess_nums_df = all_new_df[(all_new_df["interview_date"].isin(cur_check["interview_date"].tolist())) & (all_new_df["interview_time"].isin(cur_check["interview_time"].tolist()))]
-		cur_check = sorted_accounting_csv[(pd.notnull(sorted_accounting_csv["sess_diff_shift"])) & (sorted_accounting_csv["sess_diff_shift"] == 0)]
+		cur_check = sorted_accounting_csv[(~sorted_accounting_csv["sess_diff_shift"].isnull()) & (sorted_accounting_csv["sess_diff_shift"] == 0)]
 		bad_sess_nums_df_2 = all_new_df[(all_new_df["interview_date"].isin(cur_check["interview_date"].tolist())) & (all_new_df["interview_time"].isin(cur_check["interview_time"].tolist()))]
 	else:
 		bad_sess_nums_df = pd.DataFrame(columns=all_new_df.columns)
@@ -176,13 +176,13 @@ def interview_warnings_check(interview_type, data_root, study, ptID, warning_lab
 			warned_numbers.extend(cur_df["interview_number"].tolist())
 			warned_dates.extend(cur_df["interview_date"].tolist())
 			warned_times.extend(cur_df["interview_time"].tolist())
-			warned_texts.extend([cur_message] for x in range(len(cur_df.shape[0])))
+			warned_texts.extend([cur_message] for x in range(cur_df.shape[0]))
 
 		final_warning_df = pd.DataFrame()
 		values = [warned_days, warned_numbers, warned_dates, warned_times, warned_texts]
 		for header,value in zip(new_cols,values):
 			final_warning_df[header] = value
-		final_warning_df["warning_date"] = [today_str for x in range(len(final_warning_df.shape[0]))]
+		final_warning_df["warning_date"] = [today_str for x in range(final_warning_df.shape[0])]
 
 		# will now save this DF, first confirming there is nothing else to concat with first, otherwise need to join that first
 		warn_output_path = study + "_" + ptID + "_" + interview_type + "InterviewProcessWarningsTable.csv"

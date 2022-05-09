@@ -35,4 +35,4 @@ sudo chgrp -R pronet /opt/software/Pronet_data_sync/PHOENIX/*/*/processed/*
 sudo chgrp -R pronet /opt/software/Pronet_data_sync/PHOENIX/PROTECTED/box_transfer
 
 # finally run the utility for stats combined across sites
-bash /opt/software/process_offsite_audio/final_all_sites_utility.sh /opt/software/Pronet_data_sync/PHOENIX mennis2@partners.org Pronet-dev
+bash /opt/software/process_offsite_audio/final_all_sites_utility.sh /opt/software/Pronet_data_sync/PHOENIX mennis2@partners.org PronetDev
