@@ -37,5 +37,6 @@ echo "" >> "$repo_root"/logs/TOTAL/"$cur_date"/all_warning_update_email.txt
 python "$repo_root"/individual_modules/functions_called/detect_all_updates_func.py "$repo_root"/logs/TOTAL/"$cur_date"
 
 # now just send both!
-mail -s "[${server_version}] Interview Pipeline Daily Stats Email" -a "$repo_root"/logs/TOTAL/"$cur_date"/all-QC-summary-stats.csv -a "$repo_root"/logs/TOTAL/"$cur_date"/all-processed-accounting.csv "$summary_email_list" < "$repo_root"/logs/TOTAL/"$cur_date"/all_pipeline_update_email.txt
-mail -s "[${server_version}] Interview Pipeline Daily Warnings Email" -a "$repo_root"/logs/TOTAL/"$cur_date"/all-processed-warnings.csv -a "$repo_root"/logs/TOTAL/"$cur_date"/all-SOP-warnings.csv "$summary_email_list" < "$repo_root"/logs/TOTAL/"$cur_date"/all_warning_update_email.txt
+# note -A is the flag for mailx attachments on pronet, whereas is is -a on ERIS
+mail -s "[${server_version}] Interview Pipeline Daily Stats Email" -A "$repo_root"/logs/TOTAL/"$cur_date"/all-QC-summary-stats.csv -A "$repo_root"/logs/TOTAL/"$cur_date"/all-processed-accounting.csv "$summary_email_list" < "$repo_root"/logs/TOTAL/"$cur_date"/all_pipeline_update_email.txt
+mail -s "[${server_version}] Interview Pipeline Daily Warnings Email" -A "$repo_root"/logs/TOTAL/"$cur_date"/all-processed-warnings.csv -A "$repo_root"/logs/TOTAL/"$cur_date"/all-SOP-warnings.csv "$summary_email_list" < "$repo_root"/logs/TOTAL/"$cur_date"/all_warning_update_email.txt

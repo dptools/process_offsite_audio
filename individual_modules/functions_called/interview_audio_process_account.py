@@ -63,7 +63,7 @@ def interview_raw_audio_account(interview_type, data_root, study, ptID):
 			continue
 	
 		# line 1 is full raw path , line 2 is renamed file name
-		with cur_f as open(filename, 'r'):
+		with open(filename, 'r') as cur_f:
 			line_list = cur_f.readlines()
 		raw_audio_path = line_list[0]
 		# check that this hasn't already been processed using the raw path before proceeding, otherwise skip

@@ -36,7 +36,7 @@ def interview_video_account(interview_type, data_root, study, ptID):
 			continue
 	
 		# line 1 (only line) is renamed file name
-		with cur_f as open(foldername + "/" + foldername + ".txt", 'r'):
+		with open(foldername + "/" + foldername + ".txt", 'r') as cur_f:
 			line_list = cur_f.readlines()
 		video_rename = line_list[0]
 		# check that this hasn't already been processed using the raw path before proceeding, otherwise skip

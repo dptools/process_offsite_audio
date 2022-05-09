@@ -19,7 +19,7 @@ for p in *; do
 	cd "$p"/interviews
 
 	# now check open and then psychs for transcripts of interest - in prescreening means they were sent for the sites to review
-	if [[ -d open/transcripts/prescreening ]];
+	if [[ -d open/transcripts/prescreening ]]; then
 		cd open/transcripts/prescreening
 		for file in *.txt; do
 			if [[ ! -e $file ]]; then # make sure don't get errors related to file not found if the folder is empty
@@ -27,7 +27,7 @@ for p in *; do
 			fi
 
 			if [[ ! -e ../${file} ]]; then # this means there is a transcript pending review!
-				if [[ ! -e ${repo_root}/site_review_email_body.txt ]]; # if this is first one flagged add an intro to newly created email body txt
+				if [[ ! -e ${repo_root}/site_review_email_body.txt ]]; then # if this is first one flagged add an intro to newly created email body txt
 					echo "Action required - transcripts needing manual review!" > "$repo_root"/site_review_email_body.txt
 					echo "The following is a list of transcripts still pending redaction review for this site:" >> "$repo_root"/site_review_email_body.txt
 					echo "(note that there may be an ~1 day lag between correctly approving a transcript and it being registered by the interview pipeline)" >> "$repo_root"/site_review_email_body.txt
@@ -38,7 +38,7 @@ for p in *; do
 		done
 		cd ../../.. # leave the transcription folder once loop is done
 	fi
-	if [[ -d psychs/transcripts/prescreening ]];
+	if [[ -d psychs/transcripts/prescreening ]]; then
 		cd psychs/transcripts/prescreening
 		for file in *.txt; do
 			if [[ ! -e $file ]]; then # make sure don't get errors related to file not found if the folder is empty
@@ -46,7 +46,7 @@ for p in *; do
 			fi
 
 			if [[ ! -e ../${file} ]]; then # this means there is a transcript pending review!
-				if [[ ! -e ${repo_root}/site_review_email_body.txt ]]; # if this is first one flagged add an intro to newly created email body txt
+				if [[ ! -e ${repo_root}/site_review_email_body.txt ]]; then # if this is first one flagged add an intro to newly created email body txt
 					echo "Action required - transcripts needing manual review!" > "$repo_root"/site_review_email_body.txt
 					echo "The following is a list of transcripts still pending redaction review for this site:" >> "$repo_root"/site_review_email_body.txt
 					echo "(note that there may be an ~1 day lag between correctly approving a transcript and it being registered by the interview pipeline)" >> "$repo_root"/site_review_email_body.txt

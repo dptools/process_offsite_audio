@@ -114,7 +114,7 @@ def interview_transcript_account(interview_type, data_root, study, ptID, languag
 				# there should never be a CSV if the source txt is not at least UTF-8!
 				transcript_encoding_final_list.append("UTF-8")
 		else:
-			processed_csv_transcript_filename_list.append("")
+			processed_csv_filename_list.append("")
 			transcript_processed_date_list.append("")
 			transcript_processed_accounting_date_list.append("")
 			transcript_encoding_final_list.append("")
@@ -180,7 +180,7 @@ def interview_transcript_account(interview_type, data_root, study, ptID, languag
 				# there should never be a CSV if the source txt is not at least UTF-8!
 				transcript_encoding_final_list.append("UTF-8")
 		else:
-			processed_csv_transcript_filename_list.append("")
+			processed_csv_filename_list.append("")
 			transcript_processed_date_list.append("")
 			transcript_processed_accounting_date_list.append("")
 			transcript_encoding_final_list.append("")
@@ -208,7 +208,7 @@ def interview_transcript_account(interview_type, data_root, study, ptID, languag
 		fname = csv_trans.split("/")[-1]
 		if fname in processed_list: # if already registered as processed can skip this part of loop
 			continue
-		if fname in processed_csv_transcript_filename_list: # also skip if this is a new CSV that was alredy counted above
+		if fname in processed_csv_filename_list: # also skip if this is a new CSV that was alredy counted above
 			continue
 
 		# if at this point we know we have entries in the previously saved DF to edit, similar to above
