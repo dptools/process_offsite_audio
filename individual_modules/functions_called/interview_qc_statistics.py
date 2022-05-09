@@ -29,12 +29,18 @@ def interview_qc_statistics(interview_type, data_root, study, summary_lab_email_
 	all_audio_dfs = [pd.read_csv(x) for x in all_audio_paths]
 	all_video_dfs = [pd.read_csv(x) for x in all_video_paths]
 	all_trans_dfs = [pd.read_csv(x) for x in all_trans_paths]
-	concat_audio = pd.concat(all_audio_dfs)
-	concat_video = pd.concat(all_video_dfs)
-	concat_trans = pd.concat(all_trans_dfs)
-	concat_audio.reset_index(drop=True, inplace=True)
-	concat_video.reset_index(drop=True, inplace=True)
-	concat_trans.reset_index(drop=True, inplace=True)
+	try:
+		concat_audio = pd.concat(all_audio_dfs)
+	except:
+		concat_audio = pd.DataFrame()
+	try:
+		concat_video = pd.concat(all_video_dfs)
+	except:
+		concat_audio = pd.DataFrame()
+	try:
+		concat_trans = pd.concat(all_trans_dfs)
+	except:
+		concat_audio = pd.DataFrame()
 	# isolate QC-related columns here, but first ensure not dealing with empty df that doesn't have column names, to prevent crash
 	if concat_audio.empty:
 		concat_audio.columns = ["length_minutes","overall_db","amplitude_stdev","mean_flatness"]
@@ -57,6 +63,9 @@ def interview_qc_statistics(interview_type, data_root, study, summary_lab_email_
 								 "num_turns_S3","num_words_S3","min_words_in_turn_S3","max_words_in_turn_S3",
 								 "num_inaudible","num_questionable","num_crosstalk","num_redacted","num_commas","num_dashes",
 								 "final_timestamp_minutes","min_timestamp_space","max_timestamp_space","min_timestamp_space_per_word","max_timestamp_space_per_word"]]
+	concat_audio.reset_index(drop=True, inplace=True)
+	concat_video.reset_index(drop=True, inplace=True)
+	concat_trans.reset_index(drop=True, inplace=True)
 
 	# calculate all summary stats, first for audio (do mean, stdev, max, min)
 	if not concat_audio.empty:
@@ -246,7 +255,7 @@ def interview_qc_statistics(interview_type, data_root, study, summary_lab_email_
 			fa.write("For the following select QC features, the site-wide " + interview_type + " interview mean and standard deviation are provided, if available:")
 			for ltw in combined_strings:
 				fa.write("\n")
-				fa.write(combined_strings)
+				fa.write(ltw)
 			# don't add spacing at the end as for next interview type it will happen automatically
 
 if __name__ == '__main__':
