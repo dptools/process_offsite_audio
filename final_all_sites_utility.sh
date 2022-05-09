@@ -38,5 +38,14 @@ python "$repo_root"/individual_modules/functions_called/detect_all_updates_func.
 
 # now just send both!
 # note -A is the flag for mailx attachments on pronet, whereas is is -a on ERIS
-mail -s "[${server_version}] Interview Pipeline Daily Stats Email" -A "$repo_root"/logs/TOTAL/"$cur_date"/all-QC-summary-stats.csv -A "$repo_root"/logs/TOTAL/"$cur_date"/all-processed-accounting.csv "$summary_email_list" < "$repo_root"/logs/TOTAL/"$cur_date"/all_pipeline_update_email.txt
-mail -s "[${server_version}] Interview Pipeline Daily Warnings Email" -A "$repo_root"/logs/TOTAL/"$cur_date"/all-processed-warnings.csv -A "$repo_root"/logs/TOTAL/"$cur_date"/all-SOP-warnings.csv "$summary_email_list" < "$repo_root"/logs/TOTAL/"$cur_date"/all_warning_update_email.txt
+cd "$repo_root"/logs/TOTAL/"$cur_date" # change directories first so the file paths don't sneak into the attachment names
+# for some stupid reason it seems impossible to both have an email body and have email attachments with this version of mailx (apparently if using -A it is an outdated version?)
+# tried many things so now just doing a workaround until the emails are nicer anyway (currently CSVs may be too dense)
+echo "" >> all_pipeline_update_email.txt
+echo "Note described attachments are being sent in a separate email (these and warning CSVs to all be attached, should be 4 updated records coming in a separate email)" >> all_pipeline_update_email.txt
+echo "" >> all_warning_update_email.txt
+echo "Note described attachments are being sent in a separate email (these and processed stat/accounting CSVs to all be attached, should be 4 updated records coming in a separate email)" >> all_warning_update_email.txt
+# actually send the email bodies now first
+mail -s "[${server_version}] Interview Pipeline Daily Stats Email"  "$summary_email_list" < all_pipeline_update_email.txt
+mail -s "[${server_version}] Interview Pipeline Daily Warnings Email" "$summary_email_list" < all_warning_update_email.txt
+mail -s "[${server_version}] Interview Pipeline Latest Attachments" -A all-QC-summary-stats.csv -A all-processed-accounting.csv -A all-processed-warnings.csv -A all-SOP-warnings.csv "$summary_email_list"
