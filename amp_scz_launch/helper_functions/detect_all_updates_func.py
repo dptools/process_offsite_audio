@@ -18,15 +18,24 @@ def all_updates_email(output_root):
 	# get current date string for reference
 	today_str = datetime.date.today().strftime("%Y-%m-%d")
 
-	# load all the data frames to reference to start
-	summary_stat_df = pd.read_csv(os.path.join(output_root,"all-QC-summary-stats.csv"))
-	# don't actually need the accounting df, that part will be attached to email but not needed in the body construction
-	warning_df = pd.read_csv(os.path.join(output_root,"all-processed-warnings.csv"))
-	sop_df = pd.read_csv(os.path.join(output_root,"all-SOP-warnings.csv"))
-
 	# get email body paths ready
 	final_summary_path = os.path.join(output_root,"all_pipeline_update_email.txt")
 	final_warning_path = os.path.join(output_root,"all_warning_update_email.txt")
+
+	# load all the data frames to reference to start - for any that may be missing just load in an empty dummy that can be used to ensure the "no updates" text goes through
+	try:
+		summary_stat_df = pd.read_csv(os.path.join(output_root,"all-QC-summary-stats.csv"))
+	except:
+		summary_stat_df = pd.DataFrame(columns=["interview_type","summary_group","computed_date"])
+	# don't actually need the accounting df, that part will be attached to email but not needed in the body construction - so just move on to warnings dfs
+	try:
+		warning_df = pd.read_csv(os.path.join(output_root,"all-processed-warnings.csv"))
+	except:
+		warning_df = pd.DataFrame(columns=["warning_date"])
+	try:
+		sop_df = pd.read_csv(os.path.join(output_root,"all-SOP-warnings.csv"))
+	except:
+		sop_df = pd.DataFrame(columns=["date_detected"])
 
 	# now get only the most relevant rows for the email body, starting with open QC
 	summary_stat_df_open = summary_stat_df[(summary_stat_df["interview_type"] == "open") & (summary_stat_df["summary_group"] == "site")]

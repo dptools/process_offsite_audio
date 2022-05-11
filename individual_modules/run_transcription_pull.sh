@@ -34,14 +34,20 @@ if [ $pipeline = "Y" ]; then
 	# also need to determine in pipeline case if the site is eligible for random manual review - set boolean and update email alert
 	# currently looks for 5 completed box transfers to 'for review'
 	# technically if a site has multiple interviews in one day that pushes them over 5 we will give them a few extras in this setup, but not considering that a problem
-	cd "$data_root"/PROTECTED/box_transfer/completed
-	num_pushed_review=$(find . -maxdepth 1 -name "${study}*.txt" -printf '.' | wc -m)
-	if [[ $num_pushed_review -gt 4 ]]; then
-		random_phase=1
-		echo "Note this site has already had 5 or more transcripts set aside for manual redaction review, so only 10% of pulled transcripts are now marked" >> "$repo_root"/transcript_lab_email_body.txt
+	if [[ -d ${data_root}/PROTECTED/box_transfer/completed ]]; then
+		cd "$data_root"/PROTECTED/box_transfer/completed
+		num_pushed_review=$(find . -maxdepth 1 -name "${study}*.txt" -printf '.' | wc -m)
+		if [[ $num_pushed_review -gt 4 ]]; then
+			random_phase=1
+			echo "Note this site has already had 5 or more transcripts set aside for manual redaction review, so only 10% of pulled transcripts are now marked" >> "$repo_root"/transcript_lab_email_body.txt
+		else
+			random_phase=0
+			echo "Note this site has not yet had at least 5 transcripts set aside for manual redaction review, so all newly pulled transcripts will be marked" >> "$repo_root"/transcript_lab_email_body.txt
+		fi
 	else
+		# catch when the directory doesn't exist separately
 		random_phase=0
-		echo "Note this site has not yet had at least 5 transcripts set aside for manual redaction review, so all newly pulled transcripts will be marked" >> "$repo_root"/transcript_lab_email_body.txt
+		echo "No completed box_transfer folder, so all newly pulled transcripts will be marked for manual redaction review" >> "$repo_root"/transcript_lab_email_body.txt
 	fi
 
 	# add final headers for email prep
