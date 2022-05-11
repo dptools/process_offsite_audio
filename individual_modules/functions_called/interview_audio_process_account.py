@@ -65,11 +65,12 @@ def interview_raw_audio_account(interview_type, data_root, study, ptID):
 		# line 1 is full raw path , line 2 is renamed file name
 		with open(filename, 'r') as cur_f:
 			line_list = cur_f.readlines()
-		raw_audio_path = line_list[0]
+		raw_audio_path = line_list[0].rstrip()
 		# check that this hasn't already been processed using the raw path before proceeding, otherwise skip
 		if raw_audio_path in processed_list:
 			continue
-		audio_rename = line_list[1]
+		audio_rename = line_list[1].rstrip()
+		audio_rename_trans = line_list[2].rstrip()
 		# title is date + time
 		interview_date = filename.split("+")[0]
 		interview_time = filename.split("+")[1].split(".txt")[0]
@@ -81,7 +82,7 @@ def interview_raw_audio_account(interview_type, data_root, study, ptID):
 		last_modified_date = datetime.datetime.fromtimestamp(os.path.getmtime(sliding_qc_path)).date().strftime("%Y-%m-%d")
 
 		# check for which folder the final audio is under to log what happened to it
-		if os.path.exists("../pending_audio/" + audio_rename) or os.path.exists("../completed_audio/" + audio_rename):
+		if os.path.exists("../pending_audio/" + audio_rename_trans) or os.path.exists("../completed_audio/" + audio_rename_trans):
 			success_bool = 1
 		else:
 			success_bool = 0
@@ -89,7 +90,7 @@ def interview_raw_audio_account(interview_type, data_root, study, ptID):
 			reject_bool = 1
 		else:
 			reject_bool = 0
-		if os.path.exists("../audio_to_send/" + audio_rename):
+		if os.path.exists("../audio_to_send/" + audio_rename_trans):
 			upload_failed_bool = 1
 		else:
 			upload_failed_bool = 0

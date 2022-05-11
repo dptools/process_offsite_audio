@@ -61,9 +61,14 @@ def interview_mono_rename(interview_type, data_root, study, ptID):
 		new_name = study + "_" + ptID + "_interviewMonoAudio_" + interview_type + "_day" + format(day_num, '04d') + "_session" + format(session_num, '03d') + ".wav"
 		os.rename(filename, new_name)
 
+		# for final completed_audio (or pending/tosend), it would be named this, so write both for checking (in accounting table will still just keep new_name though)
+		new_name_eventual = study + "_" + ptID + "_interviewAudioTranscript_" + interview_type + "_day" + format(day_num, '04d') + "_session" + format(session_num, '03d') + ".wav"
+
 		cur_map_path = "../audio_filename_maps/" + filename[:-3] + "txt"
 		with open(cur_map_path, 'a') as f: # a for append mode, so doesn't erase the raw filepath on line 1
 			f.write(new_name)
+			f.write("\n")
+			f.write(new_name_eventual)
 
 if __name__ == '__main__':
     # Map command line arguments to function arguments.

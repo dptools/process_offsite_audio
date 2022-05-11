@@ -37,6 +37,8 @@ echo "" >> "$repo_root"/logs/TOTAL/"$cur_date"/all_warning_update_email.txt
 # finalize the email bodies
 python "$func_root"/detect_all_updates_func.py "$repo_root"/logs/TOTAL/"$cur_date"
 
+# TODO: split out the site-level summary stats and the patient-level ones into separate QC summary CSVs for the attachment, to make it less confusing
+
 # now just send both!
 # note -A is the flag for mailx attachments on pronet, whereas is is -a on ERIS
 cd "$repo_root"/logs/TOTAL/"$cur_date" # change directories first so the file paths don't sneak into the attachment names
