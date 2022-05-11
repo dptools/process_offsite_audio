@@ -32,28 +32,43 @@ def interview_qc_statistics(interview_type, data_root, study, summary_lab_email_
 	try:
 		concat_audio = pd.concat(all_audio_dfs)
 	except:
-		concat_audio = pd.DataFrame()
+		if len(all_audio_dfs) == 1:
+			concat_audio = all_audio_dfs[0]
+		else:
+			concat_audio = pd.DataFrame()
 	try:
 		concat_video = pd.concat(all_video_dfs)
 	except:
-		concat_audio = pd.DataFrame()
+		if len(all_video_dfs) == 1:
+			concat_video = all_video_dfs[0]
+		else:
+			concat_video = pd.DataFrame()
 	try:
 		concat_trans = pd.concat(all_trans_dfs)
 	except:
-		concat_audio = pd.DataFrame()
+		if len(all_trans_dfs) == 1:
+			concat_trans = all_trans_dfs[0]
+		else:
+			concat_trans = pd.DataFrame()
 	# isolate QC-related columns here, but first ensure not dealing with empty df that doesn't have column names, to prevent crash
 	if concat_audio.empty:
-		concat_audio.columns = ["length_minutes","overall_db","amplitude_stdev","mean_flatness"]
+		cur_columns = ["length_minutes","overall_db","amplitude_stdev","mean_flatness"]
+		for col in cur_columns:
+			concat_audio[col] = []
 	if concat_video.empty:
-		concat_video.columns = ["number_extracted_frames","minimum_faces_detected_in_frame","maximum_faces_detected_in_frame","mean_faces_detected_in_frame", 
-								"minimum_face_confidence_score","maximum_face_confidence_score","mean_face_confidence_score",
-								"minimum_face_area","maximum_face_area","mean_face_area"]
+		cur_columns = ["number_extracted_frames","minimum_faces_detected_in_frame","maximum_faces_detected_in_frame","mean_faces_detected_in_frame", 
+					   "minimum_face_confidence_score","maximum_face_confidence_score","mean_face_confidence_score",
+					   "minimum_face_area","maximum_face_area","mean_face_area"]
+		for col in cur_columns:
+			concat_video[col] = []
 	if concat_trans.empty:
-		concat_trans.columns = ["num_subjects", "num_turns_S1","num_words_S1","min_words_in_turn_S1","max_words_in_turn_S1",
-								"num_turns_S2","num_words_S2","min_words_in_turn_S2","max_words_in_turn_S2",
-								"num_turns_S3","num_words_S3","min_words_in_turn_S3","max_words_in_turn_S3",
-								"num_inaudible","num_questionable","num_crosstalk","num_redacted","num_commas","num_dashes",
-								"final_timestamp_minutes","min_timestamp_space","max_timestamp_space","min_timestamp_space_per_word","max_timestamp_space_per_word"]
+		cur_columns = ["num_subjects", "num_turns_S1","num_words_S1","min_words_in_turn_S1","max_words_in_turn_S1",
+					   "num_turns_S2","num_words_S2","min_words_in_turn_S2","max_words_in_turn_S2",
+					   "num_turns_S3","num_words_S3","min_words_in_turn_S3","max_words_in_turn_S3",
+					   "num_inaudible","num_questionable","num_crosstalk","num_redacted","num_commas","num_dashes",
+					   "final_timestamp_minutes","min_timestamp_space","max_timestamp_space","min_timestamp_space_per_word","max_timestamp_space_per_word"]
+		for col in cur_columns:
+			concat_trans[col] = []
 	concat_audio = concat_audio[["length_minutes","overall_db","amplitude_stdev","mean_flatness"]]
 	concat_video = concat_video[["number_extracted_frames","minimum_faces_detected_in_frame","maximum_faces_detected_in_frame","mean_faces_detected_in_frame", 
 								 "minimum_face_confidence_score","maximum_face_confidence_score","mean_face_confidence_score",
