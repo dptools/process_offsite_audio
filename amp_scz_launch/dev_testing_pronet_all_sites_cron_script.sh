@@ -9,23 +9,35 @@ sudo chmod -R 770 /opt/software/Pronet_data_sync/PHOENIX/*/*/processed
 conda activate audio_process
 
 # run audio side code for each config
-for file in /opt/software/process_offsite_audio/pronet_site_configs/*.sh; do
+for file in /opt/software/process_offsite_audio/amp_scz_launch/dev_testing_pronet_site_configs/*.sh; do
 	bash /opt/software/process_offsite_audio/interview_audio_process.sh "$file"
+	# add spacing for when monitoring logs in real time
+	echo ""
+	echo ""
 done
 
 # run transcript side code for each config
-for file in /opt/software/process_offsite_audio/pronet_site_configs/*.sh; do
+for file in /opt/software/process_offsite_audio/amp_scz_launch/dev_testing_pronet_site_configs/*.sh; do
 	bash /opt/software/process_offsite_audio/interview_transcript_process.sh "$file"
+	# add spacing for when monitoring logs in real time
+	echo ""
+	echo ""
 done
 
 # run video code for each config
-for file in /opt/software/process_offsite_audio/pronet_site_configs/*.sh; do
+for file in /opt/software/process_offsite_audio/amp_scz_launch/dev_testing_pronet_site_configs/*.sh; do
 	bash /opt/software/process_offsite_audio/interview_video_process.sh "$file"
+	# add spacing for when monitoring logs in real time
+	echo ""
+	echo ""
 done
 
 # run accounting summary compilation for each config
-for file in /opt/software/process_offsite_audio/pronet_site_configs/*.sh; do
+for file in /opt/software/process_offsite_audio/amp_scz_launch/dev_testing_pronet_site_configs/*.sh; do
 	bash /opt/software/process_offsite_audio/interview_summary_checks.sh "$file"
+	# add spacing for when monitoring logs in real time
+	echo ""
+	echo ""
 done
 
 # at the end of the processing, make sure that all processed interview outputs are in the pronet group, so they can be appropriately synced back to datalake
@@ -35,4 +47,4 @@ sudo chgrp -R pronet /opt/software/Pronet_data_sync/PHOENIX/*/*/processed/*
 sudo chgrp -R pronet /opt/software/Pronet_data_sync/PHOENIX/PROTECTED/box_transfer
 
 # finally run the utility for stats combined across sites
-bash /opt/software/process_offsite_audio/final_all_sites_utility.sh /opt/software/Pronet_data_sync/PHOENIX mennis2@partners.org PronetDev
+bash /opt/software/process_offsite_audio/amp_scz_launch/final_all_sites_utility.sh /opt/software/Pronet_data_sync/PHOENIX mennis2@partners.org PronetDev
