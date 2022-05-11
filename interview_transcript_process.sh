@@ -36,10 +36,7 @@ if [[ ! -d $study/processed ]]; then
 	echo "Study ${study} folder improperly set up"
 	exit
 fi
-if [[ ! -d ../GENERAL/$study/raw ]]; then
-	echo "Study ${study} folder improperly set up"
-	exit
-fi
+# don't care if there is a raw in GENERAL as I will never use that part, so excluding that check
 if [[ ! -d ../GENERAL/$study/processed ]]; then
 	echo "Study ${study} folder improperly set up"
 	exit
