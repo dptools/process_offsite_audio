@@ -145,7 +145,7 @@ echo ""
 # only send if there is something relevant for this study though - check environment variables set by relevant modules
 if [[ "$trans_updates" == 1 || "$review_updates" == 1 ]]; then
 	echo "Emailing status update to lab"
-	mail -s "[${study} Interview Pipeline Updates] New Transcripts Received" "$lab_email_list" < "$repo_root"/transcript_lab_email_body.txt
+	mail -s "[${study} ${server_version} Interview Pipeline Updates] Transcription Status Update" "$lab_email_list" < "$repo_root"/transcript_lab_email_body.txt
 	# move email to logs folder for reference if it has real content
 	mv "$repo_root"/transcript_lab_email_body.txt "$repo_root"/logs/"$study"/emails_sent/transcript_lab_email_body_"$log_timestamp".txt
 else

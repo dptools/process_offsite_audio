@@ -72,7 +72,7 @@ def interview_raw_audio_account(interview_type, data_root, study, ptID):
 		audio_rename = line_list[1]
 		# title is date + time
 		interview_date = filename.split("+")[0]
-		interview_time = filename.split("+")[1].split(".")[0]
+		interview_time = filename.split("+")[1].split(".txt")[0]
 		# get day and interview numbers from within the renamed file name
 		day_num = int(audio_rename.split("_day")[1].split("_")[0])
 		sess_num = int(audio_rename.split("_session")[1].split(".")[0])
