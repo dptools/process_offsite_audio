@@ -187,6 +187,12 @@ def interview_warnings_check(interview_type, data_root, study, ptID, warning_lab
 		for header,value in zip(new_cols,values):
 			final_warning_df[header] = value
 		final_warning_df["warning_date"] = [today_str for x in range(final_warning_df.shape[0])]
+		final_warning_df.drop_duplicates(inplace=True)
+
+		# solve weird duplicates problem
+		warned_days = final_warning_df["day"].tolist()
+		warned_numbers = final_warning_df["interview_number"].tolist()
+		warned_texts = final_warning_df["warning_text"].tolist()
 
 		# will now save this DF, first confirming there is nothing else to concat with first, otherwise need to join that first
 		warn_output_path = study + "_" + ptID + "_" + interview_type + "InterviewProcessWarningsTable.csv"
@@ -194,6 +200,7 @@ def interview_warnings_check(interview_type, data_root, study, ptID, warning_lab
 			existing_df = pd.read_csv(warn_output_path)
 			join_csv = pd.concat([existing_df, final_warning_df])
 			join_csv.reset_index(drop=True, inplace=True)
+			join_csv.drop_duplicates(inplace=True)
 			join_csv.to_csv(warn_output_path, index=False)
 		else:
 			final_warning_df.to_csv(warn_output_path, index=False)
