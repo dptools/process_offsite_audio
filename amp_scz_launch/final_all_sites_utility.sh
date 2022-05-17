@@ -29,15 +29,13 @@ fi
 python "$func_root"/concat_all_csvs_func.py "$data_root" "$repo_root"/logs/TOTAL/"$cur_date"
 
 # now can initialize emails that will be sent - one will be "good" updates and one will be "bad". I will attach the created CSVs to these emails below, but also will put newest updates in email bodies via python script
-echo "Interview pipeline code has completed the run across ${server_version} sites today. Any new processing updates are reported on in this email body. CSVs combining all info to date from across sites are also attached - one containing patient and site level DPDash QC summary stats (open and psychs summarized separately) and one containing file accounting information for processed files (including name maps and the dates of various pipeline steps)." > "$repo_root"/logs/TOTAL/"$cur_date"/all_pipeline_update_email.txt
+echo "Interview pipeline code has completed the run across ${server_version} sites today. Any new processing updates are reported on in this email body. CSVs combining all info to date from across sites are also attached - one containing per subject DPDash QC summary stats, one containing per site DPDash QC summary stats (recall open and psychs summarized separately), and one containing file accounting information for processed files (including name maps and the dates of various pipeline steps)." > "$repo_root"/logs/TOTAL/"$cur_date"/all_pipeline_update_email.txt
 echo "" >> "$repo_root"/logs/TOTAL/"$cur_date"/all_pipeline_update_email.txt
 echo "Interview pipeline code has completed the run across ${server_version} sites today. New warnings detected are reported on in this email body (note it is not exhaustive, may need to refer to more detailed logs if something seems amiss). CSVs combining all info to date from across sites are also attached - one containing any warnings related to file processing outputs and one containing any warnings related to raw file SOP violations." > "$repo_root"/logs/TOTAL/"$cur_date"/all_warning_update_email.txt
 echo "" >> "$repo_root"/logs/TOTAL/"$cur_date"/all_warning_update_email.txt
 
 # finalize the email bodies
 python "$func_root"/detect_all_updates_func.py "$repo_root"/logs/TOTAL/"$cur_date"
-
-# TODO: split out the site-level summary stats and the patient-level ones into separate QC summary CSVs for the attachment, to make it less confusing
 
 # now just send both!
 # note -A is the flag for mailx attachments on pronet, whereas is is -a on ERIS
@@ -46,12 +44,12 @@ cd "$repo_root"/logs/TOTAL/"$cur_date" # change directories first so the file pa
 # tried many things so now just doing a workaround until the emails are nicer anyway (currently CSVs may be too dense)
 echo "" >> all_pipeline_update_email.txt
 echo "" >> all_pipeline_update_email.txt
-echo "Note described attachments are being sent in a separate email (these and warning CSVs to all be attached, should be 4 updated records coming in a separate email)" >> all_pipeline_update_email.txt
+echo "Note described attachments are being sent in a separate email (these and warning CSVs to all be attached, should be 5 updated records coming in a separate email)" >> all_pipeline_update_email.txt
 echo "" >> all_warning_update_email.txt
 echo "" >> all_warning_update_email.txt
-echo "Note described attachments are being sent in a separate email (these and processed stat/accounting CSVs to all be attached, should be 4 updated records coming in a separate email)" >> all_warning_update_email.txt
+echo "Note described attachments are being sent in a separate email (these and processed stat/accounting CSVs to all be attached, should be 5 updated records coming in a separate email)" >> all_warning_update_email.txt
 # actually send the email bodies now first
 mail -s "[${server_version}] Interview Pipeline Daily Stats Email"  "$summary_email_list" < all_pipeline_update_email.txt
 mail -s "[${server_version}] Interview Pipeline Daily Warnings Email" "$summary_email_list" < all_warning_update_email.txt
 # inputting the txt file here even though it won't show up in the email body, just to prevent command from stalling looking for a cc
-mail -s "[${server_version}] Interview Pipeline Latest Attachments" -A all-QC-summary-stats.csv -A all-processed-accounting.csv -A all-processed-warnings.csv -A all-SOP-warnings.csv "$summary_email_list" < all_pipeline_update_email.txt
+mail -s "[${server_version}] Interview Pipeline Latest Attachments" -A all-QC-summary-stats-per-site.csv -A all-QC-summary-stats-per-patient.csv -A all-processed-accounting.csv -A all-processed-warnings.csv -A all-SOP-warnings.csv "$summary_email_list" < all_pipeline_update_email.txt

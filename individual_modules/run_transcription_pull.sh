@@ -121,7 +121,7 @@ for p in *; do # loop over all patients in the specified study folder on PHOENIX
 			# get total number pulled this round to put into header
 			num_pulled=$(find . -maxdepth 1 -name "done+*" -printf '.' | wc -m)
 			echo "" >> "$repo_root"/transcript_lab_email_body.txt 
-			echo "Participant ${p} Open Interview Transcripts Newly Completed/Processed (${num_pulled} Total) - " >> "$repo_root"/transcript_lab_email_body.txt 
+			echo "Participant ${p} Open Interview Transcripts Newly Completed (${num_pulled} Total) - " >> "$repo_root"/transcript_lab_email_body.txt 
 			# loop through files that have been pulled to append the names to email list
 			shopt -s nullglob # if there are no "done" files, this will keep it from running empty loop
 			for file in done+*; do 
@@ -184,7 +184,7 @@ for p in *; do # loop over all patients in the specified study folder on PHOENIX
 			# get total number pulled this round to put into header
 			num_pulled=$(find . -maxdepth 1 -name "done+*" -printf '.' | wc -m)
 			echo "" >> "$repo_root"/transcript_lab_email_body.txt 
-			echo "Participant ${p} Psychs Interview Transcripts Newly Completed/Processed (${num_pulled} Total) - " >> "$repo_root"/transcript_lab_email_body.txt 
+			echo "Participant ${p} Psychs Interview Transcripts Newly Completed (${num_pulled} Total) - " >> "$repo_root"/transcript_lab_email_body.txt 
 			# loop through files that have been pulled to append the names to email list
 			shopt -s nullglob # if there are no "done" files, this will keep it from running empty loop
 			for file in done+*; do 

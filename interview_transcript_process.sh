@@ -157,6 +157,12 @@ echo ""
 # similarly will send the email about transcripts remaining to be reviewed
 if [[ -e ${repo_root}/site_review_email_body.txt ]]; then
 	echo "Emailing review prompt to site"
+	# first add additional context to the email
+	echo "" >> "$repo_root"/site_review_email_body.txt
+	echo "These files are in Box under the 'for review' subfolder of transcripts, which can be found in your site interviews folder. Please review each file for redaction correctness, ensuring all (and only) words that should be redacted are encased in curly braces." >> "$repo_root"/site_review_email_body.txt
+	echo "In order for your review to register as complete so that the transcript can finish processing, you must then move the transcript text file (with filename unchanged!) into the appropriate part of the 'approved' subfolder you will find in Box, also under 'transcripts'. This means that each completed transcript should be placed directly under the subfolder for the corresponding subject ID that is found in 'approved'." >> "$repo_root"/site_review_email_body.txt
+	echo "If you have additional questions, please see the SOP." >> "$repo_root"/site_review_email_body.txt
+	# now can send
 	mail -s "[Action Required] ${server_version} Interview Pipeline Transcripts to Review" "$site_email_list" < "$repo_root"/site_review_email_body.txt
 	mv "$repo_root"/site_review_email_body.txt "$repo_root"/logs/"$study"/emails_sent/site_review_email_body_"$log_timestamp".txt
 else

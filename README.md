@@ -95,7 +95,7 @@ Finally, the video side of the pipeline can again be run using the same settings
 
 	bash interview_video_process.sh example_config.sh
 
-For use on Pronet, config files are already generated for each site in the Pronet_site_configs subfolder, and can be edited as needed. The all_sites_cron_script.sh runs the audio, transcript, and video sides of the pipeline for each of these configs, used for running the code across sites (currently on the Pronet dev server at 2pm daily).
+For use on Pronet, config files are already generated for each site in the Pronet_site_configs subfolder, and can be edited as needed. The all_sites_cron_script.sh runs the audio, transcript, and video sides of the pipeline for each of these configs, used for running the code across sites (currently on the Pronet production server for initial site YA at 2pm daily, and on the Pronet development server for all sites at 3pm daily).
 
 ##### Architecture Diagram <a name="diagram"></a>
 Each major step is initiated by the pipeline using a script in the individual_modules folder, see this folder if specific steps need to be run independently. 
@@ -155,7 +155,7 @@ We connect to the TranscribeMe server via SFTP. The pySFTP python package, a wra
 
 The account password is input using a temporary environment variable. It was previously prompted for using read -s upon each run of the code, but for the purposes of automatic scheduled jobs, the password may now be stored in a hidden file with restricted permissions on a PROTECTED portion of our machine instead. Anyone who could access this file necessarily must also have access to the raw files themselves, so use of the TranscribeMe password would provide no additional benefit. 
 
-Note that once the transcript side of the pipeline has detected a returned transcript on this SFTP server, the corresponding uploaded audio is deleted by our code on TranscribeMe's end using the same SFTP package. 
+Note that once the transcript side of the pipeline has detected a returned transcript on this SFTP server, the corresponding uploaded audio is deleted by our code on TranscribeMe's end using the same SFTP package. TranscribeMe also automatically deletes files on their server (including the transcripts this code moves to "archive" subfolders) after a certain amount of time has passed.  
 
 </details>
 
@@ -172,7 +172,7 @@ The major steps of the transcript side of the pipeline are:
 7. Compute transcript QC stats across the redacted transcripts
 8. Send email listing all the transcripts that were successfully pulled from TranscribeMe and those still awaiting transcription, as well as the transcripts newly returned from manual review by sites 
 
-Note that the Box/Mediaflux push described in step 3 is done by separate code written by the Pronet/Prescient teams respectively (latter remains to be implemented). The return of reviewed transcripts is handled by Lochness. Sites will go through any transcripts sent to them, mark any PII missed by TranscribeMe with curly braces (per TranscribeMe convention), and move to a folder indicating completed review (which Lochness can then pull from). Currently the code sends all transcripts for review by sites, but per the U24 SOP the code will eventually be updated to send a random subset only for review. Anything not sent for review will immediatly undergo steps 5 and on. 
+Note that the Box/Mediaflux push described in step 3 is done by separate code written by the Pronet/Prescient teams respectively (Pronet version is on a daily dev+prod cron at 4pm, Prescient remains to be implemented). The return of reviewed transcripts is handled by Lochness. Sites will go through any transcripts sent to them, mark any PII missed by TranscribeMe with curly braces (per TranscribeMe convention), and move to a folder indicating completed review (which Lochness can then pull from). Currently the code sends all transcripts for review by sites, but per the U24 SOP the code will eventually be updated to send a random subset only for review. Anything not sent for review will immediatly undergo steps 5 and on. Transcripts that have been succesfully transferred to Box for site review will be kept by the transfer code in a "completed" subfolder indefinitely, which is what will be referred to in determining whether a site is still in the mandatory manual review phase or not. 
 
 <details>
 	<summary>The primary outputs of this side of the pipeline include the transcripts at various stages of processing, as well as the final derived QC measures, as detailed here:</summary>
@@ -331,15 +331,15 @@ Test data collection has begun across sites, awaiting real data collection. The 
 This code has been running autonomously on the Pronet development server since early February 2022. Only a minority of sites have correctly added properly formatted interviews to Box and registered the corresponding subject ID in REDCap, but the code has worked well in those cases.
 
 <details>
-	<summary>Details on site mock interview status as of 5/9/2022:</summary>
+	<summary>Details on site mock interview status as of 5/17/2022:</summary>
 
 Sites that have successfully had some data processed - 
 * PronetLA, PronetYA, PronetNN, and PronetWU have had an interview make it all the way through the pipeline.
-	* In the case of PronetYA, three interviews have gone through the pipeline.
+	* In the case of PronetYA, three interviews have gone through the dev pipeline, and one through a mock test of production.
 	* In the case of PronetLA, two interviews have gone through the pipeline.
 	* All other sites with any processing have done a single interview.
 * PronetCA, PronetSF, PronetPI, PronetOR, PronetSI, PronetGA, PronetMT, PronetMA, PronetPA, and PronetTE have had transcripts returned by TranscribeMe, but have not yet correctly completed the manual redaction review process.
-	* PronetOR, PronetSF, PronetCA, and PronetMT have put the reviewed transcript in the wrong spot on Box.
+	* PronetOR, PronetSF, PronetCA, PronetPA, and PronetMT have put the reviewed transcript in the wrong spot on Box.
 	* The others don't seem to have attempted to transfer an approved transcript at all.
 
 As mentioned there are other sites that have tried to put interviews in Box but there were issues that prevented them from being processed -
@@ -347,7 +347,8 @@ As mentioned there are other sites that have tried to put interviews in Box but 
 	* PronetIR, PronetKC, and PronetPV all fall into this category due to lack of a correct subject ID registered to REDCap.
 * There have also been cases of interviews pulled by Lochness but with naming issues that prevented this code from recognizing them (the files within the Zoom folder should not be renamed by sites!). 
 	* PronetHA incorrectly renamed the audio file only, so the video part of the interview has been QCed but the audio has not yet been processed.
-	* PronetNC incorrectly renamed all files, so it has not been processed at all.
+	* PronetNC and PronetSD incorrectly renamed video and audio files, so it has not been processed at all.
+	* PronetNL incorrectly renamed the Zoom folder, removing the timestamp information, so it has not been processed at all
 
 All sites should have a test interview complete processing, in order to ensure that everyone understands the data collection procedures and has functioning equipment. There are also a few things in particular that really should still be tested - 
 * There has not yet been a non-English test audio fully processed.
@@ -364,7 +365,7 @@ All sites should have a test interview complete processing, in order to ensure t
 
 </details>
 
-Dependencies have been installed on the Pronet production server, but testing there remain to be ironed out. Note dev testing will continue in parallel to prod testing, to cover sites that haven't thoroughly done their testing yet.
+Code has been installed on the Pronet production server, and the first successful test with mock subject YA00037 has been completed. Note dev testing will continue in parallel to prod testing, to cover sites that haven't thoroughly done their testing yet.
 
 As far as real data collection timeline, some sites may be able to begin soon, but others remain months away - need to figure out more about this as summer approaches. There are some deadlines being imposed by NIMH, but it is also not clear how quickly this pipeline needs to launch after data collection starts. There will always be some gap between upload and outputs being available anyway, because of the time it takes to manually transcribe.
 
@@ -431,6 +432,7 @@ For the existing protocols, it is an ongoing issue to ensure that sites are awar
 <details>
 	<summary>There are also some details that need to be verified on our end still in order to make some final decisions about the code:</summary>
 
+* Confirm exactly what the SOP is for videos! How many faces should be in frame?
 * Need to review redaction guidelines with TranscribeMe and ensure they are not being over the top aggressive with redaction (but also careful not to miss anything that is obvious PII)
 * It turns out we are only receiving turn-level timestamps and they likely won't be of higher resolution (although it is less useful with turns anyway). So we should be more careful overall going forward to make sure eveyrone is on the same page about all expectations and the protocol for when mistakes happen, before moving into production
 * Also still waiting on TranscribeMe to answer about the verbatim transcription conventions in other languages. Need to confirm what will be different (at the very least I would expect markings like "inaudible" to be different)

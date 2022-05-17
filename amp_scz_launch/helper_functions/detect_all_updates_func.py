@@ -26,7 +26,7 @@ def all_updates_email(output_root):
 	try:
 		summary_stat_df = pd.read_csv(os.path.join(output_root,"all-QC-summary-stats.csv"))
 	except:
-		summary_stat_df = pd.DataFrame(columns=["interview_type","summary_group","computed_date"])
+		summary_stat_df = pd.DataFrame(columns=["interview_type","summary_group","computed_date","subjectID","siteID"])
 	# don't actually need the accounting df, that part will be attached to email but not needed in the body construction - so just move on to warnings dfs
 	try:
 		warning_df = pd.read_csv(os.path.join(output_root,"all-processed-warnings.csv"))
@@ -128,6 +128,23 @@ def all_updates_email(output_root):
 			for cur_site in sites_list:
 				fa.write("\n")
 				fa.write(cur_site)
+
+	# before exiting, put together the summary stat DFs split by site versus patient for more clarity in the attachments email
+	summary_stat_df_sites = summary_stat_df[summary_stat_df["summary_group"] == "site"]
+	summary_stat_df_sites.drop(columns=["subjectID","summary_group"], inplace=True)
+	summary_stat_df_sites.sort_values(by=["computed_date"], ascending=False, inplace=True) # sort by the date so the first kept duplciate will be latest
+	summary_stat_df_sites.drop_duplicates(subset=["siteID","interview_type"], inplace=True)
+	summary_stat_df_patients = summary_stat_df[summary_stat_df["summary_group"] == "patient"] # for the patient one there won't be as many duplicates, but still could be some!
+	# obviously don't drop subjectID, instead treat site ID this way - otherwise repeating above
+	summary_stat_df_patients.drop(columns=["siteID","summary_group"], inplace=True)
+	summary_stat_df_patients.sort_values(by=["computed_date"], ascending=False, inplace=True) # sort by the date so the first kept duplciate will be latest
+	summary_stat_df_patients.drop_duplicates(subset=["subjectID","interview_type"], inplace=True)
+
+	# now actually save
+	summary_stat_df_sites.reset_index(drop=True, inplace=True)
+	summary_stat_df_patients.reset_index(drop=True, inplace=True)
+	summary_stat_df_sites.to_csv(os.path.join(output_root,"all-QC-summary-stats-per-site.csv"), index=False)
+	summary_stat_df_patients.to_csv(os.path.join(output_root,"all-QC-summary-stats-per-patient.csv"), index=False)
 
 	return
 	

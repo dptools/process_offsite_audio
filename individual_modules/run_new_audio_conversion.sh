@@ -49,7 +49,21 @@ for p in *; do
 	if [[ -d "$p"/interviews/open ]]; then
 		cd "$p"/interviews/open
 		for folder in *; do
-			# escape spaces and other issues in folder name
+			# get metadata info for checking basic conventions before proceeding
+			cur_f_date=$(echo "$folder" | awk -F ' ' '{print $1}') 
+			cur_f_time=$(echo "$folder" | awk -F ' ' '{print $2}')
+
+			# check folder name a bit more closely - lengths should be set a particular way
+			if [[ ${#cur_f_date} != 10 ]]; then
+				echo "(open offsite interview ${folder} does not have a properly formatted Zoom folder name)"
+				continue
+			fi
+			if [[ ${#cur_f_time} != 8 ]]; then
+				echo "(open offsite interview ${folder} does not have a properly formatted Zoom folder name)"
+				continue
+			fi
+
+			# escape spaces and other issues in folder name before having to do stuff with path
 			folder_formatted=$(printf %q "$folder")
 
 			# need to use eval along with the %q command
@@ -167,6 +181,20 @@ for p in *; do
 				fi
 
 				# done with file for now if it is a standalone onsite 
+				continue
+			fi
+
+			# get metadata info for checking basic conventions before proceeding
+			cur_f_date=$(echo "$folder" | awk -F ' ' '{print $1}') 
+			cur_f_time=$(echo "$folder" | awk -F ' ' '{print $2}')
+
+			# check folder name a bit more closely - lengths should be set a particular way
+			if [[ ${#cur_f_date} != 10 ]]; then
+				echo "(psychs offsite interview ${folder} does not have a properly formatted Zoom folder name)"
+				continue
+			fi
+			if [[ ${#cur_f_time} != 8 ]]; then
+				echo "(psychs offsite interview ${folder} does not have a properly formatted Zoom folder name)"
 				continue
 			fi
 

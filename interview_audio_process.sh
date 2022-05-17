@@ -101,7 +101,7 @@ for p in *; do
 
 	# now need to make sure processed folders are setup for this patient in both PROTECTED and GENERAL
 	# need patient folder under processed, and then also need interviews folder under patient (and psychs/open under interviews)
-	# TODO - confirm desired folder permissions situation here, add appropriate checks if needed here and in the other top level bash script (or delete if that's fine!)
+	# TODO - confirm desired folder permissions situation here for prod, add appropriate checks if needed (also in the other top level bash scripts), or could potentially delete this section
 	if [[ ! -d ${data_root}/PROTECTED/${study}/processed/${p} ]]; then
 		mkdir "$data_root"/PROTECTED/"$study"/processed/"$p"
 	fi
@@ -134,7 +134,6 @@ for p in *; do
 	# especially because when it is run with auto send off, a to_send folder will be left that someone may forget about, could inadvertently send a backlog later
 	# so solution for now is just to exit the script if there are preexisting to_send files for this study
 	# then let user know the outstanding files should be dealt with outside of the main pipeline
-	# TODO: write some instructions about this part in the README
 	if [ $auto_send_on = "Y" ] || [ $auto_send_on = "y" ]; then
 		if [[ -d "$data_root"/PROTECTED/"$study"/processed/"$p"/interviews/open/audio_to_send ]]; then 
 			# know to_send exists for this patient now, so need it to be empty to continue the script

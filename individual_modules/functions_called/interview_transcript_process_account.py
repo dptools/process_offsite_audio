@@ -219,7 +219,7 @@ def interview_transcript_account(interview_type, data_root, study, ptID, languag
 		prev_account.loc[prev_account["redacted_transcript_filename"]==redacted_name, "transcript_processed_accounting_date"] = today_str
 
 		# finally just have to check encoding to update that record
-		redacted_path = "../" + redacted_name
+		redacted_path = os.path.join(data_root, "GENERAL", study, "processed", ptID, "interviews", interview_type, "transcripts", redacted_name)
 		with open(redacted_path, 'rb') as fd:
 			ascii_bool = fd.read().isascii()
 		if ascii_bool:
