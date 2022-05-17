@@ -43,7 +43,7 @@ chgrp -R pronet /mnt/ProNET/Lochness/PHOENIX/*/*/processed/*/interviews
 chgrp -R pronet /mnt/ProNET/Lochness/PHOENIX/PROTECTED/box_transfer
 
 # finally run the utility for stats combined across sites
-bash /opt/software/process_offsite_audio/amp_scz_launch/final_all_sites_utility.sh /mnt/ProNET/Lochness/PHOENIX "mennis2@partners.org" PronetProduction
+bash /opt/software/process_offsite_audio/amp_scz_launch/final_all_sites_utility.sh /mnt/ProNET/Lochness/PHOENIX "mennis2@partners.org,pwolff514@gmail.com" PronetProduction
 
 # and make sure logs are readable!
 chgrp -R pronet /opt/software/process_offsite_audio/logs

@@ -27,7 +27,7 @@ export auto_send_limit_bool
 
 # settings for automatic email, again only relevant if auto transcription is on
 # first addresses for the more thorough updates on most recent files
-lab_email_list="mennis2@partners.org" # pwolff514@gmail.com
+lab_email_list="mennis2@partners.org,pwolff514@gmail.com"
 # then addresses to send the site review notification to
 site_email_list="mennis2@partners.org"
 # finally should also supply current server label (mainly for dev versus prod)
