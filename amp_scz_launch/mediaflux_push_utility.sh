@@ -28,7 +28,7 @@ exec 2> >(tee -ia "$repo_root"/logs/MediaFlux/"$cur_date".txt >&2)
 
 # TODO: 
 # echo to logs
-# run python functions from func_root to do the actual mediaflux push, using dataroot, username, and password information (mediaflux_password)
+# run python functions from func_root to do the actual mediaflux push (to be implemented), using dataroot, username, and password information (use mediaflux_password)
 
 # TODO: make sure this gets called appropriately from the prescient cron script(s)! will be once at the end and handle across sites that way
 

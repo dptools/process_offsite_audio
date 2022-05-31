@@ -48,3 +48,5 @@ sudo chgrp -R prescient /mnt/prescient/Prescient_data_sync/PHOENIX/PROTECTED/box
 
 # finally run the utility for stats combined across sites
 bash /home/cho/soft/process_offsite_audio/amp_scz_launch/final_all_sites_utility.sh /mnt/prescient/Prescient_data_sync/PHOENIX mennis2@partners.org PrescientDev
+
+# this is development cron script - some TODOs remain for this implementation as well as site testing (see docs) before production parts can be implemented
