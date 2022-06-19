@@ -2,7 +2,8 @@
 
 # need to ensure that my account can write to processed folders, because Lochness does not always create the interview subfolders for a subject ID (needs to be one in GENERAL and PROTECTED)
 # this is just a workaround for the dev server right now, for production we need to figure out an actual structure for file permissions
-sudo chmod -R 770 /mnt/prescient/Prescient_data_sync/PHOENIX/*/*/processed
+chmod -R 770 /mnt/prescient/Prescient_data_sync/PHOENIX/*/*/processed
+# needed to drop sudo though to prevent asking for password from stalling the cron. hopefully it works fine anyways!
 
 # activate python environment
 . /home/cho/miniconda3/etc/profile.d/conda.sh
@@ -42,9 +43,9 @@ done
 
 # at the end of the processing, make sure that all processed interview outputs are in the pronet group, so they can be appropriately synced back to datalake
 # this is also a temporary workaround for dev server
-sudo chgrp -R prescient /mnt/prescient/Prescient_data_sync/PHOENIX/*/*/processed/*
+chgrp -R prescient /mnt/prescient/Prescient_data_sync/PHOENIX/*/*/processed/*
 # similarly make sure for the box transfer folder!
-sudo chgrp -R prescient /mnt/prescient/Prescient_data_sync/PHOENIX/PROTECTED/box_transfer
+chgrp -R prescient /mnt/prescient/Prescient_data_sync/PHOENIX/PROTECTED/box_transfer
 
 # finally run the utility for stats combined across sites
 bash /home/cho/soft/process_offsite_audio/amp_scz_launch/final_all_sites_utility.sh /mnt/prescient/Prescient_data_sync/PHOENIX mennis2@partners.org PrescientDev "yes"
