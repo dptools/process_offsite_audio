@@ -9,7 +9,7 @@ sudo chmod -R 770 /mnt/prescient/Prescient_data_sync/PHOENIX/*/*/processed
 conda activate audio_process
 
 # run audio side code for each config
-for file in /home/cho/soft/process_offsite_audio/amp_scz_launch/dev_testing_pronet_site_configs/*.sh; do
+for file in /home/cho/soft/process_offsite_audio/amp_scz_launch/dev_testing_prescient_site_configs/*.sh; do
 	bash /home/cho/soft/process_offsite_audio/interview_audio_process.sh "$file"
 	# add spacing for when monitoring logs in real time
 	echo ""
@@ -17,7 +17,7 @@ for file in /home/cho/soft/process_offsite_audio/amp_scz_launch/dev_testing_pron
 done
 
 # run transcript side code for each config
-for file in /home/cho/soft/process_offsite_audio/amp_scz_launch/dev_testing_pronet_site_configs/*.sh; do
+for file in /home/cho/soft/process_offsite_audio/amp_scz_launch/dev_testing_prescient_site_configs/*.sh; do
 	bash /home/cho/soft/process_offsite_audio/interview_transcript_process.sh "$file"
 	# add spacing for when monitoring logs in real time
 	echo ""
@@ -25,7 +25,7 @@ for file in /home/cho/soft/process_offsite_audio/amp_scz_launch/dev_testing_pron
 done
 
 # run video code for each config
-for file in /home/cho/soft/process_offsite_audio/amp_scz_launch/dev_testing_pronet_site_configs/*.sh; do
+for file in /home/cho/soft/process_offsite_audio/amp_scz_launch/dev_testing_prescient_site_configs/*.sh; do
 	bash /home/cho/soft/process_offsite_audio/interview_video_process.sh "$file"
 	# add spacing for when monitoring logs in real time
 	echo ""
@@ -33,7 +33,7 @@ for file in /home/cho/soft/process_offsite_audio/amp_scz_launch/dev_testing_pron
 done
 
 # run accounting summary compilation for each config
-for file in /home/cho/soft/process_offsite_audio/amp_scz_launch/dev_testing_pronet_site_configs/*.sh; do
+for file in /home/cho/soft/process_offsite_audio/amp_scz_launch/dev_testing_prescient_site_configs/*.sh; do
 	bash /home/cho/soft/process_offsite_audio/interview_summary_checks.sh "$file"
 	# add spacing for when monitoring logs in real time
 	echo ""
@@ -48,5 +48,7 @@ sudo chgrp -R prescient /mnt/prescient/Prescient_data_sync/PHOENIX/PROTECTED/box
 
 # finally run the utility for stats combined across sites
 bash /home/cho/soft/process_offsite_audio/amp_scz_launch/final_all_sites_utility.sh /mnt/prescient/Prescient_data_sync/PHOENIX mennis2@partners.org PrescientDev
+
+# note Kevin's code now handles the Mediaflux push, so that is not needed here!
 
 # this is development cron script - some TODOs remain for this implementation as well as site testing (see docs) before production parts can be implemented
