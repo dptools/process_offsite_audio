@@ -4,6 +4,7 @@
 data_root="$1"
 summary_email_list="$2"
 server_version="$3"
+mail_attach="$4"
 
 # get absolute path to dir script is being run from, to save history of emails in logs and find relevant functions
 full_path=$(realpath $0)
@@ -52,4 +53,8 @@ echo "Note described attachments are being sent in a separate email (these and p
 mail -s "[${server_version}] Interview Pipeline Daily Stats Email"  "$summary_email_list" < all_pipeline_update_email.txt
 mail -s "[${server_version}] Interview Pipeline Daily Warnings Email" "$summary_email_list" < all_warning_update_email.txt
 # inputting the txt file here even though it won't show up in the email body, just to prevent command from stalling looking for a cc
-mail -s "[${server_version}] Interview Pipeline Latest Attachments" -A all-QC-summary-stats-per-site.csv -A all-QC-summary-stats-per-patient.csv -A all-processed-accounting.csv -A all-processed-warnings.csv -A all-SOP-warnings.csv "$summary_email_list" < all_pipeline_update_email.txt
+if [[ -z ${mail_attach} ]]; then 
+	mail -s "[${server_version}] Interview Pipeline Latest Attachments" -A all-QC-summary-stats-per-site.csv -A all-QC-summary-stats-per-patient.csv -A all-processed-accounting.csv -A all-processed-warnings.csv -A all-SOP-warnings.csv "$summary_email_list" < all_pipeline_update_email.txt
+else # prescient has a different version of the mail command!
+	mail -s "[${server_version}] Interview Pipeline Latest Attachments" -a all-QC-summary-stats-per-site.csv -a all-QC-summary-stats-per-patient.csv -a all-processed-accounting.csv -a all-processed-warnings.csv -a all-SOP-warnings.csv "$summary_email_list" < all_pipeline_update_email.txt
+fi

@@ -47,7 +47,7 @@ sudo chgrp -R prescient /mnt/prescient/Prescient_data_sync/PHOENIX/*/*/processed
 sudo chgrp -R prescient /mnt/prescient/Prescient_data_sync/PHOENIX/PROTECTED/box_transfer
 
 # finally run the utility for stats combined across sites
-bash /home/cho/soft/process_offsite_audio/amp_scz_launch/final_all_sites_utility.sh /mnt/prescient/Prescient_data_sync/PHOENIX mennis2@partners.org PrescientDev
+bash /home/cho/soft/process_offsite_audio/amp_scz_launch/final_all_sites_utility.sh /mnt/prescient/Prescient_data_sync/PHOENIX mennis2@partners.org PrescientDev "yes"
 
 # note Kevin's code now handles the Mediaflux push, so that is not needed here!
 
