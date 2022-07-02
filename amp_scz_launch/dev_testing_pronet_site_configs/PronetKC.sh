@@ -27,7 +27,7 @@ export auto_send_limit_bool
 
 # settings for automatic email, again only relevant if auto transcription is on
 # first addresses for the more thorough updates on most recent files
-lab_email_list="mennis2@partners.org,philip.wolff@yale.edu"
+lab_email_list="mennis2@partners.org,philip.wolff@yale.edu,jtbaker@partners.org"
 # then addresses to send the site review notification to
 site_email_list="mennis2@partners.org,amedeo.minichino@kcl.ac.uk,sarah.c.kerins@kcl.ac.uk,andrea.de_micheli@kcl.ac.uk"
 # finally should also supply current server label (mainly for dev versus prod)
