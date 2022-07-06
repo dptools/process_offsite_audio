@@ -135,8 +135,8 @@ def interview_mono_qc(interview_type, data_root, study, ptID):
 	os.chdir(os.path.join(data_root, "GENERAL", study, "processed", ptID, "interviews", interview_type))
 
 	# now save CSV
-	# convention for U24 DPDash is different, so study name in the DPDash CSV name needs to always just be avlqc identifier here
-	output_path_format = "avlqc"+"-"+ptID+"-interviewMonoAudioQC_" + interview_type + "-day*.csv"
+	# convention for U24 DPDash is different, so study name in the DPDash CSV name needs to always just be last two digits of the study ID here
+	output_path_format = study[-2:]+"-"+ptID+"-interviewMonoAudioQC_" + interview_type + "-day*.csv"
 	output_paths = glob.glob(output_path_format)
 	# single existing DPDash file is expected - do concatenation and then delete old version (since naming convention will not overwrite)
 	if len(output_paths) == 1:
@@ -146,16 +146,16 @@ def interview_mono_qc(interview_type, data_root, study, ptID):
 		# drop any duplicates in case audio got decrypted a second time - shouldn't happen via pipeline
 		join_csv.drop_duplicates(subset=["patient", "day", "timeofday"],inplace=True)
 		join_csv.sort_values(by=["day","timeofday"],inplace=True) # make sure concatenated CSV is still sorted primarily by day number and secondarily by time
-		# study name in the DPDash CSV name needs to always just be avlqc identifier here
-		output_path_cur = "avlqc" + "-" + ptID + "-interviewMonoAudioQC_" + interview_type + "-day" + str(join_csv["day"].tolist()[0]) + "to" + str(join_csv["day"].tolist()[-1]) + '.csv'
+		# study name in the DPDash CSV name needs to always just be last two digits of the study ID here
+		output_path_cur = study[-2:] + "-" + ptID + "-interviewMonoAudioQC_" + interview_type + "-day" + str(join_csv["day"].tolist()[0]) + "to" + str(join_csv["day"].tolist()[-1]) + '.csv'
 		join_csv.to_csv(output_path_cur,index=False)
 		return # function is now done if we are in the single existing dp dash case
 	# print warning if more than 1 for this patient
 	if len(output_paths) > 1:
 		print("Warning - multiple DPDash CSVs exist for patient " + ptID + ". Saving current CSV separately for now")
 	# with 0 or more than 1, just save this as is
-	# study name in the DPDash CSV name needs to always just be avlqc identifier here
-	output_path_cur = "avlqc" + "-" + ptID + "-interviewMonoAudioQC_" + interview_type + "-day" + str(study_days[0]) + "to" + str(study_days[-1]) + '.csv'
+	# study name in the DPDash CSV name needs to always just be last two digits of the study ID here
+	output_path_cur = study[-2:] + "-" + ptID + "-interviewMonoAudioQC_" + interview_type + "-day" + str(study_days[0]) + "to" + str(study_days[-1]) + '.csv'
 	new_csv.to_csv(output_path_cur,index=False)
 	
 	# if reach the end, exit with code indicating there was no problem
