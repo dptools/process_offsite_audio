@@ -6,7 +6,8 @@ chmod -R 770 /mnt/prescient/Prescient_data_sync/PHOENIX/*/*/processed
 # needed to drop sudo though to prevent asking for password from stalling the cron. hopefully it works fine anyways!
 
 # activate python environment
-. /home/cho/miniconda3/etc/profile.d/conda.sh
+source ~/.bash_profile
+source /home/cho/miniconda3/etc/profile.d/conda.sh
 conda activate audio_process
 
 # run audio side code for each config
@@ -46,6 +47,8 @@ done
 chgrp -R prescient /mnt/prescient/Prescient_data_sync/PHOENIX/*/*/processed/*
 # similarly make sure for the box transfer folder!
 chgrp -R prescient /mnt/prescient/Prescient_data_sync/PHOENIX/PROTECTED/box_transfer
+#final permissions update
+chmod -R 770 /mnt/prescient/Prescient_data_sync/PHOENIX/*/*/processed
 
 # finally run the utility for stats combined across sites
 bash /home/cho/soft/process_offsite_audio/amp_scz_launch/final_all_sites_utility.sh /mnt/prescient/Prescient_data_sync/PHOENIX mennis2@partners.org PrescientDev "yes"

@@ -149,6 +149,7 @@ def interview_mono_qc(interview_type, data_root, study, ptID):
 		# study name in the DPDash CSV name needs to always just be avlqc identifier here
 		output_path_cur = "avlqc" + "-" + ptID + "-interviewMonoAudioQC_" + interview_type + "-day" + str(join_csv["day"].tolist()[0]) + "to" + str(join_csv["day"].tolist()[-1]) + '.csv'
 		join_csv.to_csv(output_path_cur,index=False)
+		os.remove(output_paths[0])
 		return # function is now done if we are in the single existing dp dash case
 	# print warning if more than 1 for this patient
 	if len(output_paths) > 1:

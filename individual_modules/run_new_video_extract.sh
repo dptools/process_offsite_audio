@@ -96,35 +96,59 @@ for p in *; do
 					mkdir ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"
 					dur=$(echo `ffprobe "$file" 2>&1 | grep Duration | awk -F ' ' '{print $2}' | sed s/,//`)
 					hours=$(echo "$dur" | awk -F ':' '{print $1}')
-					for hr in $(seq 0 $hours); do
-						# if a minute doesn't exist in the hour ffmpeg will fail that command, but no effect on the greater pipeline so it is easiest to let it just proceed this way
-						# this is assuming a video will not hit 10+ hours, which seems reasonable
-						# offset first frame by 1 second to avoid capturing possible empty screen at very beginning of recording
-						# takes frame every 4 minutes now
-						ffmpeg -ss 0"$hr":00:01 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute00.jpg &> /dev/null
-						ffmpeg -ss 0"$hr":04:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute04.jpg &> /dev/null
-						ffmpeg -ss 0"$hr":08:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute08.jpg &> /dev/null
-						ffmpeg -ss 0"$hr":12:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute12.jpg &> /dev/null
-						ffmpeg -ss 0"$hr":16:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute16.jpg &> /dev/null
-						ffmpeg -ss 0"$hr":20:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute20.jpg &> /dev/null
-						ffmpeg -ss 0"$hr":24:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute24.jpg &> /dev/null
-						ffmpeg -ss 0"$hr":28:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute28.jpg &> /dev/null
-						ffmpeg -ss 0"$hr":32:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute32.jpg &> /dev/null
-						ffmpeg -ss 0"$hr":36:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute36.jpg &> /dev/null
-						ffmpeg -ss 0"$hr":40:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute40.jpg &> /dev/null
-						ffmpeg -ss 0"$hr":44:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute44.jpg &> /dev/null
-						ffmpeg -ss 0"$hr":48:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute48.jpg &> /dev/null
-						ffmpeg -ss 0"$hr":52:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute52.jpg &> /dev/null
-						ffmpeg -ss 0"$hr":56:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute56.jpg &> /dev/null
-					done
-
 					# initialize txt files for email bodies too if this is a pipeline call, as we have found a new video to process for the site
 					if [[ $pipeline = "Y" ]]; then
+						for hr in $(seq 0 $hours); do
+							# save log with unique timestamp (unix seconds - will be dif than current pipeline run but fine for our uses)
+							log_timestamp_ffmpeg=`date +%s`
+							# if a minute doesn't exist in the hour ffmpeg will fail that command, but no effect on the greater pipeline so it is easiest to let it just proceed this way
+							# this is assuming a video will not hit 10+ hours, which seems reasonable
+							# offset first frame by 1 second to avoid capturing possible empty screen at very beginning of recording
+							# takes frame every 4 minutes now
+							ffmpeg -ss 0"$hr":00:01 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute00.jpg &> "$repo_root"/logs/"$study"/ffmpeg_"$log_timestamp_ffmpeg"+0.txt
+							ffmpeg -ss 0"$hr":04:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute04.jpg &> "$repo_root"/logs/"$study"/ffmpeg_"$log_timestamp_ffmpeg"+4.txt
+							ffmpeg -ss 0"$hr":08:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute08.jpg &> "$repo_root"/logs/"$study"/ffmpeg_"$log_timestamp_ffmpeg"+8.txt
+							ffmpeg -ss 0"$hr":12:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute12.jpg &> "$repo_root"/logs/"$study"/ffmpeg_"$log_timestamp_ffmpeg"+12.txt
+							ffmpeg -ss 0"$hr":16:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute16.jpg &> "$repo_root"/logs/"$study"/ffmpeg_"$log_timestamp_ffmpeg"+16.txt
+							ffmpeg -ss 0"$hr":20:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute20.jpg &> "$repo_root"/logs/"$study"/ffmpeg_"$log_timestamp_ffmpeg"+20.txt
+							ffmpeg -ss 0"$hr":24:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute24.jpg &> "$repo_root"/logs/"$study"/ffmpeg_"$log_timestamp_ffmpeg"+24.txt
+							ffmpeg -ss 0"$hr":28:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute28.jpg &> "$repo_root"/logs/"$study"/ffmpeg_"$log_timestamp_ffmpeg"+28.txt
+							ffmpeg -ss 0"$hr":32:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute32.jpg &> "$repo_root"/logs/"$study"/ffmpeg_"$log_timestamp_ffmpeg"+32.txt
+							ffmpeg -ss 0"$hr":36:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute36.jpg &> "$repo_root"/logs/"$study"/ffmpeg_"$log_timestamp_ffmpeg"+36.txt
+							ffmpeg -ss 0"$hr":40:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute40.jpg &> "$repo_root"/logs/"$study"/ffmpeg_"$log_timestamp_ffmpeg"+40.txt
+							ffmpeg -ss 0"$hr":44:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute44.jpg &> "$repo_root"/logs/"$study"/ffmpeg_"$log_timestamp_ffmpeg"+44.txt
+							ffmpeg -ss 0"$hr":48:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute48.jpg &> "$repo_root"/logs/"$study"/ffmpeg_"$log_timestamp_ffmpeg"+48.txt
+							ffmpeg -ss 0"$hr":52:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute52.jpg &> "$repo_root"/logs/"$study"/ffmpeg_"$log_timestamp_ffmpeg"+52.txt
+							ffmpeg -ss 0"$hr":56:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute56.jpg &> "$repo_root"/logs/"$study"/ffmpeg_"$log_timestamp_ffmpeg"+56.txt
+						done
 						# it is okay to just redo this every time since it will restart the file, all the other updates come way downstream
 						echo "Video Processing Updates for ${study}:" > "$repo_root"/video_lab_email_body.txt
 						echo "If any processing errors are encountered they will be included at the top of this message. All successfully processed interview videos are then listed." >> "$repo_root"/video_lab_email_body.txt
 						echo "" >> "$repo_root"/video_lab_email_body.txt
 						touch "$repo_root"/video_temp_process_list.txt # also make sure this file exists for putting together final email
+					else
+						for hr in $(seq 0 $hours); do
+							# if a minute doesn't exist in the hour ffmpeg will fail that command, but no effect on the greater pipeline so it is easiest to let it just proceed this way
+							# this is assuming a video will not hit 10+ hours, which seems reasonable
+							# offset first frame by 1 second to avoid capturing possible empty screen at very beginning of recording
+							# takes frame every 4 minutes now
+							ffmpeg -ss 0"$hr":00:01 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute00.jpg &> /dev/null
+							ffmpeg -ss 0"$hr":04:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute04.jpg &> /dev/null
+							ffmpeg -ss 0"$hr":08:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute08.jpg &> /dev/null
+							ffmpeg -ss 0"$hr":12:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute12.jpg &> /dev/null
+							ffmpeg -ss 0"$hr":16:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute16.jpg &> /dev/null
+							ffmpeg -ss 0"$hr":20:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute20.jpg &> /dev/null
+							ffmpeg -ss 0"$hr":24:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute24.jpg &> /dev/null
+							ffmpeg -ss 0"$hr":28:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute28.jpg &> /dev/null
+							ffmpeg -ss 0"$hr":32:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute32.jpg &> /dev/null
+							ffmpeg -ss 0"$hr":36:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute36.jpg &> /dev/null
+							ffmpeg -ss 0"$hr":40:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute40.jpg &> /dev/null
+							ffmpeg -ss 0"$hr":44:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute44.jpg &> /dev/null
+							ffmpeg -ss 0"$hr":48:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute48.jpg &> /dev/null
+							ffmpeg -ss 0"$hr":52:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute52.jpg &> /dev/null
+							ffmpeg -ss 0"$hr":56:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/open/video_frames/"$date"+"$time"/hour"$hr"_minute56.jpg &> /dev/null
+							# outside of pipeline we don't care about logging the error
+						done
 					fi
 				fi
 			done
@@ -190,35 +214,59 @@ for p in *; do
 					mkdir ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"
 					dur=$(echo `ffprobe "$file" 2>&1 | grep Duration | awk -F ' ' '{print $2}' | sed s/,//`)
 					hours=$(echo "$dur" | awk -F ':' '{print $1}')
-					for hr in $(seq 0 $hours); do
-						# if a minute doesn't exist in the hour ffmpeg will fail that command, but no effect on the greater pipeline so it is easiest to let it just proceed this way
-						# this is assuming a video will not hit 10+ hours, which seems reasonable
-						# offset first frame by 1 second to avoid capturing possible empty screen at very beginning of recording
-						# takes frame every 4 minutes now
-						ffmpeg -ss 0"$hr":00:01 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute00.jpg &> /dev/null
-						ffmpeg -ss 0"$hr":04:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute04.jpg &> /dev/null
-						ffmpeg -ss 0"$hr":08:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute08.jpg &> /dev/null
-						ffmpeg -ss 0"$hr":12:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute12.jpg &> /dev/null
-						ffmpeg -ss 0"$hr":16:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute16.jpg &> /dev/null
-						ffmpeg -ss 0"$hr":20:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute20.jpg &> /dev/null
-						ffmpeg -ss 0"$hr":24:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute24.jpg &> /dev/null
-						ffmpeg -ss 0"$hr":28:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute28.jpg &> /dev/null
-						ffmpeg -ss 0"$hr":32:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute32.jpg &> /dev/null
-						ffmpeg -ss 0"$hr":36:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute36.jpg &> /dev/null
-						ffmpeg -ss 0"$hr":40:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute40.jpg &> /dev/null
-						ffmpeg -ss 0"$hr":44:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute44.jpg &> /dev/null
-						ffmpeg -ss 0"$hr":48:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute48.jpg &> /dev/null
-						ffmpeg -ss 0"$hr":52:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute52.jpg &> /dev/null
-						ffmpeg -ss 0"$hr":56:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute56.jpg &> /dev/null
-					done
-
 					# initialize txt files for email bodies too if this is a pipeline call, as we have found a new video to process for the site
 					if [[ $pipeline = "Y" ]]; then
+						for hr in $(seq 0 $hours); do
+							# save log with unique timestamp (unix seconds - will be dif than current pipeline run but fine for our uses)
+							log_timestamp_ffmpeg=`date +%s`
+							# if a minute doesn't exist in the hour ffmpeg will fail that command, but no effect on the greater pipeline so it is easiest to let it just proceed this way
+							# this is assuming a video will not hit 10+ hours, which seems reasonable
+							# offset first frame by 1 second to avoid capturing possible empty screen at very beginning of recording
+							# takes frame every 4 minutes now
+							ffmpeg -ss 0"$hr":00:01 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute00.jpg &> "$repo_root"/logs/"$study"/ffmpeg_"$log_timestamp_ffmpeg"+0.txt
+							ffmpeg -ss 0"$hr":04:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute04.jpg &> "$repo_root"/logs/"$study"/ffmpeg_"$log_timestamp_ffmpeg"+4.txt
+							ffmpeg -ss 0"$hr":08:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute08.jpg &> "$repo_root"/logs/"$study"/ffmpeg_"$log_timestamp_ffmpeg"+8.txt
+							ffmpeg -ss 0"$hr":12:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute12.jpg &> "$repo_root"/logs/"$study"/ffmpeg_"$log_timestamp_ffmpeg"+12.txt
+							ffmpeg -ss 0"$hr":16:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute16.jpg &> "$repo_root"/logs/"$study"/ffmpeg_"$log_timestamp_ffmpeg"+16.txt
+							ffmpeg -ss 0"$hr":20:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute20.jpg &> "$repo_root"/logs/"$study"/ffmpeg_"$log_timestamp_ffmpeg"+20.txt
+							ffmpeg -ss 0"$hr":24:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute24.jpg &> "$repo_root"/logs/"$study"/ffmpeg_"$log_timestamp_ffmpeg"+24.txt
+							ffmpeg -ss 0"$hr":28:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute28.jpg &> "$repo_root"/logs/"$study"/ffmpeg_"$log_timestamp_ffmpeg"+28.txt
+							ffmpeg -ss 0"$hr":32:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute32.jpg &> "$repo_root"/logs/"$study"/ffmpeg_"$log_timestamp_ffmpeg"+32.txt
+							ffmpeg -ss 0"$hr":36:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute36.jpg &> "$repo_root"/logs/"$study"/ffmpeg_"$log_timestamp_ffmpeg"+36.txt
+							ffmpeg -ss 0"$hr":40:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute40.jpg &> "$repo_root"/logs/"$study"/ffmpeg_"$log_timestamp_ffmpeg"+40.txt
+							ffmpeg -ss 0"$hr":44:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute44.jpg &> "$repo_root"/logs/"$study"/ffmpeg_"$log_timestamp_ffmpeg"+44.txt
+							ffmpeg -ss 0"$hr":48:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute48.jpg &> "$repo_root"/logs/"$study"/ffmpeg_"$log_timestamp_ffmpeg"+48.txt
+							ffmpeg -ss 0"$hr":52:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute52.jpg &> "$repo_root"/logs/"$study"/ffmpeg_"$log_timestamp_ffmpeg"+52.txt
+							ffmpeg -ss 0"$hr":56:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute56.jpg &> "$repo_root"/logs/"$study"/ffmpeg_"$log_timestamp_ffmpeg"+56.txt
+						done
 						# it is okay to just redo this every time since it will restart the file, all the other updates come way downstream
 						echo "Video Processing Updates for ${study}:" > "$repo_root"/video_lab_email_body.txt
 						echo "If any processing errors are encountered they will be included at the top of this message. All successfully processed interview videos are then listed." >> "$repo_root"/video_lab_email_body.txt
 						echo "" >> "$repo_root"/video_lab_email_body.txt
 						touch "$repo_root"/video_temp_process_list.txt # also make sure this file exists for putting together final email
+					else
+						for hr in $(seq 0 $hours); do
+							# if a minute doesn't exist in the hour ffmpeg will fail that command, but no effect on the greater pipeline so it is easiest to let it just proceed this way
+							# this is assuming a video will not hit 10+ hours, which seems reasonable
+							# offset first frame by 1 second to avoid capturing possible empty screen at very beginning of recording
+							# takes frame every 4 minutes now
+							ffmpeg -ss 0"$hr":00:01 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute00.jpg &> /dev/null
+							ffmpeg -ss 0"$hr":04:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute04.jpg &> /dev/null
+							ffmpeg -ss 0"$hr":08:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute08.jpg &> /dev/null
+							ffmpeg -ss 0"$hr":12:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute12.jpg &> /dev/null
+							ffmpeg -ss 0"$hr":16:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute16.jpg &> /dev/null
+							ffmpeg -ss 0"$hr":20:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute20.jpg &> /dev/null
+							ffmpeg -ss 0"$hr":24:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute24.jpg &> /dev/null
+							ffmpeg -ss 0"$hr":28:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute28.jpg &> /dev/null
+							ffmpeg -ss 0"$hr":32:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute32.jpg &> /dev/null
+							ffmpeg -ss 0"$hr":36:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute36.jpg &> /dev/null
+							ffmpeg -ss 0"$hr":40:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute40.jpg &> /dev/null
+							ffmpeg -ss 0"$hr":44:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute44.jpg &> /dev/null
+							ffmpeg -ss 0"$hr":48:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute48.jpg &> /dev/null
+							ffmpeg -ss 0"$hr":52:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute52.jpg &> /dev/null
+							ffmpeg -ss 0"$hr":56:00 -i "$file" -vframes 1 ../../../../../processed/"$p"/interviews/psychs/video_frames/"$date"+"$time"/hour"$hr"_minute56.jpg &> /dev/null
+							# outside of pipeline we don't care about logging the error
+						done
 					fi
 				fi
 			done

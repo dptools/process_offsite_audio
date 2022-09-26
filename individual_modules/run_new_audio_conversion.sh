@@ -106,11 +106,16 @@ for p in *; do
 					# also only convert if file hasn't already been processed in a previous run
 					# (look for prior output to know - sliding window QC)
 					if [[ ! -e ../../../../../processed/"$p"/interviews/open/temp_audio/"$date"+"$time".wav && ! -e ../../../../../processed/"$p"/interviews/open/sliding_window_audio_qc/"$date"+"$time".csv ]]; then
-						eval ffmpeg -i "$file" ../../../../../processed/"$p"/interviews/open/temp_audio/"$date"+"$time".wav &> /dev/null
 						# initialize txt files for email bodies too if this is a pipeline call, as we have found a new audio to process for the site
 						if [[ $pipeline = "Y" ]]; then
+							# save with unique timestamp (unix seconds - will be dif than current pipeline run but fine for our uses)
+							log_timestamp_ffmpeg=`date +%s`
+							eval ffmpeg -i "$file" ../../../../../processed/"$p"/interviews/open/temp_audio/"$date"+"$time".wav &> "$repo_root"/logs/"$study"/ffmpeg_"$log_timestamp_ffmpeg".txt
 							# it is okay to just redo this every time since it will restart the file, all the other updates come way downstream
 							echo "Audio Processing Updates for ${study}:" > "$repo_root"/audio_lab_email_body.txt
+						else
+							eval ffmpeg -i "$file" ../../../../../processed/"$p"/interviews/open/temp_audio/"$date"+"$time".wav &> /dev/null 
+							# ignore error outside of pipeline
 						fi
 						# now also log to the filename map
 						echo "${data_root}/PROTECTED/${study}/raw/${p}/interviews/open/${folder}/${file}" > ../../../../../processed/"$p"/interviews/open/audio_filename_maps/"$date"+"$time".txt
@@ -128,11 +133,16 @@ for p in *; do
 				# also only convert if file hasn't already been processed in a previous run
 				# (look for prior output to know - sliding window QC)
 				if [[ ! -e ../../../../processed/"$p"/interviews/open/temp_audio/"$date"+"$time".wav && ! -e ../../../../processed/"$p"/interviews/open/sliding_window_audio_qc/"$date"+"$time".csv ]]; then
-					eval ffmpeg -i "$folder_formatted"/audio_only.m4a ../../../../processed/"$p"/interviews/open/temp_audio/"$date"+"$time".wav &> /dev/null
 					# initialize txt files for email bodies too if this is a pipeline call, as we have found a new audio to process for the site
 					if [[ $pipeline = "Y" ]]; then
+						# save with unique timestamp (unix seconds - will be dif than current pipeline run but fine for our uses)
+						log_timestamp_ffmpeg=`date +%s`
+						eval ffmpeg -i "$folder_formatted"/audio_only.m4a ../../../../processed/"$p"/interviews/open/temp_audio/"$date"+"$time".wav &> "$repo_root"/logs/"$study"/ffmpeg_"$log_timestamp_ffmpeg".txt
 						# it is okay to just redo this every time since it will restart the file, all the other updates come way downstream
 						echo "Audio Processing Updates for ${study}:" > "$repo_root"/audio_lab_email_body.txt
+					else
+						eval ffmpeg -i "$folder_formatted"/audio_only.m4a ../../../../processed/"$p"/interviews/open/temp_audio/"$date"+"$time".wav &> /dev/null
+						# ignore error outside of pipeline
 					fi
 					# now also log to the filename map
 					echo "${data_root}/PROTECTED/${study}/raw/${p}/interviews/open/${folder}/${file}" > ../../../../processed/"$p"/interviews/open/audio_filename_maps/"$date"+"$time".txt
@@ -231,11 +241,16 @@ for p in *; do
 					# also only convert if file hasn't already been processed in a previous run
 					# (look for prior output to know - sliding window QC)
 					if [[ ! -e ../../../../../processed/"$p"/interviews/psychs/temp_audio/"$date"+"$time".wav && ! -e ../../../../../processed/"$p"/interviews/psychs/sliding_window_audio_qc/"$date"+"$time".csv ]]; then
-						eval ffmpeg -i "$file" ../../../../../processed/"$p"/interviews/psychs/temp_audio/"$date"+"$time".wav &> /dev/null
 						# initialize txt files for email bodies too if this is a pipeline call, as we have found a new audio to process for the site
 						if [[ $pipeline = "Y" ]]; then
+							# save with unique timestamp (unix seconds - will be dif than current pipeline run but fine for our uses)
+							log_timestamp_ffmpeg=`date +%s`
+							eval ffmpeg -i "$file" ../../../../../processed/"$p"/interviews/psychs/temp_audio/"$date"+"$time".wav &> "$repo_root"/logs/"$study"/ffmpeg_"$log_timestamp_ffmpeg".txt
 							# it is okay to just redo this every time since it will restart the file, all the other updates come way downstream
 							echo "Audio Processing Updates for ${study}:" > "$repo_root"/audio_lab_email_body.txt
+						else
+							eval ffmpeg -i "$file" ../../../../../processed/"$p"/interviews/psychs/temp_audio/"$date"+"$time".wav &> /dev/null
+							# ignore error outside of pipeline
 						fi
 					fi
 					# now also log to the filename map
@@ -253,11 +268,16 @@ for p in *; do
 				# also only convert if file hasn't already been processed in a previous run
 				# (look for prior output to know - sliding window QC)
 				if [[ ! -e ../../../../processed/"$p"/interviews/psychs/temp_audio/"$date"+"$time".wav && ! -e ../../../../processed/"$p"/interviews/psychs/sliding_window_audio_qc/"$date"+"$time".csv ]]; then
-					eval ffmpeg -i "$folder_formatted"/audio_only.m4a ../../../../processed/"$p"/interviews/psychs/temp_audio/"$date"+"$time".wav &> /dev/null
 					# initialize txt files for email bodies too if this is a pipeline call, as we have found a new audio to process for the site
 					if [[ $pipeline = "Y" ]]; then
+						# save with unique timestamp (unix seconds - will be dif than current pipeline run but fine for our uses)
+						log_timestamp_ffmpeg=`date +%s`
+						eval ffmpeg -i "$folder_formatted"/audio_only.m4a ../../../../processed/"$p"/interviews/psychs/temp_audio/"$date"+"$time".wav &> "$repo_root"/logs/"$study"/ffmpeg_"$log_timestamp_ffmpeg".txt
 						# it is okay to just redo this every time since it will restart the file, all the other updates come way downstream
 						echo "Audio Processing Updates for ${study}:" > "$repo_root"/audio_lab_email_body.txt
+					else
+						eval ffmpeg -i "$folder_formatted"/audio_only.m4a ../../../../processed/"$p"/interviews/psychs/temp_audio/"$date"+"$time".wav &> /dev/null
+						# ignore error outside of pipeline
 					fi
 					# now also log to the filename map
 					echo "${data_root}/PROTECTED/${study}/raw/${p}/interviews/psychs/${folder}/${file}" > ../../../../processed/"$p"/interviews/psychs/audio_filename_maps/"$date"+"$time".txt
