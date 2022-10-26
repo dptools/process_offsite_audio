@@ -92,6 +92,13 @@ def concat_site_csv(data_root, output_root):
 	warning_df.to_csv(os.path.join(output_root,"all-processed-warnings.csv"), index=False)
 	sop_df.to_csv(os.path.join(output_root,"all-SOP-warnings.csv"), index=False)
 
+	# now adding in the concatenated row by row QC record too - these are already set up, so it's a simple concat, don't need to monitor edge cases
+	individual_qc_paths = glob.glob(os.path.join(data_root, "GENERAL", "*", "processed", "*", "interviews", "*", "*_combinedQCRecords.csv"))
+	individual_qc_dfs = [pd.read_csv(x) for x in individual_qc_paths]
+	individual_qc_concat = pd.concat(individual_qc_dfs)
+	individual_qc_concat.reset_index(drop=True, inplace=True)
+	individual_qc_concat.to_csv(os.path.join(output_root,"combined-QC.csv"), index=False)
+
 	# that is end of function, as outputs will be accessed by a second python function
 	return
 	

@@ -45,5 +45,14 @@ chgrp -R pronet /mnt/ProNET/Lochness/PHOENIX/PROTECTED/box_transfer
 # finally run the utility for stats combined across sites
 bash /opt/software/process_offsite_audio/amp_scz_launch/final_all_sites_utility.sh /mnt/ProNET/Lochness/PHOENIX "mennis2@partners.org,philip.wolff@yale.edu" PronetProduction
 
+# run the weekly logging email if it is Monday!
+# note that running the above final_all_sites_utility is necessary for the below to work, in addition to having run the rest of the pipeline (as it concats extra CSVs for this)
+# this is only done for production (and only for pronet currently, unclear who will monitor prescient)
+if [[ $(date +%u) == 1 ]]; then
+	pii_email_list="mennis2@partners.org,pwolff@emory.edu,zarina.bilgrami@emory.edu"
+	deid_email_list="mennis2@partners.org,pwolff@emory.edu,zarina.bilgrami@emory.edu,jtbaker@partners.org,eliebenthal@mclean.harvard.edu,elin@mclean.harvard.edu"
+	bash /opt/software/process_offsite_audio/amp_scz_launch/weekly_logging_utility.sh "$pii_email_list" "$deid_email_list"
+fi
+
 # and make sure logs are readable!
 chgrp -R pronet /opt/software/process_offsite_audio/logs

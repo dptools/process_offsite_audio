@@ -17,8 +17,25 @@ else
 	pipeline="Y" # track when in pipeline for contributing email portion
 fi
 
-# for this script actually going to run as a single python function study-wide! to better facilitate the email part
+# move to study folder to loop over patients - first combining python function defined per patient
+cd "$data_root"/GENERAL/"$study"/processed
+echo "Combining DPDash CSVs across modality"
+for p in *; do
+	# first check that it is truly a patient ID
+	if [[ ! -d $p/interviews ]]; then
+		continue
+	fi
 
+	# now confirm for open and psychs respectively that there will be a folder to move to by the python script
+	if [[ -d $p/interviews/open ]]; then
+		python "$func_root"/interview_qc_combine.py "open" "$data_root" "$study" "$p"
+	fi
+	if [[ -d $p/interviews/psychs ]]; then
+		python "$func_root"/interview_qc_combine.py "psychs" "$data_root" "$study" "$p"
+	fi
+done
+
+# for main part of script actually going to run as a single python function study-wide! to better facilitate the email part
 echo "Processing new open interviews"
 # compute patient summary stats for each modality using DPDash CSVs, add to some historical log
 # within each patient's historical log CSV, also include site wide summary stats at current date
