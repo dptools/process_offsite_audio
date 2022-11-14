@@ -36,21 +36,28 @@ def interview_qc_combine(interview_type, data_root, study, patient):
 		audio_df = audio_df[audio_filter]
 	else:
 		audio_df = pd.DataFrame(columns=audio_filter)
+		for col in audio_filter: # hack for empty df merge - no real record would ever have nan in any merge column
+			audio_df[col] = [np.nan]
 	if len(all_video_paths) == 1:
 		video_df = pd.read_csv(all_video_paths[0])
 		video_df["interview_type"] = [interview_type for x in range(video_df.shape[0])]
 		video_df = video_df[video_filter]
 	else:
 		video_df = pd.DataFrame(columns=video_filter)
+		for col in video_filter: # hack for empty df merge - no real record would ever have nan in any merge column
+			video_df[col] = [np.nan]
 	if len(all_trans_paths) == 1:
 		trans_df = pd.read_csv(all_trans_paths[0])
 		trans_df["interview_type"] = [interview_type for x in range(trans_df.shape[0])]
 		trans_df = trans_df[trans_filter]
 	else:
 		trans_df = pd.DataFrame(columns=trans_filter)
+		for col in trans_filter: # hack for empty df merge - no real record would ever have nan in any merge column
+			trans_df[col] = [np.nan]
 
 	# finally do the merge
 	all_df = audio_df.merge(video_df, on=merge_cols, how='outer').merge(trans_df, on=merge_cols, how='outer')
+	all_df.dropna(how='all',inplace=True) # remove fully nan rows due to above
 	all_df.reset_index(drop=True, inplace=True)
 
 	# then can save

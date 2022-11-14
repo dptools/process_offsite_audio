@@ -152,8 +152,9 @@ for p in *; do
 	fi
 
 	# now repeat similarly for psychs, except these can also have stand alone mono-only onsites
-	if [[ -d ../psychs ]]; then
-		cd ../psychs
+	cd "$data_root"/PROTECTED/"$study"/raw # reset folder first
+	if [[ -d "$p"/interviews/psychs ]]; then
+		cd "$p"/interviews/psychs
 		for folder in *; do
 			# escape spaces and other issues in folder name
 			folder_formatted=$(printf %q "$folder")

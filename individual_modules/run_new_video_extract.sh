@@ -152,12 +152,12 @@ for p in *; do
 					fi
 				fi
 			done
-
 			cd .. # leave interview folder at end of loop
 		done
 	fi
 
 	# now repeat similarly for psychs, will be same process here
+	cd "$data_root"/PROTECTED/"$study"/raw # reset folder first
 	if [[ -d "$p"/interviews/psychs ]]; then
 		cd "$p"/interviews/psychs
 		for folder in *; do
@@ -270,7 +270,6 @@ for p in *; do
 					fi
 				fi
 			done
-
 			cd .. # leave interview folder at end of loop
 		done
 	fi
