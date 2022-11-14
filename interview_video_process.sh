@@ -137,6 +137,9 @@ if [[ -e "$repo_root"/video_lab_email_body.txt ]]; then
 	echo "--- Interview videos newly processed ---" >> "$repo_root"/video_lab_email_body.txt
 	cat "$repo_root"/video_temp_process_list.txt >> "$repo_root"/video_lab_email_body.txt
 	rm "$repo_root"/video_temp_process_list.txt
+	echo "" >> "$repo_root"/video_lab_email_body.txt
+	# also add a warning message so empty email has clear meaning
+	echo "(if the above list is empty, a new video was recognized but processing code crashed - could be an issue with processing long videos on the limited compute of data aggregation server)" >> "$repo_root"/video_lab_email_body.txt
 	# now send
 	mail -s "[${study} ${server_version} Interview Pipeline Updates] New Video Processed" "$lab_email_list" < "$repo_root"/video_lab_email_body.txt
 	# move the email to logs folder for reference if there was actual content

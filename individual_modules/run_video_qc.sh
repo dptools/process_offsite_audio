@@ -104,6 +104,8 @@ for p in *; do
 			# make sure use future rename formatting!
 			if [[ -e "$repo_root"/video_lab_email_body.txt ]]; then 
 				cat "$folder"/"$folder".txt >> "$repo_root"/video_temp_process_list.txt
+				# add new line between multiple interviews
+				echo "" >> "$repo_root"/video_temp_process_list.txt
 			fi	
 		fi
 	done
@@ -197,6 +199,8 @@ for p in *; do
 			# make sure use future rename formatting!
 			if [[ -e "$repo_root"/video_lab_email_body.txt ]]; then 
 				cat "$folder"/"$folder".txt >> "$repo_root"/video_temp_process_list.txt
+				# add new line between multiple interviews
+				echo "" >> "$repo_root"/video_temp_process_list.txt
 			fi	
 		fi
 	done
