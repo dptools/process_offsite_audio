@@ -29,7 +29,7 @@ export auto_send_limit_bool
 # first addresses for the more thorough updates on most recent files
 lab_email_list="mennis2@partners.org,jtbaker@partners.org"
 # then addresses to send the site review notification to
-site_email_list="mennis2@partners.org"
+site_email_list="mennis2@partners.org,dpaccqueries_ls@chuv.ch"
 # finally should also supply current server label (mainly for dev versus prod)
 server_version="dev"
 # for U24 now have language marker setting to add to the files that are uploaded to TranscribeMe, to alert them of what language the audio will be in

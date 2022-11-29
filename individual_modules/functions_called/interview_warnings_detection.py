@@ -125,20 +125,20 @@ def interview_warnings_check(interview_type, data_root, study, ptID, warning_lab
 					  "final_timestamp_minutes","min_timestamp_space","max_timestamp_space","min_timestamp_space_per_word","max_timestamp_space_per_word"]
 	# overall folder must exist when called from bash script
 	os.chdir(os.path.join(data_root, "GENERAL", study, "processed", ptID, "interviews", interview_type))
-	# for this project the DPDash CSV name only uses avlqc identifier, not site ID
-	audio_dpdash_name_format = "avlqc" + "-" + ptID + "-interviewMonoAudioQC_" + interview_type + "-day*.csv"
+	# switching back to study identifier for DPDash CSVs
+	audio_dpdash_name_format = study[-2:] + "-" + ptID + "-interviewMonoAudioQC_" + interview_type + "-day*.csv"
 	try:
 		audio_dpdash_name = glob.glob(audio_dpdash_name_format)[0] # DPDash script deletes any older days in this subfolder, so should only get 1 match each time
 		audio_dpdash_qc = pd.read_csv(audio_dpdash_name)
 	except:
 		audio_dpdash_qc = pd.DataFrame(columns=audio_qc_headers)
-	video_dpdash_name_format = "avlqc" + "-" + ptID + "-interviewVideoQC_" + interview_type + "-day*.csv"
+	video_dpdash_name_format = study[-2:] + "-" + ptID + "-interviewVideoQC_" + interview_type + "-day*.csv"
 	try:
 		video_dpdash_name = glob.glob(video_dpdash_name_format)[0] # DPDash script deletes any older days in this subfolder, so should only get 1 match each time
 		video_dpdash_qc = pd.read_csv(video_dpdash_name)
 	except:
 		video_dpdash_qc = pd.DataFrame(columns=video_qc_headers)
-	trans_dpdash_name_format = "avlqc" + "-" + ptID + "-interviewRedactedTranscriptQC_" + interview_type + "-day*.csv"
+	trans_dpdash_name_format = study[-2:] + "-" + ptID + "-interviewRedactedTranscriptQC_" + interview_type + "-day*.csv"
 	try:
 		trans_dpdash_name = glob.glob(trans_dpdash_name_format)[0] # DPDash script deletes any older days in this subfolder, so should only get 1 match each time
 		trans_dpdash_qc = pd.read_csv(trans_dpdash_name)

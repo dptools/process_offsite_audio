@@ -22,9 +22,9 @@ def interview_qc_combine(interview_type, data_root, study, patient):
 	os.chdir(os.path.join(data_root, "GENERAL", study, "processed", patient, "interviews", interview_type))
 
 	# get the list of DPDash CSVs for the different modalities, should be 0 or 1 for each
-	all_audio_paths = glob.glob("avlqc*interviewMonoAudioQC*.csv")
-	all_video_paths = glob.glob("avlqc*interviewVideoQC*.csv")
-	all_trans_paths = glob.glob("avlqc*interviewRedactedTranscriptQC*.csv")
+	all_audio_paths = glob.glob(study[-2:] + "*interviewMonoAudioQC*.csv")
+	all_video_paths = glob.glob(study[-2:] + "*interviewVideoQC*.csv")
+	all_trans_paths = glob.glob(study[-2:] + "*interviewRedactedTranscriptQC*.csv")
 	# exit if there is nothing to do for this patient
 	if len(all_audio_paths) == 0 and len(all_video_paths) == 0:
 		return

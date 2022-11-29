@@ -49,8 +49,7 @@ def get_email_summary_stats(data_root, study, lab_email_path, interview_type):
 		filen = filep.split("/")[-1]
 		ptID = filen.split("_")[1]
 		os.chdir(os.path.join(data_root, "GENERAL", study, "processed", ptID, "interviews", interview_type))
-		# for this project the DPDash CSV name only uses avlqc identifier
-		dpdash_name_format = "avlqc" + "-" + ptID + "-interviewMonoAudioQC_" + interview_type + "-day*.csv"
+		dpdash_name_format = study[-2:] + "-" + ptID + "-interviewMonoAudioQC_" + interview_type + "-day*.csv"
 		dpdash_name = glob.glob(dpdash_name_format)[0] # DPDash script deletes any older days in this subfolder, so should only get 1 match each time
 		dpdash_qc = pd.read_csv(dpdash_name) 
 		# technically reloading this CSV for each file instead of for each patient, but should be a fast operation because CSV is small
@@ -74,8 +73,7 @@ def get_email_summary_stats(data_root, study, lab_email_path, interview_type):
 		filen = filep.split("/")[-1]
 		ptID = filen.split("_")[1]
 		os.chdir(os.path.join(data_root, "GENERAL", study, "processed", ptID, "interviews", interview_type))
-		# for this project the DPDash CSV name only uses avlqc identifier
-		dpdash_name_format = "avlqc" + "-" + ptID + "-interviewMonoAudioQC_" + interview_type + "-day*.csv"
+		dpdash_name_format = study[-2:] + "-" + ptID + "-interviewMonoAudioQC_" + interview_type + "-day*.csv"
 		dpdash_name = glob.glob(dpdash_name_format)[0] # DPDash script deletes any older days in this subfolder, so should only get 1 match each time
 		dpdash_qc = pd.read_csv(dpdash_name) 
 		# technically reloading this CSV for each file instead of for each patient, but should be a fast operation because CSV is small
@@ -99,8 +97,7 @@ def get_email_summary_stats(data_root, study, lab_email_path, interview_type):
 		filen = filep.split("/")[-1]
 		ptID = filen.split("_")[1]
 		os.chdir(os.path.join(data_root, "GENERAL", study, "processed", ptID, "interviews", interview_type))
-		# for this project the DPDash CSV name only uses avlqc identifier
-		dpdash_name_format = "avlqc" + "-" + ptID + "-interviewMonoAudioQC_" + interview_type + "-day*.csv"
+		dpdash_name_format = study[-2:] + "-" + ptID + "-interviewMonoAudioQC_" + interview_type + "-day*.csv"
 		dpdash_name = glob.glob(dpdash_name_format)[0] # DPDash script deletes any older days in this subfolder, so should only get 1 match each time
 		dpdash_qc = pd.read_csv(dpdash_name) 
 		# technically reloading this CSV for each file instead of for each patient, but should be a fast operation because CSV is small

@@ -11,8 +11,8 @@ def move_audio_to_send(interview_type, data_root, study, ptID, length_cutoff, db
 	# navigate to folder of interest, load initial CSVs
 	try:
 		os.chdir(os.path.join(data_root, "GENERAL", study, "processed", ptID, "interviews", interview_type))
-		# for this project the DPDash CSV name only uses avlqc identifier, not site ID
-		dpdash_name_format = "avlqc" + "-" + ptID + "-interviewMonoAudioQC_" + interview_type + "-day*.csv"
+		# using study identifier again now, only last 2 digits
+		dpdash_name_format = study[-2:] + "-" + ptID + "-interviewMonoAudioQC_" + interview_type + "-day*.csv"
 		dpdash_name = glob.glob(dpdash_name_format)[0] # DPDash script deletes any older days in this subfolder, so should only get 1 match each time
 		dpdash_qc = pd.read_csv(dpdash_name)
 		os.chdir(os.path.join(data_root, "PROTECTED", study, "processed", ptID, "interviews", interview_type))

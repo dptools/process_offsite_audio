@@ -17,9 +17,9 @@ def interview_qc_statistics(interview_type, data_root, study, summary_lab_email_
 	patient_list = os.listdir(".")
 
 	# also get the list of all DPDash CSVs for this site and interview type to concat into a temporary master reference
-	all_audio_paths = glob.glob(os.path.join("*/interviews", interview_type, "avlqc-*-interviewMonoAudioQC_" + interview_type + "-day*.csv"))
-	all_video_paths = glob.glob(os.path.join("*/interviews", interview_type, "avlqc-*-interviewVideoQC_" + interview_type + "-day*.csv"))
-	all_trans_paths = glob.glob(os.path.join("*/interviews", interview_type, "avlqc-*-interviewRedactedTranscriptQC_" + interview_type + "-day*.csv"))
+	all_audio_paths = glob.glob(os.path.join("*/interviews", interview_type, study[-2:] + "-*-interviewMonoAudioQC_" + interview_type + "-day*.csv"))
+	all_video_paths = glob.glob(os.path.join("*/interviews", interview_type, study[-2:] + "-*-interviewVideoQC_" + interview_type + "-day*.csv"))
+	all_trans_paths = glob.glob(os.path.join("*/interviews", interview_type, study[-2:] + "-*-interviewRedactedTranscriptQC_" + interview_type + "-day*.csv"))
 	# exit if the site doesn't have data yet - could occur for one interview type for a site while the other has updates
 	if len(all_audio_paths) == 0 and len(all_video_paths) == 0:
 		print("No data yet for input site and interview type, exiting")
@@ -156,7 +156,7 @@ def interview_qc_statistics(interview_type, data_root, study, summary_lab_email_
 		os.chdir(os.path.join(ptID, "interviews", interview_type))
 
 		# load in any DPDash CSVs we can specific for this patient now, starting with audio
-		audio_dpdash_name_format = glob.glob("avlqc" + "-" + ptID + "-interviewMonoAudioQC_" + interview_type + "-day*.csv")
+		audio_dpdash_name_format = glob.glob(study[-2:] + "-" + ptID + "-interviewMonoAudioQC_" + interview_type + "-day*.csv")
 		if len(audio_dpdash_name_format) > 0:
 			audio_dpdash_qc = pd.read_csv(audio_dpdash_name_format[0]) # DPDash script deletes any older days in this subfolder, so should only get 1 match each time
 			# calculate all summary stats, first for audio (do mean, stdev, max, min)
@@ -180,7 +180,7 @@ def interview_qc_statistics(interview_type, data_root, study, summary_lab_email_
 			pt_audio_summary_df = pd.DataFrame(columns=audio_summary_df.columns)
 
 		# now repeat for video, and then transripts
-		video_dpdash_name_format = glob.glob("avlqc" + "-" + ptID + "-interviewVideoQC_" + interview_type + "-day*.csv")
+		video_dpdash_name_format = glob.glob(study[-2:] + "-" + ptID + "-interviewVideoQC_" + interview_type + "-day*.csv")
 		if len(video_dpdash_name_format) > 0:
 			video_dpdash_qc = pd.read_csv(video_dpdash_name_format[0]) # DPDash script deletes any older days in this subfolder, so should only get 1 match each time
 			# calculate all summary stats, first for video (do mean, stdev, max, min)
@@ -203,7 +203,7 @@ def interview_qc_statistics(interview_type, data_root, study, summary_lab_email_
 		else:
 			pt_video_summary_df = pd.DataFrame(columns=video_summary_df.columns)
 
-		trans_dpdash_name_format = glob.glob("avlqc" + "-" + ptID + "-interviewRedactedTranscriptQC_" + interview_type + "-day*.csv")
+		trans_dpdash_name_format = glob.glob(study[-2:] + "-" + ptID + "-interviewRedactedTranscriptQC_" + interview_type + "-day*.csv")
 		if len(trans_dpdash_name_format) > 0:
 			trans_dpdash_qc = pd.read_csv(trans_dpdash_name_format[0]) # DPDash script deletes any older days in this subfolder, so should only get 1 match each time
 			# calculate all summary stats, first for trans (do mean, stdev, max, min)
