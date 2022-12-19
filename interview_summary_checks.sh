@@ -141,6 +141,15 @@ if [[ -e "$repo_root"/summary_lab_email_body.txt ]]; then
 	now=$(date +"%T")
 	echo "Current time: ${now}"
 	echo ""
+else
+	# run the combo script either way
+	bash "$repo_root"/individual_modules/run_qc_combine_only.sh "$data_root" "$study"
+	echo ""
+
+	# add current time for runtime tracking purposes
+	now=$(date +"%T")
+	echo "Current time: ${now}"
+	echo ""
 fi
 
 # finally send email if these was anything to email about

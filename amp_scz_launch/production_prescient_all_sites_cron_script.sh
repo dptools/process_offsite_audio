@@ -52,3 +52,13 @@ chmod -R 770 /mnt/prescient/Prescient_production/PHOENIX/*/*/processed
 bash /home/cho/soft/process_offsite_audio/amp_scz_launch/final_all_sites_utility.sh /mnt/prescient/Prescient_production/PHOENIX mennis2@partners.org PrescientProduction "yes"
 
 # note Kevin's code now handles the Mediaflux push, so that is not needed here!
+
+# run the weekly logging email if it is Monday!
+# note that running the above final_all_sites_utility is necessary for the below to work, in addition to having run the rest of the pipeline (as it concats extra CSVs for this)
+# this is only done for production
+if [[ $(date +%u) == 1 ]]; then
+	# currently sending only to myself for testing purposes, still need to identify who will lead monitoring for Prescient
+	pii_email_list="mennis2@partners.org"
+	deid_email_list="mennis2@partners.org"
+	bash /opt/software/process_offsite_audio/amp_scz_launch/weekly_logging_utility.sh "$pii_email_list" "$deid_email_list" "yes"
+fi

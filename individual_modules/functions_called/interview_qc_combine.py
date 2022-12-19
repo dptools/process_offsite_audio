@@ -56,9 +56,11 @@ def interview_qc_combine(interview_type, data_root, study, patient):
 			trans_df[col] = [np.nan]
 
 	# finally do the merge
-	all_df = audio_df.merge(video_df, on=merge_cols, how='outer').merge(trans_df, on=merge_cols, how='outer')
-	all_df.dropna(how='all',inplace=True) # remove fully nan rows due to above
-	all_df.reset_index(drop=True, inplace=True)
+	all_df_int = audio_df.merge(video_df, on=merge_cols, how='outer')
+	all_df_int.dropna(subset=merge_cols,how='any',inplace=True) # all rows should have all metadata specifiers at the end
+	all_df_int.reset_index(inplace=True)
+	all_df = all_df_int.merge(trans_df, on=merge_cols, how='left') # there is no scenario where we should have a transcript stat without the stat from audio, so can use left merge here
+	all_df.reset_index(inplace=True)
 
 	# then can save
 	output_path = patient + "_" + interview_type + "_combinedQCRecords.csv"
