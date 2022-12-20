@@ -56,11 +56,35 @@ def interview_qc_combine(interview_type, data_root, study, patient):
 			trans_df[col] = [np.nan]
 
 	# finally do the merge
-	all_df_int = audio_df.merge(video_df, on=merge_cols, how='outer')
-	all_df_int.dropna(subset=merge_cols,how='any',inplace=True) # all rows should have all metadata specifiers at the end
-	all_df_int.reset_index(inplace=True)
-	all_df = all_df_int.merge(trans_df, on=merge_cols, how='left') # there is no scenario where we should have a transcript stat without the stat from audio, so can use left merge here
-	all_df.reset_index(inplace=True)
+	try:
+		all_df_int = audio_df.merge(video_df, on=merge_cols, how='outer')
+		all_df_int.dropna(subset=merge_cols,how='any',inplace=True) # all rows should have all metadata specifiers at the end
+		all_df_int.reset_index(drop=True,inplace=True)
+	except: # merging if one is completely nan actually doesnt work, so need to handle it separately
+		video_df.dropna(subset=merge_cols,how='any',inplace=True)
+		audio_df.dropna(subset=merge_cols,how='any',inplace=True)
+		if video_df.empty:
+			if audio_df.empty:
+				return
+			all_df_int = audio_df
+			for col in video_filter: 
+				all_df_int[col] = [np.nan for x in range(all_df_int.shape[0])]
+		else:
+			rearrange_cols = [x for x in merge_cols]
+			all_df_int = video_df
+			for col in audio_filter: 
+				all_df_int[col] = [np.nan for x in range(all_df_int.shape[0])]
+				rearrange_cols.append(col)
+			rearrange_cols.extend(video_filter)
+			all_df_int = all_df_int[rearrange_cols]
+
+	try:
+		all_df = all_df_int.merge(trans_df, on=merge_cols, how='left') # there is no scenario where we should have a transcript stat without the stat from audio, so can use left merge here
+		all_df.reset_index(drop=True,inplace=True)
+	except: # same scenario with handling if this subject/interview type has no transcripts yet
+		all_df = all_df_int
+		for col in trans_filter:
+			all_df[col] = [np.nan for x in range(all_df.shape[0])]
 
 	# then can save
 	output_path = patient + "_" + interview_type + "_combinedQCRecords.csv"
