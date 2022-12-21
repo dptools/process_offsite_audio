@@ -67,15 +67,15 @@ def interview_qc_combine(interview_type, data_root, study, patient):
 			if audio_df.empty:
 				return
 			all_df_int = audio_df
-			for col in video_filter: 
+			for col in video_filter[len(merge_cols):]: # merge columns at the start already, need to exclude them here
 				all_df_int[col] = [np.nan for x in range(all_df_int.shape[0])]
 		else:
 			rearrange_cols = [x for x in merge_cols]
 			all_df_int = video_df
-			for col in audio_filter: 
+			for col in audio_filter[len(merge_cols):]: # merge columns at the start already, need to exclude them here
 				all_df_int[col] = [np.nan for x in range(all_df_int.shape[0])]
 				rearrange_cols.append(col)
-			rearrange_cols.extend(video_filter)
+			rearrange_cols.extend(video_filter[len(merge_cols):])
 			all_df_int = all_df_int[rearrange_cols]
 
 	try:
@@ -83,7 +83,7 @@ def interview_qc_combine(interview_type, data_root, study, patient):
 		all_df.reset_index(drop=True,inplace=True)
 	except: # same scenario with handling if this subject/interview type has no transcripts yet
 		all_df = all_df_int
-		for col in trans_filter:
+		for col in trans_filter[len(merge_cols):]: # merge columns at the start already, need to exclude them here
 			all_df[col] = [np.nan for x in range(all_df.shape[0])]
 
 	# then can save
