@@ -1,4 +1,6 @@
 # Interview AV Data Aggregation and Quality Control
+[![DOI](https://zenodo.org/badge/581321104.svg)](https://zenodo.org/badge/latestdoi/581321104)
+
 Code for data organization and quality control of clinical interview audio and video recorded from Zoom, currently focused on minimum necessary steps for initial use by sites of [the AMP SCZ project](https://www.ampscz.org/). This repository is a prerelease of Baker Lab code, made publicly viewable for the purposes of testing on collaborator machines. 
 
 The audio side of the pipeline converts/renames any new mono interview audio files and extracts QC measures from these files. It then handles automatic upload of acceptable audio to TranscribeMe, along with emailing documentation to the group. It does not currently process speaker-specific audio files.  
