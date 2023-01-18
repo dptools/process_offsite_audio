@@ -52,11 +52,6 @@ if [[ $(date +%u) == 1 ]]; then
 	pii_email_list="mennis2@partners.org,pwolff@emory.edu,zarina.bilgrami@emory.edu"
 	deid_email_list="mennis2@partners.org,pwolff@emory.edu,zarina.bilgrami@emory.edu,jtbaker@partners.org,eliebenthal@mclean.harvard.edu,elin@mclean.harvard.edu,sylvain.bouix@etsmtl.ca"
 	bash /opt/software/process_offsite_audio/amp_scz_launch/weekly_logging_utility.sh "$pii_email_list" "$deid_email_list"
-else
-	# still run, sending only to myself for reference for now (can remove when monitoring workflow is better established)
-	pii_email_list="mennis2@partners.org"
-	deid_email_list="mennis2@partners.org"
-	bash /opt/software/process_offsite_audio/amp_scz_launch/weekly_logging_utility.sh "$pii_email_list" "$deid_email_list"
 fi
 
 # and make sure logs are readable!
