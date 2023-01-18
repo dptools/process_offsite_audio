@@ -52,7 +52,7 @@ def run_summary_operation_figs(input_csv,output_folder,cur_server):
 				x_ticks_list.extend(list(range(100,int(max_x)+1,15)))
 				cur_ax.set_xticks(x_ticks_list)
 				for tick in cur_ax.get_xticklabels():
-    				tick.set_rotation(45)
+					tick.set_rotation(45)
 			else:
 				cur_ax.set_xticks(range(0,int(max_x)+1,5))
 
@@ -103,7 +103,7 @@ def run_summary_operation_figs(input_csv,output_folder,cur_server):
 				x_ticks_list.extend(list(range(100,int(max_x)+1,15)))
 				cur_ax.set_xticks(x_ticks_list)
 				for tick in cur_ax.get_xticklabels():
-    				tick.set_rotation(45)
+					tick.set_rotation(45)
 			else:
 				cur_ax.set_xticks(range(0,int(max_x)+1,5))
 
@@ -146,7 +146,7 @@ def run_summary_operation_figs(input_csv,output_folder,cur_server):
 				x_ticks_list.extend(list(range(100,int(max_x)+1,15)))
 				cur_ax.set_xticks(x_ticks_list)
 				for tick in cur_ax.get_xticklabels():
-    				tick.set_rotation(45)
+					tick.set_rotation(45)
 			else:
 				cur_ax.set_xticks(range(0,int(max_x)+1,5))
 
