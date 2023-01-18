@@ -56,6 +56,7 @@ def run_summary_operation_figs(input_csv,output_folder,cur_server):
 			else:
 				cur_ax.set_xticks(range(0,int(max_x)+1,5))
 			cur_ax.grid(color="#d3d3d3")
+			cur_ax.set_axisbelow(True)
 
 		fig.suptitle(cur_server + " AVL QC Distributions - stacked histograms by interview type" + "\n" + "(Data as of " + cur_date + ")")
 		fig.tight_layout()
@@ -108,6 +109,7 @@ def run_summary_operation_figs(input_csv,output_folder,cur_server):
 			else:
 				cur_ax.set_xticks(range(0,int(max_x)+1,5))
 			cur_ax.grid(color="#d3d3d3")
+			cur_ax.set_axisbelow(True)
 
 		fig.suptitle(cur_server + " OPEN interview AVL QC Distributions - stacked histograms by site" + "\n" + "(Data as of " + cur_date + ")")
 		fig.tight_layout()
@@ -152,6 +154,7 @@ def run_summary_operation_figs(input_csv,output_folder,cur_server):
 			else:
 				cur_ax.set_xticks(range(0,int(max_x)+1,5))
 			cur_ax.grid(color="#d3d3d3")
+			cur_ax.set_axisbelow(True)
 
 		fig.suptitle(cur_server + " PSYCHS interview AVL QC Distributions - stacked histograms by site" + "\n" + "(Data as of " + cur_date + ")")
 		fig.tight_layout()
