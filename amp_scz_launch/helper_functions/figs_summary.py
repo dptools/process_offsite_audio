@@ -47,7 +47,14 @@ def run_summary_operation_figs(input_csv,output_folder,cur_server):
 			cur_ax.set_xlabel(xname)
 			cur_ax.set_ylabel(yname)
 			max_x = cur_ax.get_xlim()[-1]
-			cur_ax.set_xticks(range(0,int(max_x)+1,5))
+			if max_x > 100:
+				x_ticks_list = list(range(0,100,5))
+				x_ticks_list.extend(list(range(100,int(max_x)+1,15)))
+				cur_ax.set_xticks(x_ticks_list)
+				for tick in cur_ax.get_xticklabels():
+    				tick.set_rotation(45)
+			else:
+				cur_ax.set_xticks(range(0,int(max_x)+1,5))
 
 		fig.suptitle(cur_server + " AVL QC Distributions - stacked histograms by interview type" + "\n" + "(Data as of " + cur_date + ")")
 		fig.tight_layout()
@@ -91,7 +98,14 @@ def run_summary_operation_figs(input_csv,output_folder,cur_server):
 			cur_ax.set_xlabel(xname)
 			cur_ax.set_ylabel(yname)
 			max_x = cur_ax.get_xlim()[-1]
-			cur_ax.set_xticks(range(0,int(max_x)+1,5))
+			if max_x > 100:
+				x_ticks_list = list(range(0,100,5))
+				x_ticks_list.extend(list(range(100,int(max_x)+1,15)))
+				cur_ax.set_xticks(x_ticks_list)
+				for tick in cur_ax.get_xticklabels():
+    				tick.set_rotation(45)
+			else:
+				cur_ax.set_xticks(range(0,int(max_x)+1,5))
 
 		fig.suptitle(cur_server + " OPEN interview AVL QC Distributions - stacked histograms by site" + "\n" + "(Data as of " + cur_date + ")")
 		fig.tight_layout()
@@ -127,7 +141,14 @@ def run_summary_operation_figs(input_csv,output_folder,cur_server):
 			cur_ax.set_xlabel(xname)
 			cur_ax.set_ylabel(yname)
 			max_x = cur_ax.get_xlim()[-1]
-			cur_ax.set_xticks(range(0,int(max_x)+1,5))
+			if max_x > 100:
+				x_ticks_list = list(range(0,100,5))
+				x_ticks_list.extend(list(range(100,int(max_x)+1,15)))
+				cur_ax.set_xticks(x_ticks_list)
+				for tick in cur_ax.get_xticklabels():
+    				tick.set_rotation(45)
+			else:
+				cur_ax.set_xticks(range(0,int(max_x)+1,5))
 
 		fig.suptitle(cur_server + " PSYCHS interview AVL QC Distributions - stacked histograms by site" + "\n" + "(Data as of " + cur_date + ")")
 		fig.tight_layout()
