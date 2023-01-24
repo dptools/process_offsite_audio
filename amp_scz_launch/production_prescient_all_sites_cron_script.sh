@@ -59,6 +59,6 @@ bash /home/cho/soft/process_offsite_audio/amp_scz_launch/final_all_sites_utility
 if [[ $(date +%u) == 1 ]]; then
 	# currently sending only to myself for testing purposes, still need to identify who will lead monitoring for Prescient
 	pii_email_list="mennis2@partners.org"
-	deid_email_list="mennis2@partners.org"
+	deid_email_list="mennis2@partners.org,jtbaker@partners.org,eliebenthal@mclean.harvard.edu,sylvain.bouix@etsmtl.ca"
 	bash /home/cho/soft/process_offsite_audio/amp_scz_launch/weekly_logging_utility.sh "$pii_email_list" "$deid_email_list" "yes"
 fi
