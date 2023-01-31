@@ -71,6 +71,20 @@ def run_summary_operation_figs(input_csv,output_folder,cur_server):
 	open_n_bins_list = [[[0,5,10,15,20,25,30,40,60,120],[0,0.5,0.9,1.1,1.5,1.8,2.1,2.3,3],[0,0.001,0.005,0.01,0.02,0.03,0.04,0.05],[0,0.001,0.0025,0.005,0.01,0.015,0.02,0.025]],[[0,2,3,4],30,30,30],[[20,40,50,55,60,65,70,75,80,85,100],30,30,30]]
 	psychs_n_bins_list = [[[0,20,30,40,50,60,90,120,180],[0,0.5,0.9,1.1,1.5,1.8,2.1,2.3,2.8,3.1,3.5,4],[0,0.001,0.005,0.01,0.02,0.03,0.04,0.05],[0,0.001,0.0025,0.005,0.01,0.015,0.02,0.025]],[[0,2,3,4,5],30,30,30],[[20,40,50,55,60,65,70,75,80,85,100],30,30,30]]
 
+	# add hatches to avoid color repeat confusion
+	# max number of sites for a given server will be below 30, colors repeat after 10
+	# so need at most 2 hatches, presently only need 1
+	# site assignments will change from week to week as new sites get added, because the sort is alphabetical
+	if len(site_list) > 20:
+		hatch_list = ['' for x in range(10)]
+		hatch_list.extend(['...' for x in range(10)])
+		hatch_list.extend(['xxx' for x in range(len(site_list)-20)])
+	elif len(site_list) > 10:
+		hatch_list = ['' for x in range(10)]
+		hatch_list.extend(['...' for x in range(len(site_list)-10)])
+	else:
+		hatch_list = ['' for x in range(len(site_list))]
+
 	open_pdf = PdfPages(os.path.join(output_folder,"open-dists-by-site.pdf"))
 	for j in range(len(key_features_list)):
 		key_features = key_features_list[j]
@@ -84,7 +98,12 @@ def run_summary_operation_figs(input_csv,output_folder,cur_server):
 				cur_ax = axs[0][i]
 			else:
 				cur_ax = axs[1][i-2]
-			cur_ax.hist(comb_list, cur_bins, histtype="bar", stacked=True, orientation="horizontal", label=site_names, edgecolor = "black")
+			cur_n_output, cur_bins_output, cur_patches = cur_ax.hist(comb_list, cur_bins, histtype="bar", stacked=True, orientation="horizontal", label=site_names, edgecolor = "black")
+			for p in range(len(cur_patches)):
+				patch = cur_patches[p]
+				hatch = hatch_list[p]
+				for cur_bar in patch:
+					cur_bar.set(hatch = hatch)
 			cur_ax.legend()
 			cur_ax.set_title("open " + key_features[i])
 			try:
@@ -129,7 +148,12 @@ def run_summary_operation_figs(input_csv,output_folder,cur_server):
 				cur_ax = axs[0][i]
 			else:
 				cur_ax = axs[1][i-2]
-			cur_ax.hist(comb_list, cur_bins, histtype="bar", stacked=True, orientation="horizontal", label=site_names, edgecolor = "black")
+			cur_n_output, cur_bins_output, cur_patches = cur_ax.hist(comb_list, cur_bins, histtype="bar", stacked=True, orientation="horizontal", label=site_names, edgecolor = "black")
+			for p in range(len(cur_patches)):
+				patch = cur_patches[p]
+				hatch = hatch_list[p]
+				for cur_bar in patch:
+					cur_bar.set(hatch = hatch)
 			cur_ax.legend()
 			cur_ax.set_title("psychs " + key_features[i])
 			try:
