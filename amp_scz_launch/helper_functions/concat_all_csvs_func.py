@@ -99,6 +99,72 @@ def concat_site_csv(data_root, output_root):
 	individual_qc_concat.reset_index(drop=True, inplace=True)
 	individual_qc_concat.to_csv(os.path.join(output_root,"combined-QC.csv"), index=False)
 
+	# do a per subject count for open interviews to supplement the added DPDash chart views
+	counting_columns = ["open_interview_processed_count","num_unique_days","count_within_first_month","count_after_first_month","first_day","first_last_gap_in_days",
+						"open_interview_processed_videos","open_interview_quality_videos","open_interview_processed_transcripts","open_interview_quality_transcripts",
+						"open_transcripts_within_first_month","open_transcripts_after_first_month","availability_category_estimate"]
+	counting_vals = [[] for x in range(len(counting_columns))]
+	subjects_list = []
+	for subject_id in set(individual_qc_concat["patient"].tolist()):
+		cur_pt_check = individual_qc_concat[(individual_qc_concat["patient"]==subject_id) & (individual_qc_concat["interview_type"]=="open")]
+		total_open_count = cur_pt_check.shape[0]
+		if total_open_count > 0:
+			num_unique_days = len(set(cur_pt_check["day"].tolist()))
+			df_with_video = cur_pt_check.dropna(subset=["mean_faces_detected_in_frame"])
+			num_with_video = df_with_video.shape[0]
+			num_with_video_excellent = df_with_video[(df_with_video["mean_faces_detected_in_frame"]>1.8) & (df_with_video["mean_faces_detected_in_frame"]<2.1)].shape[0]
+			df_with_trans = cur_pt_check.dropna(subset=["num_inaudible"])
+			num_with_trans = df_with_trans.shape[0]
+			num_with_trans_excellent = df_with_trans[df_with_trans["num_inaudible"]<0.01].shape[0]
+			num_in_first_month = cur_pt_check[cur_pt_check["day"]<=30].shape[0]
+			num_past_first_month = cur_pt_check[cur_pt_check["day"]>30].shape[0]
+			num_with_trans_first_month = df_with_trans[df_with_trans["day"]<=30].shape[0]
+			num_with_trans_past_first = df_with_trans[df_with_trans["day"]>30].shape[0]
+			if num_with_trans_first_month > 0:
+				if num_with_trans_past_first > 0:
+					avail_cat = 3 # category for both desired time points likely having transcripts
+				else:
+					avail_cat = 1 # category for only baseline
+			else:
+				if num_with_trans_past_first > 0:
+					avail_cat = 2 # category for only 2 month transcript
+				else:
+					avail_cat = 0 # category for neither
+			if total_open_count > 1:
+				cur_days_list = cur_pt_check["day"].tolist()
+				cur_days_list.sort()
+				first_day = cur_days_list[0]
+				first_last_gap = cur_days_list[-1] - first_day
+			else:
+				first_last_gap = 0
+				first_day = cur_pt_check["day"].tolist()[0]
+		else:
+			num_unique_days = 0
+			num_with_video = 0
+			num_with_video_excellent = 0
+			num_with_trans = 0
+			num_with_trans_excellent = 0
+			num_in_first_month = 0
+			num_past_first_month = 0
+			num_with_trans_first_month = 0
+			num_with_trans_past_first = 0
+			avail_cat = 0 # no baseline nor 2 month follow-up estimated
+			first_last_gap = 0
+			first_day = 0
+		cur_pt_vals = [total_open_count, num_unique_days, num_in_first_month, num_past_first_month, first_day, first_last_gap, num_with_video, num_with_video_excellent, 
+					   num_with_trans, num_with_trans_excellent, num_with_trans_first_month, num_with_trans_past_first, avail_cat]
+		for ind in range(len(cur_pt_vals)):
+			counting_vals[ind].append(cur_pt_vals[ind])
+		subjects_list.append(subject_id)
+	sites_list = [s[:2] for s in subjects_list]
+	new_subj_df = pd.DataFrame()
+	new_subj_df["site"] = sites_list
+	new_subj_df["subject"] = subjects_list
+	for c in range(len(counting_columns)):
+		new_subj_df[counting_columns[c]] = counting_vals[c]
+	new_subj_df.sort_values(by="subject",inplace=True)
+	new_subj_df.to_csv(os.path.join(output_root,"open-counts-by-subject.csv"), index=False)
+
 	# that is end of function, as outputs will be accessed by a second python function
 	return
 	

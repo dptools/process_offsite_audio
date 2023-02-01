@@ -39,11 +39,11 @@ if [[ -z ${mail_attach} ]]; then
 
 	# finally send combined QC email to the larger list - include additional summary stuff is above python script worked, checking for figs and then if not for tables
 	if [[ -e all-dists-by-type.pdf ]]; then
-		mail -s "Weekly Pronet Interviews AVL QC Compilation" -A key-stats-table-by-site-and-type.html -A all-dists-by-type.pdf -A open-dists-by-site.pdf -A psychs-dists-by-site.pdf -A extended-counts-table.html -A combined-QC.csv "$deid_email_list" < dummy.txt
+		mail -s "Weekly Pronet Interviews AVL QC Compilation" -A key-stats-table-by-site-and-type.html -A all-dists-by-type.pdf -A open-dists-by-site.pdf -A psychs-dists-by-site.pdf -A extended-counts-table.html -A combined-QC.csv -A open-counts-by-subject.csv "$deid_email_list" < dummy.txt
 	elif [[ -e key-stats-table-by-site-and-type.html ]]; then
-		mail -s "Weekly Pronet Interviews AVL QC Compilation" -A key-stats-table-by-site-and-type.html -A extended-counts-table.html -A combined-QC.csv "$deid_email_list" < dummy.txt
+		mail -s "Weekly Pronet Interviews AVL QC Compilation" -A key-stats-table-by-site-and-type.html -A extended-counts-table.html -A combined-QC.csv -A open-counts-by-subject.csv "$deid_email_list" < dummy.txt
 	else
-		mail -s "Weekly Pronet Interviews AVL QC Compilation" -A combined-QC.csv "$deid_email_list" < dummy.txt
+		mail -s "Weekly Pronet Interviews AVL QC Compilation" -A combined-QC.csv -A open-counts-by-subject.csv "$deid_email_list" < dummy.txt
 	fi
 else
 	# then actually send SOP and file accounting email to those that can access PII
@@ -51,11 +51,11 @@ else
 
 	# finally send combined QC email to the larger list - again checking for python outputs
 	if [[ -e all-dists-by-type.pdf ]]; then
-		mail -s "Weekly Prescient Interviews AVL QC Compilation" -a key-stats-table-by-site-and-type.html -a all-dists-by-type.pdf -a open-dists-by-site.pdf -a psychs-dists-by-site.pdf -a extended-counts-table.html -a combined-QC.csv "$deid_email_list" < dummy.txt
+		mail -s "Weekly Prescient Interviews AVL QC Compilation" -a key-stats-table-by-site-and-type.html -a all-dists-by-type.pdf -a open-dists-by-site.pdf -a psychs-dists-by-site.pdf -a extended-counts-table.html -a combined-QC.csv -a open-counts-by-subject.csv "$deid_email_list" < dummy.txt
 	elif [[ -e key-stats-table-by-site-and-type.html ]]; then
-		mail -s "Weekly Prescient Interviews AVL QC Compilation" -a key-stats-table-by-site-and-type.html -a extended-counts-table.html -a combined-QC.csv "$deid_email_list" < dummy.txt
+		mail -s "Weekly Prescient Interviews AVL QC Compilation" -a key-stats-table-by-site-and-type.html -a extended-counts-table.html -a combined-QC.csv -a open-counts-by-subject.csv "$deid_email_list" < dummy.txt
 	else
-		mail -s "Weekly Prescient Interviews AVL QC Compilation" -a combined-QC.csv "$deid_email_list" < dummy.txt
+		mail -s "Weekly Prescient Interviews AVL QC Compilation" -a combined-QC.csv -a open-counts-by-subject.csv "$deid_email_list" < dummy.txt
 	fi
 fi
 
