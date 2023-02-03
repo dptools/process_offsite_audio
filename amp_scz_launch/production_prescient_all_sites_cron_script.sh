@@ -57,8 +57,11 @@ bash /home/cho/soft/process_offsite_audio/amp_scz_launch/final_all_sites_utility
 # note that running the above final_all_sites_utility is necessary for the below to work, in addition to having run the rest of the pipeline (as it concats extra CSVs for this)
 # this is only done for production
 if [[ $(date +%u) == 1 ]]; then
-	# currently sending only to myself for testing purposes, still need to identify who will lead monitoring for Prescient
-	pii_email_list="mennis2@partners.org,pwolff@emory.edu,zarina.bilgrami@emory.edu"
-	deid_email_list="mennis2@partners.org,pwolff@emory.edu,zarina.bilgrami@emory.edu,jtbaker@partners.org,eliebenthal@mclean.harvard.edu,sylvain.bouix@etsmtl.ca"
+	pii_email_list="mennis2@partners.org,zarina.bilgrami@emory.edu,sophie.tod@orygen.org.au"
+	deid_email_list="mennis2@partners.org,pwolff@emory.edu,zarina.bilgrami@emory.edu,jtbaker@partners.org,eliebenthal@mclean.harvard.edu,sylvain.bouix@etsmtl.ca,sophie.tod@orygen.org.au,dominic.dwyer@orygen.org.au,barnaby.nelson@orygen.org.au"
+	bash /home/cho/soft/process_offsite_audio/amp_scz_launch/weekly_logging_utility.sh "$pii_email_list" "$deid_email_list" "yes"
+else # for troubleshooting/rapid iteration as well as better site progress tracking I send to myself the update daily
+	pii_email_list="mennis2@partners.org"
+	deid_email_list="mennis@g.harvard.edu"
 	bash /home/cho/soft/process_offsite_audio/amp_scz_launch/weekly_logging_utility.sh "$pii_email_list" "$deid_email_list" "yes"
 fi

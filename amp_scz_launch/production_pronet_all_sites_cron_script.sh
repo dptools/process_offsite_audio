@@ -52,6 +52,10 @@ if [[ $(date +%u) == 1 ]]; then
 	pii_email_list="mennis2@partners.org,pwolff@emory.edu,zarina.bilgrami@emory.edu"
 	deid_email_list="mennis2@partners.org,pwolff@emory.edu,zarina.bilgrami@emory.edu,jtbaker@partners.org,eliebenthal@mclean.harvard.edu,sylvain.bouix@etsmtl.ca"
 	bash /opt/software/process_offsite_audio/amp_scz_launch/weekly_logging_utility.sh "$pii_email_list" "$deid_email_list"
+else # for troubleshooting/rapid iteration as well as better site progress tracking I send to myself the update daily
+	pii_email_list="mennis2@partners.org"
+	deid_email_list="mennis@g.harvard.edu"
+	bash /opt/software/process_offsite_audio/amp_scz_launch/weekly_logging_utility.sh "$pii_email_list" "$deid_email_list"
 fi
 
 # and make sure logs are readable!
