@@ -20,7 +20,7 @@ def run_summary_operation_figs(input_csv,output_folder,cur_server):
 	input_df["max_speaker_words"] = [max(x,y,z) if not np.isnan(x) else np.nan for x,y,z in zip(input_df["num_words_S1"].tolist(),input_df["num_words_S2"].tolist(),input_df["num_words_S3"].tolist())]
 	input_df["speech_balance"] = [x/y if not np.isnan(y) else np.nan for x,y in zip(input_df["max_speaker_words"].tolist(),input_df["total_words"].tolist())]
 	input_df["max_speaker_id"] = [[x,y,z].index(max(x,y,z)) + 1 if not np.isnan(x) else np.nan for x,y,z in zip(input_df["num_words_S1"].tolist(),input_df["num_words_S2"].tolist(),input_df["num_words_S3"].tolist())]
-	input_df["transcript_video_participants_ratio"] = [x/y if not (np.isnan(x) or np.isnan(y)) else np.nan for x,y in zip(input_df["num_subjects"].tolist(),input_df["maximum_faces_detected_in_frame"].tolist())]
+	input_df["transcript_video_participants_ratio"] = [x/y if not (np.isnan(x) or np.isnan(y) or y==0) else np.nan for x,y in zip(input_df["num_subjects"].tolist(),input_df["maximum_faces_detected_in_frame"].tolist())]
 
 	key_features_list = [["length_minutes","mean_faces_detected_in_frame","inaudible_per_word","redacted_per_word"],
 						 ["num_subjects","total_words","num_inaudible","num_redacted"],
