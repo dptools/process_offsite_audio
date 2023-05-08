@@ -1,5 +1,7 @@
 # Interview AV Data Aggregation and Quality Control
 
+[![DOI](https://zenodo.org/badge/581321104.svg)](https://zenodo.org/badge/latestdoi/581321104)
+
 Code for data organization and quality control of psychiatric research interview audio and video recordings, written for [the AMPSCZ project](https://www.ampscz.org/) and focusing primarily on recordings saved via Zoom. To facilitate interview recording collection in such a large and diverse collaborative project, the pipeline has a few major functionalities, performed daily across sites and interview types (open and psychs) on the two central data aggregation servers for the project (Pronet and Prescient):
 
 1. Tracking interview recordings submitted so far, and in this process flagging any major upload issues such as missing modalities, incorrect file formats, or missing metadata. As part of this, newly submitted interviews are logged daily, and proceed to the next steps of the pipeline if the upload does not have fatal flaws.
