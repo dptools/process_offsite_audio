@@ -193,6 +193,8 @@ for p in *; do
 			echo "[rejected because audio is insufficient length]" >> "$repo_root"/audio_lab_email_body.txt
 		elif [ $err_code = "2" ]; then
 			echo "[rejected because audio has low volume]" >> "$repo_root"/audio_lab_email_body.txt
+		elif [ $err_code = "3" ]; then
+			echo "[rejected because not the first psychs session for this subject from this day]" >> "$repo_root"/audio_lab_email_body.txt
 		else
 			# again, handling case here where no error code was prepended. can happen if there is no audio QC DPDash CSV available for the patient (however that would cause rename to fail), and possibly for other reasons.
 			echo "[rejected for unknown reason - please check on the audio file and associated folder permissions]" >> "$repo_root"/audio_lab_email_body.txt

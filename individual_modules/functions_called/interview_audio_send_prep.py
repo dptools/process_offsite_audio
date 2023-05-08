@@ -53,6 +53,20 @@ def move_audio_to_send(interview_type, data_root, study, ptID, length_cutoff, db
 			error_rename = "2err" + filen
 			os.rename(filen, error_rename)
 			continue # move onto next file
+		# for psychs interviews, stop session splits from sending multiple files from a given day
+		if interview_type == "psychs":
+			if dpdash_qc[dpdash_qc["day"]==cur_day].shape[0] > 1:
+				earliest_sess_num = dpdash_qc[dpdash_qc["day"]==cur_day].sort_values(by="session")["session"].tolist()[0]
+				if cur_sess != earliest_sess_num:
+					# error code 3 will denote multiple psychs from same day and this is not first
+					error_rename = "3err" + filen
+					os.rename(filen, error_rename)
+					continue # move onto next file
+
+		# TODO - ideally we will start not sending all psychs interviews period
+		# the logic for that can be inserted here, however we will choose to filter if it is based on existing day/session info! 
+		# for any that will be rejected for that reason, copy the rename/continue steps for other errors above, now assigning code 4
+		# then would just need to add a new error code to the list of reasons for rejection in the run email writer bash (.sh) script
 
 		# if reach this point file is okay, should be moved to to_send
 		# will be renamed so that the matching txt files later pulled from transcribme can be kept as is
