@@ -181,7 +181,6 @@ def interview_transcript_qc(interview_type, data_root, study, ptID):
 			maxspaces.append(np.nan)
 			minspacesweighted.append(np.nan)
 			maxspacesweighted.append(np.nan)
-			minspacesweightedabs.append(np.nan)
 		else:
 			# use round so values are reasonably viewable on DPDash
 			minspaces.append(round(np.nanmin(differences_list),3))
