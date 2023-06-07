@@ -49,7 +49,7 @@ chgrp -R prescient /mnt/prescient/Prescient_production/PHOENIX/PROTECTED/box_tra
 chmod -R 770 /mnt/prescient/Prescient_production/PHOENIX/*/*/processed
 
 # finally run the utility for stats combined across sites
-bash /home/cho/soft/process_offsite_audio/amp_scz_launch/final_all_sites_utility.sh /mnt/prescient/Prescient_production/PHOENIX "mennis2@partners.org,philip.wolff@yale.edu,linying.li@emory.edu" PrescientProduction "yes"
+bash /home/cho/soft/process_offsite_audio/amp_scz_launch/final_all_sites_utility.sh /mnt/prescient/Prescient_production/PHOENIX "HRAHIMIEICHI@partners.org,linying.li@emory.edu" PrescientProduction "yes"
 
 # note Kevin's code now handles the Mediaflux push, so that is not needed here!
 
@@ -57,7 +57,7 @@ bash /home/cho/soft/process_offsite_audio/amp_scz_launch/final_all_sites_utility
 # note that running the above final_all_sites_utility is necessary for the below to work, in addition to having run the rest of the pipeline (as it concats extra CSVs for this)
 # this is only done for production
 if [[ $(date +%u) == 1 ]]; then
-	pii_email_list="mennis2@partners.org,sophie.tod@orygen.org.au,pwolff@emory.edu,zarina.bilgrami@emory.edu,linying.li@emory.edu,eliebenthal@mclean.harvard.edu,HRAHIMIEICHI@partners.org"
-	deid_email_list="mennis@g.harvard.edu,pwolff@emory.edu,zarina.bilgrami@emory.edu,linying.li@emory.edu,jtbaker@partners.org,eliebenthal@mclean.harvard.edu,HRAHIMIEICHI@partners.org,sylvain.bouix@etsmtl.ca,sophie.tod@orygen.org.au,dominic.dwyer@orygen.org.au,barnaby.nelson@orygen.org.au"
+	pii_email_list="sophie.tod@orygen.org.au,pwolff@emory.edu,zarina.bilgrami@emory.edu,linying.li@emory.edu,eliebenthal@mclean.harvard.edu,HRAHIMIEICHI@partners.org"
+	deid_email_list="sophie.tod@orygen.org.au,pwolff@emory.edu,zarina.bilgrami@emory.edu,linying.li@emory.edu,eliebenthal@mclean.harvard.edu,HRAHIMIEICHI@partners.org,jtbaker@partners.org,sylvain.bouix@etsmtl.ca,dominic.dwyer@orygen.org.au,barnaby.nelson@orygen.org.au"
 	bash /home/cho/soft/process_offsite_audio/amp_scz_launch/weekly_logging_utility.sh "$pii_email_list" "$deid_email_list" "yes"
 fi

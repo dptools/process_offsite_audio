@@ -107,7 +107,7 @@ def all_updates_email(output_root):
 		# compile the relevant info to write instead then
 		sites_list = list(set(warning_df["siteID"].tolist()))
 		with open(final_warning_path, 'a') as fa:
-			fa.write("Found new processing warnings for the following sites (please see attached CSV for more info):")
+			fa.write("Found new processing warnings for the following sites:")
 			for cur_site in sites_list:
 				fa.write("\n")
 				fa.write(cur_site)
@@ -124,7 +124,7 @@ def all_updates_email(output_root):
 		# compile the relevant info to write instead then
 		sites_list = list(set(sop_df["siteID"].tolist()))
 		with open(final_warning_path, 'a') as fa:
-			fa.write("Found new raw SOP violations for the following sites (please see attached CSV for more info):")
+			fa.write("Found new raw SOP violations for the following sites:")
 			for cur_site in sites_list:
 				fa.write("\n")
 				fa.write(cur_site)

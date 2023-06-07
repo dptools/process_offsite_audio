@@ -128,10 +128,16 @@ for p in *; do # loop over all patients in the specified study folder on PHOENIX
 				# first decide whether corresponding transcript will either be moved out of prescreening folder (not screened) or sent to site for review
 				if [[ $random_phase = 1 ]]; then
 					# generate a random number between 1 and 10 (inclusive)
-					cur_assign=$((1 + $RANDOM % 10))
 					# only if cur assign is 5 will we proceed (10% chance)
+					#cur_assign=$((1 + $RANDOM % 10))
+					cur_assign=1
+					# update: turning off the random assignment phase so no sites will get extra redaction review transcripts after their first batch of 5 is filled
+					# to revert: uncomment above cur_assign line (132) containing RANDOM assignment and comment out the new line (133) hard coding cur_assign to be 1 (which will auto pass the transcripts)
 				else
 					cur_assign=5 # this will automatically trigger the movement if we are not in random mode!
+					# note a site can end up with a few more than 5 for redaction review as part of this initial phase, because if they have < 5 so far on a particular day then all ones returned by TranscribeMe that day will be sent for manual review
+					# the rate TrancribeMe is able to finish these long interview transcripts (and the rate sites upload in the first place) should prevent this from getting especially large though 
+					# (more like it might accidentally turn out to be 6 or 7 sometimes)
 				fi
 
 				# now rename the audio file as needed (same in whatever case)

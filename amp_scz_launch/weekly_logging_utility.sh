@@ -35,7 +35,7 @@ echo "See attached" > dummy.txt
 
 if [[ -z ${mail_attach} ]]; then 
 	# then actually send SOP and file accounting email to those that can access PII
-	mail -s "Weekly Pronet Interviews Accounting Log" -A all-SOP-warnings.csv -A all-processed-accounting.csv "$pii_email_list" < dummy.txt
+	mail -s "Weekly Pronet Interviews Accounting Log" -A all-SOP-warnings.csv -A all-processed-warnings.csv -A all-processed-accounting.csv "$pii_email_list" < dummy.txt
 
 	# finally send combined QC email to the larger list - include additional summary stuff is above python script worked, checking for figs and then if not for tables
 	if [[ -e all-dists-by-type.pdf ]]; then
@@ -47,7 +47,7 @@ if [[ -z ${mail_attach} ]]; then
 	fi
 else
 	# then actually send SOP and file accounting email to those that can access PII
-	mail -s "Weekly Prescient Interviews Accounting Log" -a all-SOP-warnings.csv -a all-processed-accounting.csv "$pii_email_list" < dummy.txt
+	mail -s "Weekly Prescient Interviews Accounting Log" -a all-SOP-warnings.csv -a all-processed-warnings.csv -a all-processed-accounting.csv "$pii_email_list" < dummy.txt
 
 	# finally send combined QC email to the larger list - again checking for python outputs
 	if [[ -e all-dists-by-type.pdf ]]; then
