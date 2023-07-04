@@ -33,7 +33,7 @@ site_email_list="sophie.tod@orygen.org.au,preshk@hku.hk"
 # finally should also supply current server label (mainly for dev versus prod)
 server_version="Production"
 # for U24 now have language marker setting to add to the files that are uploaded to TranscribeMe, to alert them of what language the audio will be in
-transcription_language="CHINESE"
+transcription_language="CANTONESE"
 export lab_email_list
 export site_email_list
 export server_version
