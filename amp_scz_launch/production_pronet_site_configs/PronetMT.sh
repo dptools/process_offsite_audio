@@ -33,7 +33,7 @@ site_email_list="zarina.bilgrami@emory.edu,samantha.aversa.comtl@ssss.gouv.qc.ca
 # finally should also supply current server label (mainly for dev versus prod)
 server_version="Production"
 # for U24 now have language marker setting to add to the files that are uploaded to TranscribeMe, to alert them of what language the audio will be in
-transcription_language="FRENCH" # this one may be incorrect on occassion, but sticking with one language assignment per site
+transcription_language="ENGLISH" # this one may be incorrect on occassion, but sticking with one language assignment per site
 export lab_email_list
 export site_email_list
 export server_version
