@@ -29,7 +29,7 @@ export auto_send_limit_bool
 # first addresses for the more thorough updates on most recent files
 lab_email_list="philip.wolff@yale.edu,jtbaker@partners.org"
 # then addresses to send the site review notification to
-site_email_list="sophie.tod@orygen.org.au,gurpreet_rekhi@imh.com.sg,mei_san_ang@imh.com.sg,yi_chian_chua@imh.com.sg,amirah_m_iskandar@imh.com.sg"
+site_email_list="sophie.tod@orygen.org.au,isabelle.scott@orygen.org.au,beau-luke.colton@orygen.org.au,gurpreet_rekhi@imh.com.sg,mei_san_ang@imh.com.sg,yi_chian_chua@imh.com.sg,amirah_m_iskandar@imh.com.sg"
 # finally should also supply current server label (mainly for dev versus prod)
 server_version="Production"
 # for U24 now have language marker setting to add to the files that are uploaded to TranscribeMe, to alert them of what language the audio will be in

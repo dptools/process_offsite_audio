@@ -2,7 +2,7 @@
 
 # basic path settings
 data_root="/mnt/prescient/Prescient_production/PHOENIX"
-study="PrescientLS"
+study="PrescientST"
 export data_root
 export study
 
@@ -29,11 +29,11 @@ export auto_send_limit_bool
 # first addresses for the more thorough updates on most recent files
 lab_email_list="philip.wolff@yale.edu,jtbaker@partners.org"
 # then addresses to send the site review notification to
-site_email_list="sophie.tod@orygen.org.au,isabelle.scott@orygen.org.au,beau-luke.colton@orygen.org.au,dpaccqueries_ls@chuv.ch"
+site_email_list="sophie.tod@orygen.org.au,isabelle.scott@orygen.org.au,beau-luke.colton@orygen.org.au,tadasme@ciq.uchile.cl"
 # finally should also supply current server label (mainly for dev versus prod)
 server_version="Production"
 # for U24 now have language marker setting to add to the files that are uploaded to TranscribeMe, to alert them of what language the audio will be in
-transcription_language="FRENCH"
+transcription_language="SPANISH"
 export lab_email_list
 export site_email_list
 export server_version
