@@ -69,8 +69,15 @@ def interview_raw_audio_account(interview_type, data_root, study, ptID):
 		# check that this hasn't already been processed using the raw path before proceeding, otherwise skip
 		if raw_audio_path in processed_list:
 			continue
-		audio_rename = line_list[1].rstrip()
-		audio_rename_trans = line_list[2].rstrip()
+
+		try:
+			audio_rename = line_list[1].rstrip()
+			audio_rename_trans = line_list[2].rstrip()
+		except IndexError as e:
+			print(f"Error in filename map for {ptID} {interview_type} {filename} - skipping")
+			print(e)
+			continue
+
 		# title is date + time
 		interview_date = filename.split("+")[0]
 		interview_time = filename.split("+")[1].split(".txt")[0]
