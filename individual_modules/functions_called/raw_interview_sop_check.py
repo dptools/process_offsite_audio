@@ -77,6 +77,10 @@ def interview_raw_account(interview_type, data_root, study, ptID):
 		if cur_name_bool == 1 and num_valid_audio == 1 and num_valid_video == 1:
 			continue
 
+		# psychs interviews are not required to have video, so if audio is fine then can skip!
+		if interview_type == "psychs" and cur_name_bool == 1 and num_valid_audio == 1:
+			continue
+
 		# otherwise we know we need to actually add the row, append values found to list
 		raw_name_list.append(foldername)
 		folder_bool_list.append(cur_folder_bool)
