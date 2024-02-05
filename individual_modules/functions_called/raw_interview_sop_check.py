@@ -50,6 +50,11 @@ def interview_raw_account(interview_type, data_root, study, ptID):
 			if interview_type == "psychs" and foldername.endswith(".WAV") and len(foldername) == 18:
 				# in this case it is valid standalone wav
 				continue
+
+			# if starts with .checksum then it is a checksum file, so skip
+			if foldername.startswith(".checksum"):
+				continue
+
 			# otherwise we have a standalone file that is not allowed (and not previously registered) so it should be added to list for this CSV
 			raw_name_list.append(foldername)
 			folder_bool_list.append(0)
