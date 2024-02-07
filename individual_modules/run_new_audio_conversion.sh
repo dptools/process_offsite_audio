@@ -82,10 +82,14 @@ for p in *; do
 				# want exactly one audio file on the top level of Zoom folder here, as no one should be modifying the output returned by Zoom
 				num_mono=$(find . -maxdepth 1 -name "audio*.m4a" -printf '.' | wc -m)
 				if [[ $num_mono == 0 ]]; then
-					# still possible to be missing audio entirely
-					echo "(open offsite interview ${folder} is missing a properly formatted interview audio file)"
-					cd .. # leave interview folder before continuing
-					continue
+					# Check if iPad audio file exists
+					num_mono=$(find . -maxdepth 1 -name "ipadaud*.m4a" -printf '.' | wc -m)
+					if [[ $num_mono == 0 ]]; then
+						# still possible to be missing audio entirely
+						echo "(open offsite interview ${folder} is missing a properly formatted interview audio file)"
+						cd .. # leave interview folder before continuing
+						continue
+					fi
 				fi
 				if [[ $num_mono -gt 1 ]]; then
 					# this can happen if a Zoom session remains open but recording is stoppped and restarted
@@ -97,7 +101,7 @@ for p in *; do
 
 				# at this point can now process the mono audio that was identified
 				# this "loop" will just go through the 1 file
-				for file in audio*.m4a; do
+				for file in audio*.m4a ipadaud*.m4a; do
 					# get metadata info for naming converted file
 					date=$(echo "$folder" | awk -F ' ' '{print $1}') 
 					time=$(echo "$folder" | awk -F ' ' '{print $2}')
