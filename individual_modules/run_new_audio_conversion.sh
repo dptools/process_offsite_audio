@@ -162,6 +162,7 @@ for p in *; do
 		for folder in *; do
 			# escape spaces and other issues in folder name
 			folder_formatted=$(printf %q "$folder")
+			multi_part=0
 
 			# first check it is a directory, because if not we expect it is already a wav file, and probably an onsite
 			# need to use eval along with the %q command
@@ -173,9 +174,28 @@ for p in *; do
 				if [[ ${#name} != 14 ]]; then
 					# note the pipeline will have issues later on if this WAV file does not conform to the expected date/time naming convention standard
 					# using this as a crude way to check for now that the file has the expected info by checking for the expected number of digits (which should be static)
-					echo "(psychs interview ${folder} is incorrectly named, skipping)"
-					continue
+
+					# Check if WAV file has multiple parts
+					# If it has multiple parts, it will be named YYYYMMDDHHMMSS_P#.WAV
+
+					if [[ ${#name} != 17 ]]; then
+						echo "(psychs interview ${folder} is the wrong file format, skipping)"
+						continue
+					fi
+
+					# Get the first part of the name
+					name=$(echo "$folder" | awk -F '_' '{print $1}')
+					# Get the second part of the name
+					part=$(echo "$folder" | awk -F '_' '{print $2}')
+					# Check if second part is P# or not
+					if [[ $part != "P"* ]]; then
+						echo "(psychs interview ${folder} is the wrong file format, skipping)"
+						continue
+					else
+						multi_part=1
+					fi
 				fi
+
 				if [[ ${ext} != "WAV" ]]; then
 					# also confirm the file type is actually right
 					echo "(psychs interview ${folder} is the wrong file format, skipping)"
@@ -185,7 +205,18 @@ for p in *; do
 				# now proceed with copying the file if it meets checks
 				# no need to eval or use folder_formatted either, as no spaces should appear in onsite name
 				if [[ ! -e ../../../../processed/"$p"/interviews/psychs/temp_audio/"$name".wav && ! -e ../../../../processed/"$p"/interviews/psychs/sliding_window_audio_qc/"$name".csv ]]; then
-					cp "$folder" ../../../../processed/"$p"/interviews/psychs/temp_audio/"$name".wav
+					if multi_part==1; then
+						# merge all parts into one file
+						log_timestamp_ffmpeg=`date +%s`
+
+						merge_list_file="$repo_root"/logs/"$study"/"$p"_"$name"_merge_list.txt
+						for f in ./"$name"_P*.WAV; do echo "file '$PWD/$f'"; done > "$merge_list_file"
+
+						eval ffmpeg -f concat -safe 0 -i "$merge_list_file" -c copy ../../../../processed/"$p"/interviews/psychs/temp_audio/"$name".wav &> "$repo_root"/logs/"$study"/ffmpeg_"$log_timestamp_ffmpeg".txt
+					else
+						# Copy the file to the temp_audio folder
+						cp "$folder" ../../../../processed/"$p"/interviews/psychs/temp_audio/"$name".wav
+					fi
 					# initialize txt files for email bodies too if this is a pipeline call, as we have found a new audio to process for the site
 					if [[ $pipeline = "Y" ]]; then
 						# it is okay to just redo this every time since it will restart the file, all the other updates come way downstream
