@@ -57,7 +57,7 @@ bash /home/cho/soft/process_offsite_audio/amp_scz_launch/final_all_sites_utility
 # note that running the above final_all_sites_utility is necessary for the below to work, in addition to having run the rest of the pipeline (as it concats extra CSVs for this)
 # this is only done for production
 if [[ $(date +%u) == 1 ]]; then
-	pii_email_list="sophie.tod@orygen.org.au,pwolff@emory.edu,zarina.bilgrami@emory.edu,linying.li@emory.edu,eliebenthal@mclean.harvard.edu,HRAHIMIEICHI@partners.org"
-	deid_email_list="sophie.tod@orygen.org.au,pwolff@emory.edu,zarina.bilgrami@emory.edu,linying.li@emory.edu,eliebenthal@mclean.harvard.edu,HRAHIMIEICHI@partners.org,jtbaker@partners.org,sylvain.bouix@etsmtl.ca,dominic.dwyer@orygen.org.au,barnaby.nelson@orygen.org.au"
+	pii_email_list="sophie.tod@orygen.org.au,pwolff@emory.edu,zarina.bilgrami@emory.edu,linying.li@emory.edu,eliebenthal@mclean.harvard.edu,HRAHIMIEICHI@partners.org,dmohandass@mgh.harvard.edu"
+	deid_email_list="sophie.tod@orygen.org.au,pwolff@emory.edu,zarina.bilgrami@emory.edu,linying.li@emory.edu,eliebenthal@mclean.harvard.edu,HRAHIMIEICHI@partners.org,jtbaker@partners.org,sylvain.bouix@etsmtl.ca,dominic.dwyer@orygen.org.au,barnaby.nelson@orygen.org.au,dmohandass@mgh.harvard.edu"
 	bash /home/cho/soft/process_offsite_audio/amp_scz_launch/weekly_logging_utility.sh "$pii_email_list" "$deid_email_list" "yes"
 fi
