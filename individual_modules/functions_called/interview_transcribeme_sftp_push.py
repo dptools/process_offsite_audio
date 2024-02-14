@@ -132,7 +132,7 @@ def get_transcription_language(subject_id: str, study: str, data_root: Path) -> 
 		else:
 			return None
 
-		return map_transcription_language(int(language_code))
+	return map_transcription_language(int(language_code))
 
 
 

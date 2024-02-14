@@ -8,6 +8,10 @@ transcribeme_password="$4"
 transcription_language="$5"
 auto_send_limit_bool="$6"
 auto_send_limit="$7"
+log_file="$8"
+
+exec > >(tee -ia "$log_file")
+exec 2> >(tee -ia "$log_file" >&2)
 
 echo "Beginning audio SFTP script for study ${study}"
 

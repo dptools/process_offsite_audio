@@ -9,7 +9,7 @@ fi
 config_path=$1
 
 # start by getting the absolute path to the directory this script is in, which will be the top level of the repo
-# this way script will work even if the repo is downloaded to a new location, rather than relying on hard coded paths to where I put the repo. 
+# this way script will work even if the repo is downloaded to a new location, rather than relying on hard coded paths to where I put the repo.
 full_path=$(realpath $0)
 repo_root=$(dirname $full_path)
 # export the path to the repo for scripts called by this script to also use
@@ -60,10 +60,13 @@ if [[ ! -d ${repo_root}/logs/${study}/emails_sent ]]; then
 	mkdir "$repo_root"/logs/"$study"/emails_sent
 fi
 # save with unique timestamp (unix seconds)
-log_timestamp=`date +%s`
+log_timestamp=$(date +%s)
 # test using console and log file simultaneously
-exec >  >(tee -ia "$repo_root"/logs/"$study"/audio_process_logging_"$log_timestamp".txt)
-exec 2> >(tee -ia "$repo_root"/logs/"$study"/audio_process_logging_"$log_timestamp".txt >&2)
+
+# redirect stdout and stderr to a log file
+log_file="$repo_root"/logs/"$study"/audio_process_logging_"$log_timestamp".txt
+exec > >(tee -ia "$log_file")
+exec 2> >(tee -ia "$log_file" >&2)
 
 # let user know script is starting
 echo ""
@@ -135,7 +138,7 @@ for p in *; do
 	# so solution for now is just to exit the script if there are preexisting to_send files for this study
 	# then let user know the outstanding files should be dealt with outside of the main pipeline
 	if [ $auto_send_on = "Y" ] || [ $auto_send_on = "y" ]; then
-		if [[ -d "$data_root"/PROTECTED/"$study"/processed/"$p"/interviews/open/audio_to_send ]]; then 
+		if [[ -d "$data_root"/PROTECTED/"$study"/processed/"$p"/interviews/open/audio_to_send ]]; then
 			# know to_send exists for this patient now, so need it to be empty to continue the script
 			cd "$data_root"/PROTECTED/"$study"/processed/"$p"/interviews/open
 			if [ ! -z "$(ls -A audio_to_send)" ]; then
@@ -149,7 +152,7 @@ for p in *; do
 			fi
 		fi
 		# need to do everyting for psychs separately from open
-		if [[ -d "$data_root"/PROTECTED/"$study"/processed/"$p"/interviews/psychs/audio_to_send ]]; then 
+		if [[ -d "$data_root"/PROTECTED/"$study"/processed/"$p"/interviews/psychs/audio_to_send ]]; then
 			# know to_send exists for this patient now, so need it to be empty to continue the script
 			cd "$data_root"/PROTECTED/"$study"/processed/"$p"/interviews/psychs
 			if [ ! -z "$(ls -A audio_to_send)" ]; then
@@ -164,7 +167,7 @@ for p in *; do
 		fi
 
 		# do a similar check for a temp_audio folder. if one already exists additional audio would be accidentally sent to TranscribeMe
-		if [[ -d "$data_root"/PROTECTED/"$study"/processed/"$p"/interviews/open/temp_audio ]]; then 
+		if [[ -d "$data_root"/PROTECTED/"$study"/processed/"$p"/interviews/open/temp_audio ]]; then
 			cd "$data_root"/PROTECTED/"$study"/processed/"$p"/interviews/open
 			if [ ! -z "$(ls -A temp_audio)" ]; then
 				echo "Automatic transcription was selected, but there are preexisting audio files in decrypted_audio folder(s) under this study"
@@ -177,7 +180,7 @@ for p in *; do
 			fi
 		fi
 		# again repeat for psychs
-		if [[ -d "$data_root"/PROTECTED/"$study"/processed/"$p"/interviews/psychs/temp_audio ]]; then 
+		if [[ -d "$data_root"/PROTECTED/"$study"/processed/"$p"/interviews/psychs/temp_audio ]]; then
 			cd "$data_root"/PROTECTED/"$study"/processed/"$p"/interviews/psychs
 			if [ ! -z "$(ls -A temp_audio)" ]; then
 				echo "Automatic transcription was selected, but there are preexisting audio files in decrypted_audio folder(s) under this study"
@@ -228,13 +231,13 @@ echo "Current time: ${now}"
 echo ""
 
 # if auto send is on, will now actually send the set aside audio files and prepare email to alert relevant lab members/transcribeme
-# the below script will also locally move any transcript successfully sent from the to_send subfolder to the pending_audio subfolder 
+# the below script will also locally move any transcript successfully sent from the to_send subfolder to the pending_audio subfolder
 # (if to_send is empty at the end it will be deleted, otherwise an error message to review the transcripts left in that folder will be included in email)
 if [ $auto_send_on = "Y" ] || [ $auto_send_on = "y" ]; then
 	echo "Sending files for transcription"
 
 	# run push script
-	bash "$repo_root"/individual_modules/run_transcription_push.sh "$data_root" "$study" "$transcribeme_username" "$transcribeme_password" "$transcription_language" "$auto_send_limit_bool" "$auto_send_limit"
+	bash "$repo_root"/individual_modules/run_transcription_push.sh "$data_root" "$study" "$transcribeme_username" "$transcribeme_password" "$transcription_language" "$auto_send_limit_bool" "$auto_send_limit" "$log_file"
 	echo ""
 
 	# add current time for runtime tracking purposes
@@ -248,15 +251,15 @@ if [ $auto_send_on = "Y" ] || [ $auto_send_on = "y" ]; then
 	echo ""
 
 	# finally, deal with email alerts. if no audio was successfully uploaded, there will be no transcribeme email file. only send emails if there is an update to report on
-	if [[ -e "$repo_root"/audio_lab_email_body.txt ]]; then 
+	if [[ -e "$repo_root"/audio_lab_email_body.txt ]]; then
 		echo "Emailing status update to lab"
-		# send the email notifying lab members about audio files successfully pushed, with info about any errors or excluded files. 
-		mail -s "[${study} ${server_version} Interview Pipeline Updates] New Audio Processed" "$lab_email_list" < "$repo_root"/audio_lab_email_body.txt
+		# send the email notifying lab members about audio files successfully pushed, with info about any errors or excluded files.
+		mail -s "[${study} ${server_version} Interview Pipeline Updates] New Audio Processed" "$lab_email_list" <"$repo_root"/audio_lab_email_body.txt
 		# move the email to logs folder for reference if there was actual content
 		mv "$repo_root"/audio_lab_email_body.txt "$repo_root"/logs/"$study"/emails_sent/audio_lab_email_body_"$log_timestamp".txt
-	else 
+	else
 		echo "No new audio updates for this study, so no email to send"
-	fi	
+	fi
 	echo ""
 
 	# add current time for runtime tracking purposes
