@@ -192,7 +192,7 @@ for p in *; do
 						echo "Audio Processing Updates for ${study}:" > "$repo_root"/audio_lab_email_body.txt
 					fi
 					# now also log to the filename map
-					echo "${data_root}/PROTECTED/${study}/raw/${p}/interviews/psychs/${folder}" > ../../../../processed/"$p"/interviews/psychs/audio_filename_maps/"$date"+"$time".txt
+					echo "${data_root}/PROTECTED/${study}/raw/${p}/interviews/psychs/${folder}" > ../../../../processed/"$p"/interviews/psychs/audio_filename_maps/"$name".txt
 				fi
 
 				# done with file for now if it is a standalone onsite 
