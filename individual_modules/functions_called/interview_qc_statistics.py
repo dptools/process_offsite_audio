@@ -233,15 +233,9 @@ def interview_qc_statistics(interview_type, data_root, study, summary_lab_email_
 		new_pt_stats_df = pd.concat([pt_all_summary_df, all_summary_df])
 		new_pt_stats_df.reset_index(drop=True, inplace=True)
 
-		# now time to save this one, first concatenating with existing log if needed
+		# now time to save this
 		output_path = study + "_" + ptID + "_" + interview_type + "InterviewSummaryStatsLog.csv"
-		if os.path.exists(output_path):
-			old_pt_stats_df = pd.read_csv(output_path)
-			final_pt_stats_df = pd.concat([old_pt_stats_df, new_pt_stats_df])
-			final_pt_stats_df.reset_index(drop=True, inplace=True)
-			final_pt_stats_df.to_csv(output_path, index=False)
-		else:
-			new_pt_stats_df.to_csv(output_path, index=False)
+		new_pt_stats_df.to_csv(output_path, index=False)
 
 		# leave patient specific dir at end of loop
 		os.chdir(os.path.join(data_root, "GENERAL", study, "processed"))
