@@ -1,12 +1,138 @@
 #!/usr/bin/env python
 
-import pysftp
 import os
 import sys
+from pathlib import Path
+from typing import Optional, Dict
+import pandas as pd
+import json
 
 # make sure if paramiko throws an error it will get mentioned in log files
 import logging
 logging.basicConfig()
+
+import pysftp
+
+def map_transcription_language(language_code: int) -> str:
+	"""
+	Maps the language code to the language name.
+
+	Can be found in Data_Dictionary.
+
+	Parameters:
+		language_code: The language code.
+
+	Returns:
+		The language name.
+	"""
+
+	# 1, Cantonese | 2, Danish | 3, Dutch | 4, English | 5, French
+	# 6, German | 7, Italian | 8, Korean | 9, Mandarin (TBC) | 10, Spanish
+	language_code_map: Dict[int, str] = {
+		1: "Cantonese",
+		2: "Danish",
+		3: "Dutch",
+		4: "English",
+		5: "French",
+		6: "German",
+		7: "Italian",
+		8: "Korean",
+		9: "Mandarin",
+		10: "Spanish"
+	}
+
+	return language_code_map[language_code]
+
+
+def get_transcription_language_csv(sociodemographics_file_csv_file: Path) -> Optional[int]:
+	"""
+	Reads the sociodemographics survey and attempts to get the language variable.
+	Prescient uses RPMS CSVs for surveys.
+
+	Returns None if the language is not found.
+
+	Parameters:
+		sociodemographics_file_csv_file: The path to the sociodemographics survey CSV file.
+
+	Returns:
+		The language code if found, otherwise None.
+	"""
+	language_variable = "chrdemo_assess_lang"
+	sociodemographics_df = pd.read_csv(sociodemographics_file_csv_file)
+
+	try:
+		language_variable_value = sociodemographics_df[language_variable].iloc[0]
+	except KeyError:
+		return None
+	
+	# Check if language is missing
+	if pd.isna(language_variable_value):
+		return None
+	
+	return int(language_variable_value)
+
+
+def get_transcription_language_json(json_file: Path) -> Optional[int]:
+	"""
+	Reads the REDCap JSON file and attempts to get the language variable.
+	ProNET uses REDCap for surveys.
+
+	Returns None if the language is not found.
+
+	Parameters:
+		json_file: The path to the sociodemographics survey JSON file.
+
+	Returns:
+		The language code if found, otherwise None.
+	"""
+	language_variable = "chrdemo_assess_lang"
+	with open(json_file, "r") as f:
+		json_data = json.load(f)
+	
+	for event_data in json_data:
+		if language_variable in event_data:
+			value = event_data[language_variable]
+			if value != "":
+				return int(value)
+	
+	return None
+
+
+def get_transcription_language(subject_id: str, study: str, data_root: Path) -> Optional[str]:
+	"""
+	Attempts to get the transcription language for the participant from the sociodemographics survey.
+
+	Returns None if the language is not found.
+
+	Parameters:
+		subject_id: The participant's ID.
+		study: The study name.
+		data_root: The root directory of the data.
+
+	Returns:
+		The transcription language if found, otherwise None.
+	"""
+
+	data_root = Path(data_root)
+	surveys_root = data_root / "PROTECTED" / study / "raw" / subject_id / "surveys"
+
+	# Get sociodemographics survey
+	sociodemographics_files = surveys_root.glob("*sociodemographics*.csv")
+
+	# Check if sociodemographics survey exists
+	if sociodemographics_files:
+		# Read sociodemographics survey
+		sociodemographics_file = list(sociodemographics_files)[0]
+		language_code = get_transcription_language_csv(sociodemographics_file)
+	else:
+		json_files = surveys_root.glob("*.Pronet.json")
+		if json_files:
+			json_file = list(json_files)[0]
+			language_code = get_transcription_language_json(json_file)
+		else:
+			return None
+
+	return map_transcription_language(int(language_code))
 
 def transcript_pull(interview_type, data_root, study, ptID, username, password, transcription_language, pipeline=False, lab_email_path=None):
 	# track transcripts that got properly pulled this time, for use in cleaning up server later
@@ -30,6 +156,15 @@ def transcript_pull(interview_type, data_root, study, ptID, username, password, 
 		return
 
 	print("Pulling new " + interview_type + " transcripts to server for participant " + ptID + " (if available)")
+
+	try:
+		sociodemographics_language = get_transcription_language(subject_id=ptID, study=study, data_root=data_root)
+		if sociodemographics_language is not None:
+			transcription_language = sociodemographics_language
+	except Exception as e:
+		print(f"Error getting transcription language from sociodemographics survey: {e}")
+		print(f"Using default transcription language: {transcription_language}")
+		pass
 	
 	for filename in cur_pending:
 		# setup expected source filepath and desired destination filepath
