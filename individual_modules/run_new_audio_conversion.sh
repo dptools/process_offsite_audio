@@ -123,6 +123,8 @@ for p in *; do
 						fi
 						# now also log to the filename map
 						echo "${data_root}/PROTECTED/${study}/raw/${p}/interviews/open/${folder}/${file}" > ../../../../../processed/"$p"/interviews/open/audio_filename_maps/"$date"+"$time".txt
+					else
+						echo "Audio file for ${date} ${time} already exists, skipping"
 					fi
 				done
 
@@ -150,6 +152,8 @@ for p in *; do
 					fi
 					# now also log to the filename map
 					echo "${data_root}/PROTECTED/${study}/raw/${p}/interviews/open/${folder}/${file}" > ../../../../processed/"$p"/interviews/open/audio_filename_maps/"$date"+"$time".txt
+				else
+					echo "Audio file for ${date} ${time} already exists, skipping"
 				fi
 			fi
 		done
@@ -193,6 +197,8 @@ for p in *; do
 					fi
 					# now also log to the filename map
 					echo "${data_root}/PROTECTED/${study}/raw/${p}/interviews/psychs/${folder}" > ../../../../processed/"$p"/interviews/psychs/audio_filename_maps/"$name".txt
+				else
+					echo "Audio file for ${name} already exists, skipping"
 				fi
 
 				# done with file for now if it is a standalone onsite 
@@ -257,6 +263,8 @@ for p in *; do
 							eval ffmpeg -i "$file" ../../../../../processed/"$p"/interviews/psychs/temp_audio/"$date"+"$time".wav &> /dev/null
 							# ignore error outside of pipeline
 						fi
+					else
+						echo "Audio file for ${date} ${time} already exists, skipping"
 					fi
 					# now also log to the filename map
 					echo "${data_root}/PROTECTED/${study}/raw/${p}/interviews/psychs/${folder}/${file}" > ../../../../../processed/"$p"/interviews/psychs/audio_filename_maps/"$date"+"$time".txt
@@ -286,6 +294,8 @@ for p in *; do
 					fi
 					# now also log to the filename map
 					echo "${data_root}/PROTECTED/${study}/raw/${p}/interviews/psychs/${folder}/${file}" > ../../../../processed/"$p"/interviews/psychs/audio_filename_maps/"$date"+"$time".txt
+				else
+					echo "Audio file for ${date} ${time} already exists, skipping"
 				fi
 			fi
 		done
