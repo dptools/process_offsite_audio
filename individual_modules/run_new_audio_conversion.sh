@@ -124,7 +124,7 @@ for p in *; do
 						# now also log to the filename map
 						echo "${data_root}/PROTECTED/${study}/raw/${p}/interviews/open/${folder}/${file}" > ../../../../../processed/"$p"/interviews/open/audio_filename_maps/"$date"+"$time".txt
 					else
-						echo "Audio file for ${date} ${time} already exists, skipping"
+						echo "OPEN: Audio file for ${date} ${time} already exists, skipping"
 					fi
 				done
 
@@ -153,7 +153,7 @@ for p in *; do
 					# now also log to the filename map
 					echo "${data_root}/PROTECTED/${study}/raw/${p}/interviews/open/${folder}/${file}" > ../../../../processed/"$p"/interviews/open/audio_filename_maps/"$date"+"$time".txt
 				else
-					echo "Audio file for ${date} ${time} already exists, skipping"
+					echo "OPEN: Audio file for ${date} ${time} already exists, skipping"
 				fi
 			fi
 		done
@@ -198,7 +198,7 @@ for p in *; do
 					# now also log to the filename map
 					echo "${data_root}/PROTECTED/${study}/raw/${p}/interviews/psychs/${folder}" > ../../../../processed/"$p"/interviews/psychs/audio_filename_maps/"$name".txt
 				else
-					echo "Audio file for ${name} already exists, skipping"
+					echo "PSYCHS: Audio file for ${name} already exists, skipping"
 				fi
 
 				# done with file for now if it is a standalone onsite 
@@ -264,7 +264,7 @@ for p in *; do
 							# ignore error outside of pipeline
 						fi
 					else
-						echo "Audio file for ${date} ${time} already exists, skipping"
+						echo "PSYCHS: Audio file for ${date} ${time} already exists, skipping"
 					fi
 					# now also log to the filename map
 					echo "${data_root}/PROTECTED/${study}/raw/${p}/interviews/psychs/${folder}/${file}" > ../../../../../processed/"$p"/interviews/psychs/audio_filename_maps/"$date"+"$time".txt
@@ -295,7 +295,7 @@ for p in *; do
 					# now also log to the filename map
 					echo "${data_root}/PROTECTED/${study}/raw/${p}/interviews/psychs/${folder}/${file}" > ../../../../processed/"$p"/interviews/psychs/audio_filename_maps/"$date"+"$time".txt
 				else
-					echo "Audio file for ${date} ${time} already exists, skipping"
+					echo "PSYCHS: Audio file for ${date} ${time} already exists, skipping"
 				fi
 			fi
 		done
