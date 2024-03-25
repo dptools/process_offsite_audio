@@ -29,7 +29,7 @@ export auto_send_limit_bool
 # first addresses for the more thorough updates on most recent files
 lab_email_list="philip.wolff@yale.edu,jtbaker@partners.org"
 # then addresses to send the site review notification to
-site_email_list="zarina.bilgrami@emory.edu,mcalkins@pennmedicine.upenn.edu,Irena.Kesselring@Pennmedicine.upenn.edu,Alyssa.Bathery@Pennmedicine.upenn.edu"
+site_email_list="zarina.bilgrami@emory.edu,mcalkins@pennmedicine.upenn.edu,Irena.Kesselring@Pennmedicine.upenn.edu,Alyssa.Bathery@Pennmedicine.upenn.edu,alexandra.barnes@pennmedicine.upenn.edu"
 # finally should also supply current server label (mainly for dev versus prod)
 server_version="Production"
 # for U24 now have language marker setting to add to the files that are uploaded to TranscribeMe, to alert them of what language the audio will be in
