@@ -10,7 +10,7 @@ import pandas as pd
 # each call of function does so for one patient
 def interview_mono_rename(interview_type, data_root, study, ptID):
 	try:
-		study_metadata_path = os.path.join(data_root,"GENERAL",study,study + "_metadata.csv")
+		study_metadata_path = os.path.join(data_root,"PROTECTED",study,study + "_metadata.csv")
 		study_metadata = pd.read_csv(study_metadata_path)
 		patient_metadata = study_metadata[study_metadata["Subject ID"] == ptID]
 		consent_date_str = patient_metadata["Consent"].tolist()[0]

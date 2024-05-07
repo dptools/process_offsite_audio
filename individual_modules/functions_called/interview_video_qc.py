@@ -19,7 +19,7 @@ from feat import Detector
 def interview_video_qc(interview_type, data_root, study, ptID):
 	# if can't find valid metadata info for the patient, can't move forward here
 	try:
-		study_metadata_path = os.path.join(data_root,"GENERAL",study,study + "_metadata.csv")
+		study_metadata_path = os.path.join(data_root,"PROTECTED",study,study + "_metadata.csv")
 		study_metadata = pd.read_csv(study_metadata_path)
 		patient_metadata = study_metadata[study_metadata["Subject ID"] == ptID]
 		consent_date_str = patient_metadata["Consent"].tolist()[0]

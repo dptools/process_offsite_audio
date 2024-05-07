@@ -48,7 +48,7 @@ def interview_raw_audio_account(interview_type, data_root, study, ptID):
 	# get current consent date string for accounting purposes, as well as today's date
 	today_str = datetime.date.today().strftime("%Y-%m-%d")
 	# there must be a valid consent date for the patient already in order for there to be files in the filename map folder, which is checked by wrapper before calling
-	study_metadata_path = os.path.join(data_root,"GENERAL",study,study + "_metadata.csv")
+	study_metadata_path = os.path.join(data_root,"PROTECTED",study,study + "_metadata.csv")
 	study_metadata = pd.read_csv(study_metadata_path)
 	patient_metadata = study_metadata[study_metadata["Subject ID"] == ptID]
 	consent_date_str = patient_metadata["Consent"].tolist()[0]

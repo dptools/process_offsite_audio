@@ -41,7 +41,7 @@ if [[ ! -d ../GENERAL/$study/processed ]]; then
 	echo "Study ${study} folder improperly set up"
 	exit
 fi
-if [[ ! -e ../GENERAL/${study}/${study}_metadata.csv ]]; then
+if [[ ! -e ../PROTECTED/${study}/${study}_metadata.csv ]]; then
 	echo "Study ${study} missing metadata"
 	exit
 fi
