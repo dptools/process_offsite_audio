@@ -21,24 +21,24 @@ source "$config_path"
 # confirm study folder exists where it should, and has the expected GENERAL/PROTECTED and raw and processed folder paths
 cd "$data_root"/PROTECTED
 if [[ ! -d $study ]]; then
-	echo "Invalid data root path ${data_root} or study ID ${study}"
+	echo "Invalid data root path ${data_root} or study ID ${study} 1"
 	exit
 fi
 if [[ ! -d ../GENERAL/$study ]]; then
-	echo "Invalid data root path ${data_root} or study ID  ${study}"
+	echo "Invalid data root path ${data_root} or study ID  ${study} 2"
 	exit
 fi
 if [[ ! -d $study/raw ]]; then
-	echo "Study folder ${study} improperly set up"
+	echo "Study folder ${study} improperly set up 3"
 	exit
 fi
 if [[ ! -d $study/processed ]]; then
-	echo "Study folder ${study} improperly set up"
+	echo "Study folder ${study} improperly set up 4"
 	exit
 fi
 # don't care if there is a raw in GENERAL as I will never use that part, so excluding that check
 if [[ ! -d ../GENERAL/$study/processed ]]; then
-	echo "Study folder ${study} improperly set up"
+	echo "Study folder ${study} improperly set up 5"
 	exit
 fi
 if [[ ! -e ../PROTECTED/${study}/${study}_metadata.csv ]]; then
